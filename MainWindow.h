@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "CubeEdgeType.h"
+#include "GuitarFretboardPos.h"
 
 namespace Ui {
 class MainWindow;
@@ -20,16 +21,8 @@ public:
     ~MainWindow();
 
     // TODO: Add abstract music info, and specific types for piano, notes etc.
-    struct MusicInfo
-    {
-        MusicInfo(int str = 1, int fret = 0) : stringNumber(str), fretNumber(fret) {}
-
-        int stringNumber;
-        int fretNumber;
-    };
-
-    void setMaximumMusicInfo(const MusicInfo&);
-    MusicInfo musicInfoFor(EdgeType type) const;
+    void setMaxGuitarFretboardPos(const GuitarFretboardPos&);
+    GuitarFretboardPos guitarFretboardPos(EdgeType type) const;
 
     int soundDuration() const;
 

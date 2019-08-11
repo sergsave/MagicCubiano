@@ -21,6 +21,9 @@ public:
     void setMaxStringNumber(int );
     void setMaxFretNumber(int );
 
+    void setMinStringNumber(int );
+    void setMinFretNumber(int );
+
     int currentString() const;
     int currentFret() const;
 

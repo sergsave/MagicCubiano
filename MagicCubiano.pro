@@ -30,14 +30,16 @@ SOURCES += \
     main.cpp \
     MainWindow.cpp \
     SoundGenerator.cpp \
-    EdgeSettingsWidget.cpp
+    EdgeSettingsWidget.cpp \
+    GuitarFretboardPos.cpp
 
 HEADERS += \
     GiikerProtocol.h \
     MainWindow.h \
     SoundGenerator.h \
     EdgeSettingsWidget.h \
-    CubeEdgeType.h
+    CubeEdgeType.h \
+    GuitarFretboardPos.h
 
 FORMS += \
     MainWindow.ui \

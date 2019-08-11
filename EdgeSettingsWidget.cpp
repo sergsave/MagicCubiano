@@ -6,7 +6,6 @@ EdgeSettingsWidget::EdgeSettingsWidget(QWidget *parent) :
     ui(new Ui::EdgeSettingsWidget)
 {
     ui->setupUi(this);
-    ui->stringSlider->setMinimum(1);
 
     auto updateCounters = [this] () {
         ui->fretValLabel->setText(QString("%1").arg(ui->fretSlider->value()));
@@ -15,9 +14,6 @@ EdgeSettingsWidget::EdgeSettingsWidget(QWidget *parent) :
 
     connect(ui->stringSlider, &QSlider::valueChanged, this, updateCounters);
     connect(ui->fretSlider, &QSlider::valueChanged, this, updateCounters);
-
-    setMaxStringNumber(6);
-    setMaxFretNumber(20);
 }
 
 EdgeSettingsWidget::~EdgeSettingsWidget()
@@ -44,6 +40,16 @@ void EdgeSettingsWidget::setMaxStringNumber(int n)
 void EdgeSettingsWidget::setMaxFretNumber(int n)
 {
     ui->fretSlider->setMaximum(n);
+}
+
+void EdgeSettingsWidget::setMinStringNumber(int n)
+{
+    ui->stringSlider->setMinimum(n);
+}
+
+void EdgeSettingsWidget::setMinFretNumber(int n)
+{
+    ui->fretSlider->setMinimum(n);
 }
 
 int EdgeSettingsWidget::currentString() const

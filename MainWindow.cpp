@@ -11,16 +11,20 @@ MainWindow::MainWindow(QWidget *parent):
 {
     ui->setupUi(this);
 
-    ui->allStringsSlider->setMinimum(MusicInfo().stringNumber);
+    // Set minimum by default
+    auto minString = GuitarFretboardPos().string;
+    auto widgets = findChildren<EdgeSettingsWidget*>();
+
+    ui->allStringsSlider->setMinimum(minString);
+    for(auto w: widgets) w->setMinStringNumber(minString);
 
     connect(ui->allStringsSlider, &QSlider::valueChanged, ui->allStringsLabel,
             [this](auto val) { ui->allStringsLabel->setText(QString("%1").arg(val));});
 
-    auto widgets = findChildren<EdgeSettingsWidget*>();
     connect(ui->resetStringsButton, &QPushButton::clicked, this,
             [widgets, this] { for (auto w: widgets) w->setCurrentString(ui->allStringsSlider->value());});
 
-    setMaximumMusicInfo({});
+    setMaxGuitarFretboardPos({GuitarFretboardPos::maxString, GuitarFretboardPos::maxFret});
     setEdgeWidgetsName();
 }
 
@@ -73,20 +77,19 @@ EdgeSettingsWidget * MainWindow::edgeWidget(EdgeType type) const
     }
 }
 
-
-void MainWindow::setMaximumMusicInfo(const MusicInfo & info)
+void MainWindow::setMaxGuitarFretboardPos(const GuitarFretboardPos & freatboardPos)
 {
     auto widgets = findChildren<EdgeSettingsWidget*>();
     for(auto w: widgets)
     {
-        w->setMaxFretNumber(info.fretNumber);
-        w->setMaxStringNumber(info.stringNumber);
+        w->setMaxFretNumber(freatboardPos.fret);
+        w->setMaxStringNumber(freatboardPos.string);
     }
 
-    ui->allStringsSlider->setMaximum(info.stringNumber);
+    ui->allStringsSlider->setMaximum(freatboardPos.string);
 }
 
-MainWindow::MusicInfo MainWindow::musicInfoFor(EdgeType type) const
+GuitarFretboardPos MainWindow::guitarFretboardPos(EdgeType type) const
 {
     auto widget = edgeWidget(type);
     if(!widget)
