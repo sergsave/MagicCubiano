@@ -11,25 +11,68 @@ MainWindow::MainWindow(QWidget *parent):
 {
     ui->setupUi(this);
 
-    auto widgets = findChildren<EdgeSettingsWidget*>();
-    for(auto w: widgets)
-        w->setName(w->property("name").toString());
-
     ui->allStringsSlider->setMinimum(MusicInfo().stringNumber);
 
     connect(ui->allStringsSlider, &QSlider::valueChanged, ui->allStringsLabel,
             [this](auto val) { ui->allStringsLabel->setText(QString("%1").arg(val));});
 
+    auto widgets = findChildren<EdgeSettingsWidget*>();
     connect(ui->resetStringsButton, &QPushButton::clicked, this,
             [widgets, this] { for (auto w: widgets) w->setCurrentString(ui->allStringsSlider->value());});
 
     setMaximumMusicInfo({});
+    setEdgeWidgetsName();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+
+void MainWindow::setEdgeWidgetsName()
+{
+    auto setPixmap = [this] (EdgeType type, const QColor& color)
+    {
+        auto w = edgeWidget(type);
+        QPixmap pm(1, 1);
+        pm.fill(color);
+
+        if(w) w->setName(pm);
+    };
+
+    using E = EdgeType;
+
+    setPixmap(E::GREEN, Qt::darkGreen);
+    setPixmap(E::BLUE, Qt::darkBlue);
+    setPixmap(E::RED, "#FFB6C1"); // Light pink Giiker V1 peculiarity
+    setPixmap(E::ORANGE, "#FF4500");  // Orangered Giiker V1 peculiarity
+    setPixmap(E::YELLOW, Qt::yellow);
+    setPixmap(E::WHITE, Qt::white);
+}
+
+EdgeSettingsWidget * MainWindow::edgeWidget(EdgeType type) const
+{
+    using E = EdgeType;
+    switch (type) {
+    case E::GREEN:
+        return ui->greenEdgeWidget;
+    case E::BLUE:
+        return ui->blueEdgeWidget;
+    case E::RED:
+        return ui->redEdgeWidget;
+    case E::ORANGE:
+        return ui->orangeEdgeWidget;
+    case E::YELLOW:
+        return ui->yellowEdgeWidget;
+    case E::WHITE:
+        return ui->whiteEdgeWidget;
+    default:
+        assert(!"Unknown type");
+        return nullptr;
+    }
+}
+
 
 void MainWindow::setMaximumMusicInfo(const MusicInfo & info)
 {
@@ -45,29 +88,10 @@ void MainWindow::setMaximumMusicInfo(const MusicInfo & info)
 
 MainWindow::MusicInfo MainWindow::musicInfoFor(EdgeType type) const
 {
-    auto musicInfo = [] (EdgeSettingsWidget const * widget)
-    {
-        return MusicInfo(widget->currentString(), widget->currentFret());
-    };
-
-    using E = EdgeType;
-    switch (type) {
-    case E::UPPER:
-        return musicInfo(ui->uEdgeWidget);
-    case E::DOWN:
-        return musicInfo(ui->dEgdeWidget);
-    case E::FRONT:
-        return musicInfo(ui->fEdgeWidget);
-    case E::BACK:
-        return musicInfo(ui->bEdgeWidget);
-    case E::RIGHT:
-        return musicInfo(ui->rEdgeWidget);
-    case E::LEFT:
-        return musicInfo(ui->lEdgeWidget);
-    default:
-        assert(!"Unknown type");
-        return MusicInfo();
-    }
+    auto widget = edgeWidget(type);
+    if(!widget)
+        return {};
+    return {widget->currentString(), widget->currentFret()};
 }
 
 int MainWindow::soundDuration() const

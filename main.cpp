@@ -22,14 +22,14 @@ int main(int argc, char *argv[])
         window.setStatus("Connected");
     });
 
-    QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, &window, [&window] (auto turnInfo) {
-        window.setStatus(turnInfo.toString());
-    });
-
     SoundGenerator soundGenerator;
 
-    QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, &soundGenerator,
+    QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, &window,
         [&soundGenerator, &window] (auto turnInfo) {
+
+        auto status = QString("Turned %1")
+            .arg(turnInfo.direction == GiikerProtocol::TurnDirection::ANTICLOKWISE ? "'" : "");
+        window.setStatus(status);
 
         auto duration = window.soundDuration();
         auto musicInfo = window.musicInfoFor(turnInfo.edge);

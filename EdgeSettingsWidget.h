@@ -15,7 +15,8 @@ public:
     explicit EdgeSettingsWidget(QWidget *parent = 0);
     ~EdgeSettingsWidget();
 
-    void setName(const QString& name);
+    void setName(const QString& text);
+    void setName(const QPixmap& pixmap);
 
     void setMaxStringNumber(int );
     void setMaxFretNumber(int );

@@ -98,12 +98,12 @@ void GiikerProtocol::onCharacteristicChanged(const QLowEnergyCharacteristic &c, 
 
     const QMap<char, EdgeType> code2edges
     {
-        {1, EdgeType::BACK},
-        {2, EdgeType::UPPER},
-        {3, EdgeType::RIGHT},
-        {4, EdgeType::DOWN},
-        {5, EdgeType::LEFT},
-        {6, EdgeType::FRONT}
+        {1, EdgeType::BLUE},
+        {2, EdgeType::YELLOW},
+        {3, EdgeType::ORANGE},
+        {4, EdgeType::WHITE},
+        {5, EdgeType::RED},
+        {6, EdgeType::GREEN}
     };
 
     const QMap<char, TurnDirection> code2direction
@@ -128,28 +128,4 @@ void GiikerProtocol::onCharacteristicChanged(const QLowEnergyCharacteristic &c, 
     turnInfo.direction = code2direction.value(lowHalfByte);
 
     emit cubeEdgeTurned(turnInfo);
-}
-
-QString GiikerProtocol::TurnInfo::toString()
-{
-    const QMap<EdgeType, QString> edges2string
-    {
-        {EdgeType::BACK, "B"},
-        {EdgeType::UPPER, "U"},
-        {EdgeType::RIGHT, "R"},
-        {EdgeType::DOWN, "D"},
-        {EdgeType::LEFT, "L"},
-        {EdgeType::FRONT, "F"}
-    };
-
-    const QMap<TurnDirection, QString> dir2string
-    {
-        {TurnDirection::CLOCKWIZE, ""},
-        {TurnDirection::ANTICLOKWISE, "'"}
-    };
-
-    assert(edges2string.contains(edge));
-    assert(dir2string.contains(direction));
-
-    return QString("%1%2").arg(edges2string.value(edge), dir2string.value(direction));
 }

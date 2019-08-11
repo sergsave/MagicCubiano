@@ -21,11 +21,8 @@ public:
 
     struct TurnInfo
     {
-        EdgeType edge = EdgeType::FRONT;
+        EdgeType edge = EdgeType::GREEN;
         TurnDirection direction = TurnDirection::CLOCKWIZE;
-
-        // Standart rubiks cube notation
-        QString toString();
     };
 
     void connectToCube();

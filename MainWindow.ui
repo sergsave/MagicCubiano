@@ -29,46 +29,22 @@
     </layout>
    </item>
    <item>
-    <widget class="EdgeSettingsWidget" name="uEdgeWidget" native="true">
-     <property name="name" stdset="0">
-      <string>U</string>
-     </property>
-    </widget>
+    <widget class="EdgeSettingsWidget" name="yellowEdgeWidget" native="true"/>
    </item>
    <item>
-    <widget class="EdgeSettingsWidget" name="rEdgeWidget" native="true">
-     <property name="name" stdset="0">
-      <string>R</string>
-     </property>
-    </widget>
+    <widget class="EdgeSettingsWidget" name="orangeEdgeWidget" native="true"/>
    </item>
    <item>
-    <widget class="EdgeSettingsWidget" name="lEdgeWidget" native="true">
-     <property name="name" stdset="0">
-      <string>L</string>
-     </property>
-    </widget>
+    <widget class="EdgeSettingsWidget" name="redEdgeWidget" native="true"/>
    </item>
    <item>
-    <widget class="EdgeSettingsWidget" name="fEdgeWidget" native="true">
-     <property name="name" stdset="0">
-      <string>F</string>
-     </property>
-    </widget>
+    <widget class="EdgeSettingsWidget" name="greenEdgeWidget" native="true"/>
    </item>
    <item>
-    <widget class="EdgeSettingsWidget" name="dEgdeWidget" native="true">
-     <property name="name" stdset="0">
-      <string>D</string>
-     </property>
-    </widget>
+    <widget class="EdgeSettingsWidget" name="whiteEdgeWidget" native="true"/>
    </item>
    <item>
-    <widget class="EdgeSettingsWidget" name="bEdgeWidget" native="true">
-     <property name="name" stdset="0">
-      <string>B</string>
-     </property>
-    </widget>
+    <widget class="EdgeSettingsWidget" name="blueEdgeWidget" native="true"/>
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout_2" columnminimumwidth="0,100,0,0,0,0,0">

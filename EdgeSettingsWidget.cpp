@@ -25,9 +25,15 @@ EdgeSettingsWidget::~EdgeSettingsWidget()
     delete ui;
 }
 
-void EdgeSettingsWidget::setName(const QString &name)
+void EdgeSettingsWidget::setName(const QString &text)
 {
-    ui->nameLabel->setText(name);
+    ui->nameLabel->setText(text);
+}
+
+void EdgeSettingsWidget::setName(const QPixmap &pixmap)
+{
+    auto scaled = pixmap.scaled(ui->nameLabel->size());
+    ui->nameLabel->setPixmap(scaled);
 }
 
 void EdgeSettingsWidget::setMaxStringNumber(int n)

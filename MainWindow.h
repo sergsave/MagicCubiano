@@ -8,6 +8,7 @@
 namespace Ui {
 class MainWindow;
 }
+class EdgeSettingsWidget;
 
 // Now support only guitar mode
 class MainWindow : public QWidget
@@ -34,6 +35,10 @@ public:
 
 public slots:
     void setStatus(const QString &text);
+
+private:
+    void setEdgeWidgetsName();
+    EdgeSettingsWidget * edgeWidget(EdgeType type) const;
 
 private:
     Ui::MainWindow *ui;
