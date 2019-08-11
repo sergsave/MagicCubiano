@@ -20,14 +20,14 @@ int main(int argc, char *argv[])
     SoundGenerator soundGenerator;
 
     QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, &window,
-        [&soundGenerator, &window] (auto turnInfo) {
+        [&soundGenerator, &window] (auto info) {
 
         auto status = QString("Turned %1")
-            .arg(turnInfo.direction == GiikerProtocol::TurnDirection::ANTICLOKWISE ? "'" : "");
+            .arg(info.rotation == CubeEdge::ANTICLOCKWIZE ? "'" : "");
         window.setStatus(status);
 
         auto duration = window.soundDuration();
-        auto fretboardPos = window.guitarFretboardPos(turnInfo.edge);
+        auto fretboardPos = window.guitarFretboardPosFor(info);
         auto freq = fretboardPos.frequency();
 
         soundGenerator.playSound(freq, duration);

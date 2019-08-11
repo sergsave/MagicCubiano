@@ -96,20 +96,20 @@ void GiikerProtocol::onCharacteristicChanged(const QLowEnergyCharacteristic &c, 
 
     qDebug() << "Wanted characteristic ";
 
-    const QMap<char, EdgeType> code2edges
+    const QMap<char, CubeEdge::Color> code2edges
     {
-        {1, EdgeType::BLUE},
-        {2, EdgeType::YELLOW},
-        {3, EdgeType::ORANGE},
-        {4, EdgeType::WHITE},
-        {5, EdgeType::RED},
-        {6, EdgeType::GREEN}
+        {1, CubeEdge::BLUE},
+        {2, CubeEdge::YELLOW},
+        {3, CubeEdge::ORANGE},
+        {4, CubeEdge::WHITE},
+        {5, CubeEdge::RED},
+        {6, CubeEdge::GREEN}
     };
 
-    const QMap<char, TurnDirection> code2direction
+    const QMap<char, CubeEdge::Rotation> code2direction
     {
-        {1, TurnDirection::CLOCKWIZE},
-        {3, TurnDirection::ANTICLOKWISE}
+        {1, CubeEdge::CLOCKWIZE},
+        {3, CubeEdge::ANTICLOCKWIZE}
     };
 
     QByteArray lastMovesCode = value.right(4);
@@ -123,9 +123,9 @@ void GiikerProtocol::onCharacteristicChanged(const QLowEnergyCharacteristic &c, 
 
     qDebug() << "cubeEdgeTurned";
 
-    TurnInfo turnInfo;
-    turnInfo.edge = code2edges.value(highHalfByte);
-    turnInfo.direction = code2direction.value(lowHalfByte);
+    CubeEdge info;
+    info.color = code2edges.value(highHalfByte);
+    info.rotation = code2direction.value(lowHalfByte);
 
-    emit cubeEdgeTurned(turnInfo);
+    emit cubeEdgeTurned(info);
 }

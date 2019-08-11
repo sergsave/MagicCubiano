@@ -38,8 +38,8 @@ HEADERS += \
     MainWindow.h \
     SoundGenerator.h \
     EdgeSettingsWidget.h \
-    CubeEdgeType.h \
-    GuitarFretboardPos.h
+    GuitarFretboardPos.h \
+    CubeEdge.h
 
 FORMS += \
     MainWindow.ui \
@@ -47,4 +47,11 @@ FORMS += \
 
 CONFIG += mobility
 MOBILITY = 
+
+DISTFILES += \
+    anticlockwize.png \
+    clockwize.png
+
+RESOURCES += \
+    Cubiano.qrc
 

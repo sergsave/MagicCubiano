@@ -4,7 +4,7 @@
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QLowEnergyController>
 
-#include "CubeEdgeType.h"
+#include "CubeEdge.h"
 
 class GiikerProtocol : public QObject
 {
@@ -13,23 +13,11 @@ class GiikerProtocol : public QObject
 public:
     explicit GiikerProtocol(QObject *parent = 0);
 
-    enum class TurnDirection
-    {
-        CLOCKWIZE,
-        ANTICLOKWISE
-    };
-
-    struct TurnInfo
-    {
-        EdgeType edge = EdgeType::GREEN;
-        TurnDirection direction = TurnDirection::CLOCKWIZE;
-    };
-
     void connectToCube();
 
 signals:
     bool cubeConnected();
-    void cubeEdgeTurned(const TurnInfo& info);
+    void cubeEdgeTurned(const CubeEdge& info);
 
 private slots:
     void connectToDevice(const QBluetoothDeviceInfo& device);

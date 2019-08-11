@@ -14,18 +14,13 @@ MainWindow::MainWindow(QWidget *parent):
     // Set minimum by default
     auto minString = GuitarFretboardPos().string;
     auto widgets = findChildren<EdgeSettingsWidget*>();
-
-    ui->allStringsSlider->setMinimum(minString);
     for(auto w: widgets) w->setMinStringNumber(minString);
 
-    connect(ui->allStringsSlider, &QSlider::valueChanged, ui->allStringsLabel,
-            [this](auto val) { ui->allStringsLabel->setText(QString("%1").arg(val));});
-
-    connect(ui->resetStringsButton, &QPushButton::clicked, this,
-            [widgets, this] { for (auto w: widgets) w->setCurrentString(ui->allStringsSlider->value());});
+    connect(ui->bidrectCheckBox, &QCheckBox::toggled, this, &MainWindow::bedirectModeToggled);
+    connect(ui->groupStringCheckBox, &QCheckBox::toggled, this, &MainWindow::groupStringModeToggled);
 
     setMaxGuitarFretboardPos({GuitarFretboardPos::maxString, GuitarFretboardPos::maxFret});
-    setEdgeWidgetsName();
+    setEdgeWidgetsColor();
 }
 
 MainWindow::~MainWindow()
@@ -33,48 +28,56 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
-void MainWindow::setEdgeWidgetsName()
+void MainWindow::setEdgeWidgetsColor()
 {
-    auto setPixmap = [this] (EdgeType type, const QColor& color)
-    {
-        auto w = edgeWidget(type);
-        QPixmap pm(1, 1);
-        pm.fill(color);
+    using Col = CubeEdge::Color;
+    m_color2edges.clear();
 
-        if(w) w->setName(pm);
-    };
+    m_color2edges[Col::GREEN] = ui->greenEdgeWidget;
+    m_color2edges[Col::BLUE] = ui->blueEdgeWidget;
+    m_color2edges[Col::RED] = ui->redEdgeWidget;
+    m_color2edges[Col::ORANGE] = ui->orangeEdgeWidget;
+    m_color2edges[Col::WHITE] = ui->whiteEdgeWidget;
+    m_color2edges[Col::YELLOW] = ui->yellowEdgeWidget;
 
-    using E = EdgeType;
-
-    setPixmap(E::GREEN, Qt::darkGreen);
-    setPixmap(E::BLUE, Qt::darkBlue);
-    setPixmap(E::RED, "#FFB6C1"); // Light pink Giiker V1 peculiarity
-    setPixmap(E::ORANGE, "#FF4500");  // Orangered Giiker V1 peculiarity
-    setPixmap(E::YELLOW, Qt::yellow);
-    setPixmap(E::WHITE, Qt::white);
+    for (auto key: m_color2edges.keys())
+        m_color2edges.value(key)->setEdgeColor(key);
 }
 
-EdgeSettingsWidget * MainWindow::edgeWidget(EdgeType type) const
+void MainWindow::groupStringModeToggled(bool st)
 {
-    using E = EdgeType;
-    switch (type) {
-    case E::GREEN:
-        return ui->greenEdgeWidget;
-    case E::BLUE:
-        return ui->blueEdgeWidget;
-    case E::RED:
-        return ui->redEdgeWidget;
-    case E::ORANGE:
-        return ui->orangeEdgeWidget;
-    case E::YELLOW:
-        return ui->yellowEdgeWidget;
-    case E::WHITE:
-        return ui->whiteEdgeWidget;
-    default:
-        assert(!"Unknown type");
-        return nullptr;
-    }
+    auto widgets = findChildren<EdgeSettingsWidget*>();
+
+    auto setStringForAllWidget = [widgets](int string)
+    {
+        for(auto w: widgets)
+            w->setCurrentString(string);
+    };
+
+    auto bindEdgeWidgets = [this, widgets, setStringForAllWidget]
+    {
+        setStringForAllWidget(GuitarFretboardPos().string);
+        for(auto w: widgets)
+            connect(w, &EdgeSettingsWidget::stringChanged, this, setStringForAllWidget);
+    };
+
+    auto unleashEdgeWidgets = [this, widgets]
+    {
+        for(auto w: widgets)
+            disconnect(w, 0, this, 0);
+    };
+
+    if(st)
+        bindEdgeWidgets();
+    else
+        unleashEdgeWidgets();
+}
+
+void MainWindow::bedirectModeToggled(bool st)
+{
+    auto widgets = findChildren<EdgeSettingsWidget*>();
+    for(auto w: widgets)
+        w->setRotationModeEnabled(st);
 }
 
 void MainWindow::setMaxGuitarFretboardPos(const GuitarFretboardPos & freatboardPos)
@@ -85,16 +88,14 @@ void MainWindow::setMaxGuitarFretboardPos(const GuitarFretboardPos & freatboardP
         w->setMaxFretNumber(freatboardPos.fret);
         w->setMaxStringNumber(freatboardPos.string);
     }
-
-    ui->allStringsSlider->setMaximum(freatboardPos.string);
 }
 
-GuitarFretboardPos MainWindow::guitarFretboardPos(EdgeType type) const
+GuitarFretboardPos MainWindow::guitarFretboardPosFor(const CubeEdge& info) const
 {
-    auto widget = edgeWidget(type);
+    auto widget = m_color2edges.value(info.color, nullptr);
     if(!widget)
         return {};
-    return {widget->currentString(), widget->currentFret()};
+    return {widget->stringFor(info.rotation), widget->fretFor(info.rotation)};
 }
 
 int MainWindow::soundDuration() const

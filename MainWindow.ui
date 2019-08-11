@@ -47,55 +47,56 @@
     <widget class="EdgeSettingsWidget" name="blueEdgeWidget" native="true"/>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout_2" columnminimumwidth="0,100,0,0,0,0,0">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="1">
+      <widget class="QCheckBox" name="bidrectCheckBox">
+       <property name="text">
+        <string>Bidirectional mode</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="groupStringCheckBox">
+       <property name="text">
+        <string>Group strings mode</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="statusLabel">
-       <property name="text">
-        <string>Status:</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
+       <item>
+        <widget class="QLabel" name="statusLabel">
+         <property name="text">
+          <string>Status:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="statusTextLabel">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
-     <item row="1" column="6">
-      <widget class="QLineEdit" name="durLineEdit">
-       <property name="text">
-        <string>200</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="4" colspan="3">
-      <widget class="QSlider" name="allStringsSlider">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="4" colspan="2">
-      <widget class="QLabel" name="durLabel">
-       <property name="text">
-        <string>Duration [mSec]:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0" colspan="3">
-      <widget class="QPushButton" name="resetStringsButton">
-       <property name="text">
-        <string>Reset all strings</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="3">
-      <widget class="QLabel" name="allStringsLabel">
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1" colspan="3">
-      <widget class="QLabel" name="statusTextLabel">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
+     <item row="1" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="durLabel">
+         <property name="text">
+          <string>Duration [mSec]:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="durLineEdit">
+         <property name="text">
+          <string>200</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

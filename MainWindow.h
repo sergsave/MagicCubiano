@@ -2,8 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QWidget>
+#include <QMap>
 
-#include "CubeEdgeType.h"
+#include "CubeEdge.h"
 #include "GuitarFretboardPos.h"
 
 namespace Ui {
@@ -22,18 +23,22 @@ public:
 
     // TODO: Add abstract music info, and specific types for piano, notes etc.
     void setMaxGuitarFretboardPos(const GuitarFretboardPos&);
-    GuitarFretboardPos guitarFretboardPos(EdgeType type) const;
+    GuitarFretboardPos guitarFretboardPosFor(const CubeEdge& ) const;
 
     int soundDuration() const;
 
 public slots:
     void setStatus(const QString &text);
 
-private:
-    void setEdgeWidgetsName();
-    EdgeSettingsWidget * edgeWidget(EdgeType type) const;
+private slots:
+    void groupStringModeToggled(bool st);
+    void bedirectModeToggled(bool st);
 
 private:
+    void setEdgeWidgetsColor();
+
+private:
+    QMap<CubeEdge::Color, EdgeSettingsWidget*> m_color2edges;
     Ui::MainWindow *ui;
 };
 
