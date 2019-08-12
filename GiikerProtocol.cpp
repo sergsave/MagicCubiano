@@ -17,8 +17,10 @@ GiikerProtocol::GiikerProtocol(QObject * parent):
     // TODO: device selection dialog
     m_discoveryDevAgent->setLowEnergyDiscoveryTimeout(0);
 
-    connect(m_discoveryDevAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,
-            this, &GiikerProtocol::connectToDevice);
+    connect(m_discoveryDevAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, this, [this] (auto device){
+        if(device.name().startsWith("GiC"))
+            this->connectToDevice(device);
+    });
 }
 
 void GiikerProtocol::connectToCube()
@@ -26,13 +28,16 @@ void GiikerProtocol::connectToCube()
     m_discoveryDevAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
 }
 
+void GiikerProtocol::connectToCube(const QString &macAddres)
+{
+    QBluetoothDeviceInfo info(QBluetoothAddress(macAddres), "", 0);
+    connectToDevice(info);
+}
+
 void GiikerProtocol::connectToDevice(const QBluetoothDeviceInfo &device)
 {
-    qDebug() << device.name();
-    if(!device.name().startsWith("GiC"))
-        return;
-
-    m_discoveryDevAgent->stop();
+    if(m_discoveryDevAgent && m_discoveryDevAgent->isActive())
+        m_discoveryDevAgent->stop();
 
     // TODO: delete m_bleController
 

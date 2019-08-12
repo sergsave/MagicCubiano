@@ -10,9 +10,13 @@ int main(int argc, char *argv[])
 
     MainWindow window;
     GiikerProtocol protocol;
-    protocol.connectToCube();
-    window.setStatus("Connecting...");
 
+    QObject::connect(&window, &MainWindow::connectAnyRequested, &protocol,
+                     [&protocol]() { protocol.connectToCube();});
+    QObject::connect(&window, &MainWindow::connectByAddressRequested, &protocol,
+                     [&protocol](auto addr) { protocol.connectToCube(addr);});
+
+    window.setStatus("Connecting...");    
     QObject::connect(&protocol, &GiikerProtocol::cubeConnected, &window, [&window] {
         window.setStatus("Connected");
     });
@@ -33,7 +37,7 @@ int main(int argc, char *argv[])
         soundGenerator.playSound(freq, duration);
     });
 
-    window.show();
+    window.start();
 
     return a.exec();
 }

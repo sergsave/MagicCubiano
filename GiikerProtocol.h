@@ -14,6 +14,8 @@ public:
     explicit GiikerProtocol(QObject *parent = 0);
 
     void connectToCube();
+    // TODO: by name
+    void connectToCube(const QString& macAddres);
 
 signals:
     bool cubeConnected();

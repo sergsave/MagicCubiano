@@ -21,11 +21,17 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void start();
+
     // TODO: Add abstract music info, and specific types for piano, notes etc.
     void setMaxGuitarFretboardPos(const GuitarFretboardPos&);
     GuitarFretboardPos guitarFretboardPosFor(const CubeEdge& ) const;
 
     int soundDuration() const;
+
+signals:
+    void connectAnyRequested();
+    void connectByAddressRequested(const QString&);
 
 public slots:
     void setStatus(const QString &text);

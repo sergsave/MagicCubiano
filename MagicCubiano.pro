@@ -31,7 +31,8 @@ SOURCES += \
     MainWindow.cpp \
     SoundGenerator.cpp \
     EdgeSettingsWidget.cpp \
-    GuitarFretboardPos.cpp
+    GuitarFretboardPos.cpp \
+    ConnectingDialog.cpp
 
 HEADERS += \
     GiikerProtocol.h \
@@ -39,11 +40,13 @@ HEADERS += \
     SoundGenerator.h \
     EdgeSettingsWidget.h \
     GuitarFretboardPos.h \
-    CubeEdge.h
+    CubeEdge.h \
+    ConnectingDialog.h
 
 FORMS += \
     MainWindow.ui \
-    EdgeSettingsWidget.ui
+    EdgeSettingsWidget.ui \
+    ConnectingDialog.ui
 
 CONFIG += mobility
 MOBILITY = 

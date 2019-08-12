@@ -1,6 +1,8 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+#include "ConnectingDialog.h"
+
 #include <QVariant>
 
 #include <cassert>
@@ -26,6 +28,16 @@ MainWindow::MainWindow(QWidget *parent):
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::start()
+{
+    ConnectingDialog dialog;
+    connect(&dialog, &ConnectingDialog::connectAnyRequested, this, &MainWindow::connectAnyRequested);
+    connect(&dialog, &ConnectingDialog::connectByAddressRequested, this, &MainWindow::connectByAddressRequested);
+    dialog.exec();
+
+    show();
 }
 
 void MainWindow::setEdgeWidgetsColor()
