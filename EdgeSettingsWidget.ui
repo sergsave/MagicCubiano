@@ -36,7 +36,22 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="clockwizePage">
-      <layout class="QGridLayout" name="gridLayout_3" columnminimumwidth="0,35,0">
+      <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,0,1" columnminimumwidth="0,35,0">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <item row="1" column="2">
         <widget class="QSlider" name="clockStringSlider">
          <property name="orientation">
@@ -75,14 +90,29 @@
        <item row="1" column="0">
         <widget class="QLabel" name="stringLabel">
          <property name="text">
-          <string>String</string>
+          <string>String </string>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="antiClockwizePage">
-      <layout class="QGridLayout" name="gridLayout_4" columnminimumwidth="0,35,0,0">
+      <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0" columnstretch="0,0,0,1" columnminimumwidth="0,35,0,0">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <item row="1" column="1" colspan="2">
         <widget class="QLabel" name="antiStringValLabel">
          <property name="text">
