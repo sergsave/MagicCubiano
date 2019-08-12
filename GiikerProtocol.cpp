@@ -15,7 +15,7 @@ GiikerProtocol::GiikerProtocol(QObject * parent):
     m_discoveryDevAgent = new QBluetoothDeviceDiscoveryAgent(this);
 
     // TODO: device selection dialog
-    m_discoveryDevAgent->setLowEnergyDiscoveryTimeout(40000);
+    m_discoveryDevAgent->setLowEnergyDiscoveryTimeout(0);
 
     connect(m_discoveryDevAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,
             this, &GiikerProtocol::connectToDevice);

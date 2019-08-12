@@ -33,7 +33,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="clockwizePage">
       <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,0,1" columnminimumwidth="0,35,0">
@@ -151,7 +151,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="stringLabel_2">
          <property name="text">
-          <string>String</string>
+          <string>String </string>
          </property>
         </widget>
        </item>
