@@ -15,11 +15,10 @@ Reduce connection time with a large number of BLuetooth devices nearby;
 
 ## Media
 
-Simple interface screen
-
-[![ScreenShot](https://paste.pics/30b31ec5c2555c0dfd6d2f514f96a96a)]
-
 Video.
 
 [![ScreenShot](http://img.youtube.com/vi/nYMSMsSaowA/0.jpg)]
 (https://youtu.be/nYMSMsSaowA)
+
+Simple interface screen
+[![ScreenShot](https://i.paste.pics/6DYV3.png?trs=2147c44d7b6ade6b3fbc39e2f0ebb3946444ef0c7bd87c2fa72cb04feb996921)]
