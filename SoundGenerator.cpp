@@ -6,6 +6,7 @@
 #include <qmath.h>
 #include <qendian.h>
 
+// From Qt example
 class Generator : public QIODevice
 {
 public:
@@ -110,19 +111,19 @@ private:
 
 };
 
-static const int DataSampleRateHz = 44100;
-
 SoundGenerator::SoundGenerator(QObject * parent)
     :   QObject(parent)
     ,   m_device(QAudioDeviceInfo::defaultOutputDevice())
-    ,   m_generator(0)
-    ,   m_audioOutput(0)
+    ,   m_audioOutput(nullptr)
+    ,   m_generator(nullptr)
 {
 }
 
 void SoundGenerator::initializeAudio(int hz, int msec)
 {
-    m_format.setSampleRate(DataSampleRateHz);
+    const int dataSampleRateHz = 44100;
+
+    m_format.setSampleRate(dataSampleRateHz);
     m_format.setChannelCount(1);
     m_format.setSampleSize(16);
     m_format.setCodec("audio/pcm");
@@ -138,7 +139,7 @@ void SoundGenerator::initializeAudio(int hz, int msec)
     if (m_generator)
     {
         delete m_generator;
-        m_generator = 0;
+        m_generator = nullptr;
     }
     m_generator = new Generator(m_format, msec*1000, hz, this);
 
@@ -153,7 +154,7 @@ void SoundGenerator::createAudioOutput()
     if(m_audioOutput)
     {
         delete m_audioOutput;
-        m_audioOutput = 0;
+        m_audioOutput = nullptr;
     }
 
     m_audioOutput = new QAudioOutput(m_device, m_format, this);

@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
     QObject::connect(&window, &MainWindow::connectByAddressRequested, &protocol,
                      [&protocol](auto addr) { protocol.connectToCube(addr);});
 
-    window.setStatus("Connecting...");    
     QObject::connect(&protocol, &GiikerProtocol::cubeConnected, &window, [&window] {
         window.setStatus("Connected");
     });
@@ -37,6 +36,7 @@ int main(int argc, char *argv[])
         soundGenerator.playSound(freq, duration);
     });
 
+    window.setStatus("Connecting...");
     window.start();
 
     return a.exec();

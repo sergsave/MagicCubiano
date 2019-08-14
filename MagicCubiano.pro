@@ -40,8 +40,8 @@ HEADERS += \
     SoundGenerator.h \
     EdgeSettingsWidget.h \
     GuitarFretboardPos.h \
-    CubeEdge.h \
-    ConnectingDialog.h
+    ConnectingDialog.h \
+    MagicCubianoGlobal.h
 
 FORMS += \
     MainWindow.ui \

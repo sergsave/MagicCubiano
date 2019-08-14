@@ -39,8 +39,6 @@ void GiikerProtocol::connectToDevice(const QBluetoothDeviceInfo &device)
     if(m_discoveryDevAgent && m_discoveryDevAgent->isActive())
         m_discoveryDevAgent->stop();
 
-    // TODO: delete m_bleController
-
     m_bleController = new QLowEnergyController(device.address(), this);
     m_bleController->setRemoteAddressType(QLowEnergyController::PublicAddress);
 

@@ -30,9 +30,9 @@ private:
 
 private:
     QAudioDeviceInfo m_device;
-    Generator *m_generator;
     QAudioOutput *m_audioOutput;
     QAudioFormat m_format;
+    Generator *m_generator;
 };
 
 #endif // SOUNDGENERATOR_H

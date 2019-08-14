@@ -2,8 +2,10 @@
 #define EDGESETTINGS_H
 
 #include <QWidget>
+#include <QScopedPointer>
+#include <functional>
 
-#include "CubeEdge.h"
+#include "MagicCubianoGlobal.h"
 
 namespace Ui {
 class EdgeSettingsWidget;
@@ -15,7 +17,7 @@ class EdgeSettingsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit EdgeSettingsWidget(QWidget *parent = 0);
+    explicit EdgeSettingsWidget(QWidget * parent = 0);
     ~EdgeSettingsWidget();
 
     void setEdgeColor(CubeEdge::Color color);
@@ -45,8 +47,11 @@ signals:
 private:
     void setRotationPage(CubeEdge::Rotation rot);
 
-    QSlider * fretSlider() const;
-    QSlider * stringSlider() const;
+    QSlider * currFretSlider() const;
+    QSlider * currStringSlider() const;
+
+    void forEachFretSliders(std::function<void(QSlider *)>);
+    void forEachStringSliders(std::function<void(QSlider *)>);
 
     void updateButtonIcon();
 
@@ -55,7 +60,7 @@ private:
     CubeEdge::Color m_color = CubeEdge::GREEN;
 
     bool m_rotationMode = false;
-    Ui::EdgeSettingsWidget *ui;
+    QScopedPointer<Ui::EdgeSettingsWidget> m_ui;
 };
 
 #endif // EDGESETTINGS_H

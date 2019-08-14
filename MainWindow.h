@@ -3,8 +3,11 @@
 
 #include <QWidget>
 #include <QMap>
+#include <QScopedPointer>
 
-#include "CubeEdge.h"
+#include <functional>
+
+#include "MagicCubianoGlobal.h"
 #include "GuitarFretboardPos.h"
 
 namespace Ui {
@@ -41,11 +44,12 @@ private slots:
     void bedirectModeToggled(bool st);
 
 private:
-    void setEdgeWidgetsColor();
+    void initEdgeWidgets();
+    QList<EdgeSettingsWidget*> edgeWidgets();
 
 private:
     QMap<CubeEdge::Color, EdgeSettingsWidget*> m_color2edges;
-    Ui::MainWindow *ui;
+    QScopedPointer<Ui::MainWindow> m_ui;
 };
 
 #endif // MAINWINDOW_H

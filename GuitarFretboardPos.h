@@ -7,7 +7,7 @@ struct GuitarFretboardPos
     GuitarFretboardPos(int string = 1, int fret = 0) :
         string(string), fret(fret) {}
 
-    double frequency();
+    double frequency() const;
 
     int string;
     int fret;

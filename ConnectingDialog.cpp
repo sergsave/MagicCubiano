@@ -1,24 +1,21 @@
 #include "ConnectingDialog.h"
 #include "ui_ConnectingDialog.h"
 
-ConnectingDialog::ConnectingDialog(QWidget *parent) :
+ConnectingDialog::ConnectingDialog(QWidget * parent) :
     QDialog(parent),
-    ui(new Ui::ConnectingDialog)
+    m_ui(new Ui::ConnectingDialog)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
-    connect(ui->connectAnyButton, &QPushButton::clicked, this, [this] {
+    connect(m_ui->connectAnyButton, &QPushButton::clicked, this, [this] {
         emit connectAnyRequested();
         accept();
     });
-    connect(ui->connectAddressButton, &QPushButton::clicked, this, [this] {
+    connect(m_ui->connectAddressButton, &QPushButton::clicked, this, [this] {
         // TODO: Validator
-        emit connectByAddressRequested(ui->addressEdit->text());
+        emit connectByAddressRequested(m_ui->addressEdit->text());
         accept();
     });
 }
 
-ConnectingDialog::~ConnectingDialog()
-{
-    delete ui;
-}
+ConnectingDialog::~ConnectingDialog() = default;

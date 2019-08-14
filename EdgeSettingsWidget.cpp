@@ -6,7 +6,9 @@
 
 using Rotation = CubeEdge::Rotation;
 
-static bool isClockwize(Rotation rot)
+namespace {
+
+bool isClockwize(Rotation rot)
 {
     switch (rot)
     {
@@ -20,7 +22,7 @@ static bool isClockwize(Rotation rot)
     }
 }
 
-static QColor colorFor(CubeEdge::Color color)
+QColor colorFor(CubeEdge::Color color)
 {
     using Col = CubeEdge::Color;
     QMap<Col, QColor> map
@@ -36,28 +38,30 @@ static QColor colorFor(CubeEdge::Color color)
     return map.value(color, Qt::black);
 }
 
-EdgeSettingsWidget::EdgeSettingsWidget(QWidget *parent) :
+}
+
+EdgeSettingsWidget::EdgeSettingsWidget(QWidget * parent) :
     QWidget(parent),
-    ui(new Ui::EdgeSettingsWidget)
+    m_ui(new Ui::EdgeSettingsWidget)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
     auto bind = [](QSlider const * slider, QLabel * label) {
         label->setText(QString("%1").arg(slider->value()));
     };
 
     auto updateCounters = [this, bind] () {
-        bind(ui->clockFretSlider, ui->clockFretValLabel);
-        bind(ui->clockStringSlider, ui->clockStringValLabel);
-        bind(ui->antiStringSlider, ui->antiStringValLabel);
-        bind(ui->antiFretSlider, ui->antiFretValLabel);
+        bind(m_ui->clockFretSlider, m_ui->clockFretValLabel);
+        bind(m_ui->clockStringSlider, m_ui->clockStringValLabel);
+        bind(m_ui->antiStringSlider, m_ui->antiStringValLabel);
+        bind(m_ui->antiFretSlider, m_ui->antiFretValLabel);
     };
 
-    auto sliderValueChanged = [this, updateCounters] (QSlider * slider, int val) {
+    auto sliderValueChanged = [this, updateCounters] (QSlider const * slider, int val) {
 
-        if(slider == stringSlider())
+        if(slider == currStringSlider())
             emit stringChanged(val);
-        if(slider == fretSlider())
+        if(slider == currFretSlider())
             emit fretChanged(val);
 
         updateCounters();
@@ -69,30 +73,26 @@ EdgeSettingsWidget::EdgeSettingsWidget(QWidget *parent) :
         });
     };
 
-    initSlider(ui->clockStringSlider);
-    initSlider(ui->antiStringSlider);
-    initSlider(ui->clockFretSlider);
-    initSlider(ui->antiFretSlider);
+    forEachFretSliders(initSlider);
+    forEachStringSliders(initSlider);
 
     setRotationModeEnabled(false);
     setRotationPage(Rotation::CLOCKWIZE);
 
-    connect(ui->rotationButton, &QPushButton::toggled, this, [this] (bool st) {
+    connect(m_ui->rotationButton, &QPushButton::toggled, this, [this] (bool st) {
         setRotationPage(st ? Rotation::ANTICLOCKWIZE : Rotation::CLOCKWIZE);
     });
 }
 
-EdgeSettingsWidget::~EdgeSettingsWidget()
-{
-    delete ui;
-}
+EdgeSettingsWidget::~EdgeSettingsWidget() = default;
 
 void EdgeSettingsWidget::updateButtonIcon()
 {
-    auto button = ui->rotationButton;
+    auto button = m_ui->rotationButton;
 
     button->setStyleSheet(QString("background-color: %1").arg(colorFor(m_color).name()));
 
+    // TODO: correct size on Android
     const QString path = isClockwize(m_rotationPage) ? ":/images/clockwize.png" : ":/images/anticlockwize.png";
     const QSize size {40, 40};
 
@@ -115,10 +115,10 @@ void EdgeSettingsWidget::setRotationModeEnabled(bool enabled)
 {
     const QMap<QSlider *, QSlider *> sliders
     {
-        {ui->clockFretSlider,  ui->antiFretSlider},
-        {ui->antiFretSlider,  ui->clockFretSlider},
-        {ui->clockStringSlider,  ui->antiStringSlider},
-        {ui->antiStringSlider,  ui->clockStringSlider},
+        {m_ui->clockFretSlider,  m_ui->antiFretSlider},
+        {m_ui->antiFretSlider,  m_ui->clockFretSlider},
+        {m_ui->clockStringSlider,  m_ui->antiStringSlider},
+        {m_ui->antiStringSlider,  m_ui->clockStringSlider},
     };
 
     auto bindSliders = [] (QSlider * s1, QSlider * s2) {
@@ -141,10 +141,12 @@ void EdgeSettingsWidget::setRotationModeEnabled(bool enabled)
     }
 
     auto syncSlidersValue = [this] {
-        ui->clockStringSlider->setValue(stringSlider()->value());
-        ui->antiStringSlider->setValue(stringSlider()->value());
-        ui->clockFretSlider->setValue(fretSlider()->value());
-        ui->antiFretSlider->setValue(fretSlider()->value());
+        forEachStringSliders([this] (auto s) {
+            s->setValue(this->currStringSlider()->value());
+        });
+        forEachFretSliders([this] (auto s) {
+            s->setValue(this->currFretSlider()->value());
+        });
     };
 
     if(!enabled)
@@ -161,9 +163,9 @@ bool EdgeSettingsWidget::inRotationMode(bool) const
 void EdgeSettingsWidget::setRotationPage(Rotation page)
 {
     if(isClockwize(page))
-        ui->stackedWidget->setCurrentWidget(ui->clockwizePage);
+        m_ui->stackedWidget->setCurrentWidget(m_ui->clockwizePage);
     else
-        ui->stackedWidget->setCurrentWidget(ui->antiClockwizePage);
+        m_ui->stackedWidget->setCurrentWidget(m_ui->antiClockwizePage);
 
     m_rotationPage = page;
 
@@ -172,67 +174,75 @@ void EdgeSettingsWidget::setRotationPage(Rotation page)
 
 void EdgeSettingsWidget::setMaxStringNumber(int n)
 {
-    ui->clockStringSlider->setMaximum(n);
-    ui->antiStringSlider->setMaximum(n);
+    forEachStringSliders([this, n] (QSlider * s) { s->setMaximum(n); });
 }
 
 void EdgeSettingsWidget::setMaxFretNumber(int n)
 {
-    ui->clockFretSlider->setMaximum(n);
-    ui->antiFretSlider->setMaximum(n);
+    forEachFretSliders([this, n] (QSlider * s) { s->setMaximum(n); });
 }
 
 void EdgeSettingsWidget::setMinStringNumber(int n)
 {
-    ui->clockStringSlider->setMinimum(n);
-    ui->antiStringSlider->setMinimum(n);
+    forEachStringSliders([this, n] (QSlider * s) { s->setMinimum(n); });
 }
 
 void EdgeSettingsWidget::setMinFretNumber(int n)
 {
-    ui->clockFretSlider->setMinimum(n);
-    ui->antiFretSlider->setMinimum(n);
+    forEachFretSliders([this, n] (QSlider * s) { s->setMinimum(n); });
 }
 
 void EdgeSettingsWidget::setCurrentString(int n)
 {
-    stringSlider()->setValue(n);
+    currStringSlider()->setValue(n);
 }
 
 void EdgeSettingsWidget::setCurrentFret(int n)
 {
-    fretSlider()->setValue(n);
+    currFretSlider()->setValue(n);
 }
 
 int EdgeSettingsWidget::stringFor(CubeEdge::Rotation rot) const
 {
     if(isClockwize(rot))
-        return ui->clockStringSlider->value();
+        return m_ui->clockStringSlider->value();
 
-    return ui->antiStringSlider->value();
+    return m_ui->antiStringSlider->value();
 }
 
 int EdgeSettingsWidget::fretFor(CubeEdge::Rotation rot) const
 {
     if(isClockwize(rot))
-        return ui->clockFretSlider->value();
+        return m_ui->clockFretSlider->value();
 
-    return ui->antiFretSlider->value();
+    return m_ui->antiFretSlider->value();
 }
 
-QSlider *EdgeSettingsWidget::fretSlider() const
+QSlider *EdgeSettingsWidget::currFretSlider() const
 {
     if(isClockwize(m_rotationPage))
-        return ui->clockFretSlider;
+        return m_ui->clockFretSlider;
 
-    return ui->antiFretSlider;
+    return m_ui->antiFretSlider;
 }
 
-QSlider *EdgeSettingsWidget::stringSlider() const
+QSlider *EdgeSettingsWidget::currStringSlider() const
 {
     if(isClockwize(m_rotationPage))
-        return ui->clockStringSlider;
+        return m_ui->clockStringSlider;
 
-    return ui->antiStringSlider;
+    return m_ui->antiStringSlider;
+}
+
+void EdgeSettingsWidget::forEachFretSliders(std::function<void (QSlider *)> func)
+{
+    const QList<QSlider*> sliders { m_ui->clockFretSlider, m_ui->antiFretSlider };
+    for (auto s: sliders) func(s);
+}
+
+void EdgeSettingsWidget::forEachStringSliders(std::function<void (QSlider *)> func)
+{
+    const QList<QSlider*> sliders { m_ui->clockStringSlider, m_ui->antiStringSlider };
+    for (auto s: sliders) func(s);
 }
 

@@ -4,7 +4,7 @@
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QLowEnergyController>
 
-#include "CubeEdge.h"
+#include "MagicCubianoGlobal.h"
 
 class GiikerProtocol : public QObject
 {

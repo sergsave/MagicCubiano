@@ -4,8 +4,10 @@
 
 #include <cassert>
 
+namespace {
+
 // http://static1.squarespace.com/static/57a08f8a414fb546e8e35178/587dae1f9f7456b5f7fc5413/59e456f08dd041f0a6c9ed93/1508217399278/Guitar_fret_notes_and_frequency_hz.png?format=1500w
-static const QVector<QVector<double>> g_frequenciesTable
+const QVector<QVector<double>> g_frequenciesTable
 {
     // All frets for first string
     {
@@ -51,7 +53,9 @@ static const QVector<QVector<double>> g_frequenciesTable
     },
 };
 
-double GuitarFretboardPos::frequency()
+}
+
+double GuitarFretboardPos::frequency() const
 {
     // TODO: constexpr and static_assert
     assert(g_frequenciesTable.size() == GuitarFretboardPos::maxString && "Not full table!");

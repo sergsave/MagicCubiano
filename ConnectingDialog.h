@@ -2,6 +2,7 @@
 #define CONNECTINGDIALOG_H
 
 #include <QDialog>
+#include <QScopedPointer>
 
 namespace Ui {
 class ConnectingDialog;
@@ -20,7 +21,7 @@ signals:
     void connectByAddressRequested(const QString&);
 
 private:
-    Ui::ConnectingDialog *ui;
+    QScopedPointer<Ui::ConnectingDialog> m_ui;
 };
 
 #endif // CONNECTINGDIALOG_H
