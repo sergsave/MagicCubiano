@@ -4,7 +4,7 @@ Source code of app for playing music on Xiaomi Giiker Cube.
 
 ## Description
 
-Using Qt 5.9.5. Testing on Adroid only.
+Using Qt 5.9.5. Testing on Android only.
 
 ## Knowing issues
 
