@@ -17,7 +17,7 @@ Reduce connection time with a large number of BLuetooth devices nearby;
 
 Simple interface screen
 
-[![ScreenShot](https://i.paste.pics/5258eb55a241b2ef6e8a78d4791c9fe2.png?trs=2147c44d7b6ade6b3fbc39e2f0ebb3946444ef0c7bd87c2fa72cb04feb996921 = 640x360)]
+[![ScreenShot](https://paste.pics/30b31ec5c2555c0dfd6d2f514f96a96a)]
 
 Video.
 
