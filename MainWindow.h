@@ -5,8 +5,6 @@
 #include <QMap>
 #include <QScopedPointer>
 
-#include <functional>
-
 #include "MagicCubianoGlobal.h"
 #include "GuitarFretboardPos.h"
 

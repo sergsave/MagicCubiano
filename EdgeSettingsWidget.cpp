@@ -174,22 +174,22 @@ void EdgeSettingsWidget::setRotationPage(Rotation page)
 
 void EdgeSettingsWidget::setMaxStringNumber(int n)
 {
-    forEachStringSliders([this, n] (QSlider * s) { s->setMaximum(n); });
+    forEachStringSliders([n] (QSlider * s) { s->setMaximum(n); });
 }
 
 void EdgeSettingsWidget::setMaxFretNumber(int n)
 {
-    forEachFretSliders([this, n] (QSlider * s) { s->setMaximum(n); });
+    forEachFretSliders([n] (QSlider * s) { s->setMaximum(n); });
 }
 
 void EdgeSettingsWidget::setMinStringNumber(int n)
 {
-    forEachStringSliders([this, n] (QSlider * s) { s->setMinimum(n); });
+    forEachStringSliders([n] (QSlider * s) { s->setMinimum(n); });
 }
 
 void EdgeSettingsWidget::setMinFretNumber(int n)
 {
-    forEachFretSliders([this, n] (QSlider * s) { s->setMinimum(n); });
+    forEachFretSliders([n] (QSlider * s) { s->setMinimum(n); });
 }
 
 void EdgeSettingsWidget::setCurrentString(int n)
