@@ -5,8 +5,8 @@
 #include <QMap>
 #include <QScopedPointer>
 
-#include "MagicCubianoGlobal.h"
-#include "GuitarFretboardPos.h"
+#include "src/MagicCubianoGlobal.h"
+#include "src/GuitarFretboardPos.h"
 
 namespace Ui {
 class MainWindow;

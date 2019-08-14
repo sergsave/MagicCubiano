@@ -13,11 +13,12 @@ MainWindow::MainWindow(QWidget *parent):
 {
     m_ui->setupUi(this);
 
+    initEdgeWidgets();
+
     connect(m_ui->bidrectCheckBox, &QCheckBox::toggled, this, &MainWindow::bedirectModeToggled);
     connect(m_ui->groupStringCheckBox, &QCheckBox::toggled, this, &MainWindow::groupStringModeToggled);
 
     setMaxGuitarFretboardPos({GuitarFretboardPos::maxString, GuitarFretboardPos::maxFret});
-    initEdgeWidgets();
 }
 
 MainWindow::~MainWindow() = default;

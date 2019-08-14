@@ -5,7 +5,7 @@
 #include <QScopedPointer>
 #include <functional>
 
-#include "MagicCubianoGlobal.h"
+#include "src/MagicCubianoGlobal.h"
 
 namespace Ui {
 class EdgeSettingsWidget;

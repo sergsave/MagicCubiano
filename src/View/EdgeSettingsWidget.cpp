@@ -93,7 +93,7 @@ void EdgeSettingsWidget::updateButtonIcon()
     button->setStyleSheet(QString("background-color: %1").arg(colorFor(m_color).name()));
 
     // TODO: correct size on Android
-    const QString path = isClockwize(m_rotationPage) ? ":/images/clockwize.png" : ":/images/anticlockwize.png";
+    const QString path = isClockwize(m_rotationPage) ? ":/clockwize.png" : ":/anticlockwize.png";
     const QSize size {40, 40};
 
     button->setIconSize(size);

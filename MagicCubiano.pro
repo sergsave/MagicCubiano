@@ -26,27 +26,27 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-    GiikerProtocol.cpp \
-    main.cpp \
-    MainWindow.cpp \
-    SoundGenerator.cpp \
-    EdgeSettingsWidget.cpp \
-    GuitarFretboardPos.cpp \
-    ConnectingDialog.cpp
+    src/View/ConnectingDialog.cpp \
+    src/View/EdgeSettingsWidget.cpp \
+    src/View/MainWindow.cpp \
+    src/GiikerProtocol.cpp \
+    src/GuitarFretboardPos.cpp \
+    src/main.cpp \
+    src/SoundGenerator.cpp
 
 HEADERS += \
-    GiikerProtocol.h \
-    MainWindow.h \
-    SoundGenerator.h \
-    EdgeSettingsWidget.h \
-    GuitarFretboardPos.h \
-    ConnectingDialog.h \
-    MagicCubianoGlobal.h
+    src/View/ConnectingDialog.h \
+    src/View/EdgeSettingsWidget.h \
+    src/View/MainWindow.h \
+    src/GiikerProtocol.h \
+    src/GuitarFretboardPos.h \
+    src/MagicCubianoGlobal.h \
+    src/SoundGenerator.h
 
 FORMS += \
-    MainWindow.ui \
-    EdgeSettingsWidget.ui \
-    ConnectingDialog.ui
+    src/View/ConnectingDialog.ui \
+    src/View/EdgeSettingsWidget.ui \
+    src/View/MainWindow.ui
 
 CONFIG += mobility
 MOBILITY = 
@@ -56,5 +56,4 @@ DISTFILES += \
     clockwize.png
 
 RESOURCES += \
-    Cubiano.qrc
-
+    resources/Cubiano.qrc

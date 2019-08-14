@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/" >
+        <file>clockwize.png</file>
+        <file>anticlockwize.png</file>
+    </qresource>
+</RCC>

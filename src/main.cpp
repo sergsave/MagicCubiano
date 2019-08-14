@@ -2,7 +2,7 @@
 
 #include "GiikerProtocol.h"
 #include "SoundGenerator.h"
-#include "MainWindow.h"
+#include "View/MainWindow.h"
 
 int main(int argc, char *argv[])
 {
