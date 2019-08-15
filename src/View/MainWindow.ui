@@ -48,37 +48,12 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="1">
-      <widget class="QCheckBox" name="bidrectCheckBox">
-       <property name="text">
-        <string>Bidirectional mode</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QCheckBox" name="groupStringCheckBox">
        <property name="text">
         <string>Group strings mode</string>
        </property>
       </widget>
-     </item>
-     <item row="1" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
-       <item>
-        <widget class="QLabel" name="statusLabel">
-         <property name="text">
-          <string>Status:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="statusTextLabel">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </item>
      <item row="1" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -97,6 +72,13 @@
         </widget>
        </item>
       </layout>
+     </item>
+     <item row="0" column="1">
+      <widget class="QCheckBox" name="bidrectCheckBox">
+       <property name="text">
+        <string>Bidirectional mode</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

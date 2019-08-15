@@ -1,9 +1,9 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
-#include "ConnectingDialog.h"
+#include "ConnectionDialog.h"
 
-#include <QVariant>
+#include <QScopedPointer>
 
 #include <cassert>
 
@@ -25,12 +25,23 @@ MainWindow::~MainWindow() = default;
 
 void MainWindow::start()
 {
-    ConnectingDialog dialog;
-    connect(&dialog, &ConnectingDialog::connectAnyRequested, this, &MainWindow::connectAnyRequested);
-    connect(&dialog, &ConnectingDialog::connectByAddressRequested, this, &MainWindow::connectByAddressRequested);
-    dialog.exec();
+    m_dialog.reset(new ConnectionDialog);
+    connect(m_dialog.data(), &ConnectionDialog::connectAnyRequested, this, &MainWindow::connectAnyRequested);
+    connect(m_dialog.data(), &ConnectionDialog::connectByAddressRequested, this, &MainWindow::connectByAddressRequested);
+    m_dialog->exec();
 
     show();
+}
+
+
+void MainWindow::connected()
+{
+    if(m_dialog) m_dialog->connected();
+}
+
+void MainWindow::connectionFailed()
+{
+    if(m_dialog) m_dialog->connectionFailed();
 }
 
 void MainWindow::initEdgeWidgets()
@@ -48,7 +59,7 @@ void MainWindow::initEdgeWidgets()
     for (auto key: m_color2edges.keys())
     {
         auto w = m_color2edges.value(key);
-        w->setEdgeColor(key);
+        w->setEdgeButtonColor(key);
 
         // Set minimum by default
         const auto minString = GuitarFretboardPos().string;
@@ -112,12 +123,13 @@ GuitarFretboardPos MainWindow::guitarFretboardPosFor(const CubeEdge& info) const
     return {widget->stringFor(info.rotation), widget->fretFor(info.rotation)};
 }
 
+void MainWindow::highlightEdge(CubeEdge::Color color)
+{
+    if(auto edge = m_color2edges.value(color, nullptr))
+        edge->blinkEdgeButton();
+}
+
 int MainWindow::soundDuration() const
 {
     return m_ui->durLineEdit->text().toInt();
-}
-
-void MainWindow::setStatus(const QString& text)
-{
-    m_ui->statusTextLabel->setText(text);
 }

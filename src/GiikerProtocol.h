@@ -1,9 +1,13 @@
 #pragma once
 
-#include <QBluetoothDeviceDiscoveryAgent>
-#include <QLowEnergyController>
+#include <QObject>
+#include <QLowEnergyService>
+#include <QBluetoothDeviceInfo>
 
 #include "MagicCubianoGlobal.h"
+
+class QBluetoothDeviceDiscoveryAgent;
+class QLowEnergyController;
 
 class GiikerProtocol : public QObject
 {
@@ -14,10 +18,11 @@ public:
 
     void connectToCube();
     // TODO: by name
-    void connectToCube(const QString& macAddres);
+    void connectToCube(const QString& macAddress);
 
 signals:
-    bool cubeConnected();
+    void cubeConnected();
+    void cubeConnectionFailed();
     void cubeEdgeTurned(const CubeEdge& info);
 
 private slots:

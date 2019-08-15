@@ -11,6 +11,7 @@ namespace Ui {
 class MainWindow;
 }
 class EdgeSettingsWidget;
+class ConnectionDialog;
 
 // Now support only guitar mode
 class MainWindow : public QWidget
@@ -27,6 +28,8 @@ public:
     void setMaxGuitarFretboardPos(const GuitarFretboardPos&);
     GuitarFretboardPos guitarFretboardPosFor(const CubeEdge& ) const;
 
+    void highlightEdge(CubeEdge::Color col);
+
     int soundDuration() const;
 
 signals:
@@ -34,7 +37,8 @@ signals:
     void connectByAddressRequested(const QString&);
 
 public slots:
-    void setStatus(const QString &text);
+    void connected();
+    void connectionFailed();
 
 private slots:
     void groupStringModeToggled(bool st);
@@ -47,5 +51,7 @@ private:
 private:
     QMap<CubeEdge::Color, EdgeSettingsWidget*> m_color2edges;
     QScopedPointer<Ui::MainWindow> m_ui;
+    // This dialog is free, without parent
+    QScopedPointer<ConnectionDialog> m_dialog;
 };
 

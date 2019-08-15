@@ -2,6 +2,8 @@
 
 #include <QWidget>
 #include <QScopedPointer>
+#include <QColor>
+
 #include <functional>
 
 #include "src/MagicCubianoGlobal.h"
@@ -19,8 +21,10 @@ public:
     explicit EdgeSettingsWidget(QWidget * parent = 0);
     ~EdgeSettingsWidget();
 
-    void setEdgeColor(CubeEdge::Color color);
-    CubeEdge::Color edgeColor() const;
+    void blinkEdgeButton();
+
+    void setEdgeButtonColor(CubeEdge::Color color);
+    CubeEdge::Color edgeButtonColor() const;
 
     // In rotation mode clockwize and anticlockwize slider are not synchronized
     void setRotationModeEnabled(bool);

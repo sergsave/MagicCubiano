@@ -1,5 +1,9 @@
 #include "GiikerProtocol.h"
 
+#include <QBluetoothLocalDevice>
+#include <QBluetoothDeviceDiscoveryAgent>
+#include <QLowEnergyController>
+
 #include <cassert>
 
 const QString GiikerProtocol::serviceUuid =
@@ -17,10 +21,23 @@ GiikerProtocol::GiikerProtocol(QObject * parent):
     // TODO: device selection dialog
     m_discoveryDevAgent->setLowEnergyDiscoveryTimeout(0);
 
-    connect(m_discoveryDevAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered, this, [this] (auto device){
+    auto deviceDiscovered = [this] (const QBluetoothDeviceInfo & device){
         if(device.name().startsWith("GiC"))
-            this->connectToDevice(device);
-    });
+            connectToDevice(device);
+    };
+
+    using Error = QBluetoothDeviceDiscoveryAgent::Error;
+
+    auto errorOccured = [this](Error err) {
+        if(err == Error::PoweredOffError)
+            emit cubeConnectionFailed();
+    };
+
+    connect(m_discoveryDevAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,
+            this, deviceDiscovered);
+
+    connect(m_discoveryDevAgent, QOverload<Error>::of(&QBluetoothDeviceDiscoveryAgent::error),
+            this, errorOccured);
 }
 
 void GiikerProtocol::connectToCube()
@@ -30,6 +47,12 @@ void GiikerProtocol::connectToCube()
 
 void GiikerProtocol::connectToCube(const QString &macAddres)
 {
+    if(QBluetoothLocalDevice().hostMode() == QBluetoothLocalDevice::HostPoweredOff)
+    {
+        emit cubeConnectionFailed();
+        return;
+    }
+
     QBluetoothDeviceInfo info(QBluetoothAddress(macAddres), "", 0);
     connectToDevice(info);
 }

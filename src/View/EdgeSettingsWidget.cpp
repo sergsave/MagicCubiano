@@ -2,11 +2,17 @@
 #include "ui_EdgeSettingsWidget.h"
 
 #include <cassert>
+
 #include <QColor>
+#include <QTimer>
+#include <QSize>
 
 using Rotation = CubeEdge::Rotation;
 
 namespace {
+
+const QSize g_buttonSize { 140 , 140 };
+const QSize g_buttonIconSize { 100 , 90 };
 
 bool isClockwize(Rotation rot)
 {
@@ -22,7 +28,7 @@ bool isClockwize(Rotation rot)
     }
 }
 
-QColor colorFor(CubeEdge::Color color)
+QString colorFor(CubeEdge::Color color)
 {
     using Col = CubeEdge::Color;
     QMap<Col, QColor> map
@@ -35,7 +41,13 @@ QColor colorFor(CubeEdge::Color color)
         { Col::WHITE, Qt::white}
     };
 
-    return map.value(color, Qt::black);
+    return map.value(color, Qt::black).name();
+}
+
+void setWidgetStyleColor(QWidget * w, const QString& color)
+{
+    const QString style = QString("background-color: %1").arg(color);
+    w->setStyleSheet(style);
 }
 
 }
@@ -79,36 +91,54 @@ EdgeSettingsWidget::EdgeSettingsWidget(QWidget * parent) :
     setRotationModeEnabled(false);
     setRotationPage(Rotation::CLOCKWIZE);
 
-    connect(m_ui->rotationButton, &QPushButton::toggled, this, [this] (bool st) {
+    auto button = m_ui->rotationButton;
+    connect(button, &QAbstractButton::toggled, this, [this] (bool st) {
         setRotationPage(st ? Rotation::ANTICLOCKWIZE : Rotation::CLOCKWIZE);
     });
+
+    button->setIconSize(g_buttonIconSize);
+    button->setFixedSize(g_buttonSize);
 }
 
 EdgeSettingsWidget::~EdgeSettingsWidget() = default;
+
+void EdgeSettingsWidget::blinkEdgeButton()
+{
+    const int blinkTime = 200;
+    auto button = m_ui->rotationButton;
+
+    // TODO: transparent support
+    setWidgetStyleColor(button, "black");
+
+    QTimer::singleShot(blinkTime, button, [this, button] {
+        setWidgetStyleColor(button, colorFor(m_color));
+    });
+}
+
+void EdgeSettingsWidget::setEdgeButtonColor(CubeEdge::Color color)
+{
+    m_color = color;
+    setWidgetStyleColor(m_ui->rotationButton, colorFor(m_color));
+}
+
+CubeEdge::Color EdgeSettingsWidget::edgeButtonColor() const
+{
+    return m_color;
+}
 
 void EdgeSettingsWidget::updateButtonIcon()
 {
     auto button = m_ui->rotationButton;
 
-    button->setStyleSheet(QString("background-color: %1").arg(colorFor(m_color).name()));
+    if(!m_rotationMode)
+    {
+        button->setIcon({});
+        return;
+    }
 
-    // TODO: correct size on Android
     const QString path = isClockwize(m_rotationPage) ? ":/clockwize.png" : ":/anticlockwize.png";
-    const QSize size {40, 40};
-
-    button->setIconSize(size);
-    button->setIcon(QIcon(path));
-}
-
-void EdgeSettingsWidget::setEdgeColor(CubeEdge::Color color)
-{
-    m_color = color;
-    updateButtonIcon();
-}
-
-CubeEdge::Color EdgeSettingsWidget::edgeColor() const
-{
-    return m_color;
+    // Pixmap for fastest load
+    button->setIcon(QPixmap(path));
 }
 
 void EdgeSettingsWidget::setRotationModeEnabled(bool enabled)
@@ -137,7 +167,6 @@ void EdgeSettingsWidget::setRotationModeEnabled(bool enabled)
             unleashSliders(key, value);
         else
             bindSliders(key, value);
-
     }
 
     auto syncSlidersValue = [this] {
@@ -153,11 +182,7 @@ void EdgeSettingsWidget::setRotationModeEnabled(bool enabled)
         syncSlidersValue();
 
     m_rotationMode = enabled;
-}
-
-bool EdgeSettingsWidget::inRotationMode(bool) const
-{
-    return m_rotationMode;
+    updateButtonIcon();
 }
 
 void EdgeSettingsWidget::setRotationPage(Rotation page)
@@ -170,6 +195,11 @@ void EdgeSettingsWidget::setRotationPage(Rotation page)
     m_rotationPage = page;
 
     updateButtonIcon();
+}
+
+bool EdgeSettingsWidget::inRotationMode(bool) const
+{
+    return m_rotationMode;
 }
 
 void EdgeSettingsWidget::setMaxStringNumber(int n)
