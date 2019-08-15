@@ -22,8 +22,8 @@ int main(int argc, char *argv[])
 
     SoundGenerator soundGenerator;
 
-    QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, &window,
-        [&soundGenerator, &window] (auto info) {
+    QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, &soundGenerator,
+        [&soundGenerator, &window] (const CubeEdge& info) {
 
         auto status = QString("Turned %1")
             .arg(info.rotation == CubeEdge::ANTICLOCKWIZE ? "'" : "");

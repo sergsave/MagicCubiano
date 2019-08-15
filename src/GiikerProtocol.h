@@ -1,5 +1,4 @@
-#ifndef GIIKERPROTOCOL_H
-#define GIIKERPROTOCOL_H
+#pragma once
 
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QLowEnergyController>
@@ -37,4 +36,3 @@ private:
     QLowEnergyService * m_bleService;
 };
 
-#endif // GIIKERPROTOCOL_H

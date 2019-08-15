@@ -1,5 +1,4 @@
-#ifndef EDGESETTINGS_H
-#define EDGESETTINGS_H
+#pragma once
 
 #include <QWidget>
 #include <QScopedPointer>
@@ -50,8 +49,8 @@ private:
     QSlider * currFretSlider() const;
     QSlider * currStringSlider() const;
 
-    void forEachFretSliders(std::function<void(QSlider *)>);
-    void forEachStringSliders(std::function<void(QSlider *)>);
+    void forEachFretSlider(std::function<void(QSlider *)>);
+    void forEachStringSlider(std::function<void(QSlider *)>);
 
     void updateButtonIcon();
 
@@ -63,4 +62,3 @@ private:
     QScopedPointer<Ui::EdgeSettingsWidget> m_ui;
 };
 
-#endif // EDGESETTINGS_H

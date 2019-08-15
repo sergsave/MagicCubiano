@@ -1,5 +1,4 @@
-#ifndef GUITARFRETBOARDPOS_H
-#define GUITARFRETBOARDPOS_H
+#pragma once
 
 struct GuitarFretboardPos
 {
@@ -16,4 +15,3 @@ struct GuitarFretboardPos
     static const int maxFret = 13;
 };
 
-#endif // GUITARFRETBOARDPOS_H

@@ -1,5 +1,4 @@
-#ifndef SOUNDGENERATOR_H
-#define SOUNDGENERATOR_H
+#pragma once
 
 #include <QObject>
 
@@ -35,4 +34,3 @@ private:
     Generator *m_generator;
 };
 
-#endif // SOUNDGENERATOR_H

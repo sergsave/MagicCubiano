@@ -1,5 +1,4 @@
-#ifndef MAGICCUBIANOGLOBAL_H
-#define MAGICCUBIANOGLOBAL_H
+#pragma once
 
 // Magic cube always has 6 edges
 struct CubeEdge
@@ -27,4 +26,3 @@ struct CubeEdge
     Rotation rotation;
 };
 
-#endif // MAGICCUBIANOGLOBAL_H

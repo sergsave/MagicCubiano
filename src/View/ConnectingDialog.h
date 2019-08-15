@@ -1,5 +1,4 @@
-#ifndef CONNECTINGDIALOG_H
-#define CONNECTINGDIALOG_H
+#pragma once
 
 #include <QDialog>
 #include <QScopedPointer>
@@ -24,4 +23,3 @@ private:
     QScopedPointer<Ui::ConnectingDialog> m_ui;
 };
 
-#endif // CONNECTINGDIALOG_H

@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QWidget>
 #include <QMap>
@@ -50,4 +49,3 @@ private:
     QScopedPointer<Ui::MainWindow> m_ui;
 };
 
-#endif // MAINWINDOW_H

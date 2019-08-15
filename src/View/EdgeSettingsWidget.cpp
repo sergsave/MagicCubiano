@@ -73,8 +73,8 @@ EdgeSettingsWidget::EdgeSettingsWidget(QWidget * parent) :
         });
     };
 
-    forEachFretSliders(initSlider);
-    forEachStringSliders(initSlider);
+    forEachFretSlider(initSlider);
+    forEachStringSlider(initSlider);
 
     setRotationModeEnabled(false);
     setRotationPage(Rotation::CLOCKWIZE);
@@ -141,10 +141,10 @@ void EdgeSettingsWidget::setRotationModeEnabled(bool enabled)
     }
 
     auto syncSlidersValue = [this] {
-        forEachStringSliders([this] (auto s) {
+        forEachStringSlider([this] (auto s) {
             s->setValue(this->currStringSlider()->value());
         });
-        forEachFretSliders([this] (auto s) {
+        forEachFretSlider([this] (auto s) {
             s->setValue(this->currFretSlider()->value());
         });
     };
@@ -174,22 +174,22 @@ void EdgeSettingsWidget::setRotationPage(Rotation page)
 
 void EdgeSettingsWidget::setMaxStringNumber(int n)
 {
-    forEachStringSliders([n] (QSlider * s) { s->setMaximum(n); });
+    forEachStringSlider([n] (QSlider * s) { s->setMaximum(n); });
 }
 
 void EdgeSettingsWidget::setMaxFretNumber(int n)
 {
-    forEachFretSliders([n] (QSlider * s) { s->setMaximum(n); });
+    forEachFretSlider([n] (QSlider * s) { s->setMaximum(n); });
 }
 
 void EdgeSettingsWidget::setMinStringNumber(int n)
 {
-    forEachStringSliders([n] (QSlider * s) { s->setMinimum(n); });
+    forEachStringSlider([n] (QSlider * s) { s->setMinimum(n); });
 }
 
 void EdgeSettingsWidget::setMinFretNumber(int n)
 {
-    forEachFretSliders([n] (QSlider * s) { s->setMinimum(n); });
+    forEachFretSlider([n] (QSlider * s) { s->setMinimum(n); });
 }
 
 void EdgeSettingsWidget::setCurrentString(int n)
@@ -234,15 +234,13 @@ QSlider *EdgeSettingsWidget::currStringSlider() const
     return m_ui->antiStringSlider;
 }
 
-void EdgeSettingsWidget::forEachFretSliders(std::function<void (QSlider *)> func)
+void EdgeSettingsWidget::forEachFretSlider(std::function<void (QSlider *)> func)
 {
-    const QList<QSlider*> sliders { m_ui->clockFretSlider, m_ui->antiFretSlider };
-    for (auto s: sliders) func(s);
+    for (auto s: { m_ui->clockFretSlider, m_ui->antiFretSlider }) func(s);
 }
 
-void EdgeSettingsWidget::forEachStringSliders(std::function<void (QSlider *)> func)
+void EdgeSettingsWidget::forEachStringSlider(std::function<void (QSlider *)> func)
 {
-    const QList<QSlider*> sliders { m_ui->clockStringSlider, m_ui->antiStringSlider };
-    for (auto s: sliders) func(s);
+    for (auto s: { m_ui->clockStringSlider, m_ui->antiStringSlider }) func(s);
 }
 
