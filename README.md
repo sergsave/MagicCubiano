@@ -8,10 +8,10 @@ Using Qt 5.9.5. Testing on Android only.
 
 ## Knowing issues
 
-Add midi support;
-Add background mode;
-Add "Turn on bluetooth!" message;
-Reduce connection time with a large number of BLuetooth devices nearby;
+* Add midi support;
+* Add background mode;
+* Disable display rotation;
+* Reduce connection time with a large number of BLuetooth devices nearby;
 
 ## Media
 
