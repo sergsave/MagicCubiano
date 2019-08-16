@@ -12,14 +12,14 @@ int main(int argc, char *argv[])
     GiikerProtocol protocol;
 
     QObject::connect(&window, &MainWindow::connectAnyRequested, &protocol,
-                     [&protocol]() { protocol.connectToCube();});
+        [&protocol]() { protocol.connectToCube();});
     QObject::connect(&window, &MainWindow::connectByAddressRequested, &protocol,
-                     [&protocol](auto addr) { protocol.connectToCube(addr);});
+        [&protocol](auto addr) { protocol.connectToCube(addr);});
 
     QObject::connect(&protocol, &GiikerProtocol::cubeConnected,
-                     &window, &MainWindow::connected);
+        &window, &MainWindow::connected);
     QObject::connect(&protocol, &GiikerProtocol::cubeConnectionFailed,
-                     &window, &MainWindow::connectionFailed);
+        &window, &MainWindow::connectionFailed);
 
     SoundGenerator soundGenerator;
 

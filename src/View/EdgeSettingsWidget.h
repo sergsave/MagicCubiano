@@ -2,7 +2,6 @@
 
 #include <QWidget>
 #include <QScopedPointer>
-#include <QColor>
 
 #include <functional>
 
