@@ -21,4 +21,4 @@ Video.
 
 Simple interface screen.
 
-[![ScreenShot](https://i.paste.pics/6DYV3.png?trs=2147c44d7b6ade6b3fbc39e2f0ebb3946444ef0c7bd87c2fa72cb04feb996921)]
+[![ScreenShot](https://i.paste.pics/6EFGV.png?trs=2147c44d7b6ade6b3fbc39e2f0ebb3946444ef0c7bd87c2fa72cb04feb996921)]
