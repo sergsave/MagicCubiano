@@ -28,7 +28,7 @@ bool isClockwize(Rotation rot)
     }
 }
 
-QString colorFor(CubeEdge::Color color)
+QString colorStrFor(CubeEdge::Color color)
 {
     using Col = CubeEdge::Color;
     QMap<Col, QColor> map
@@ -46,6 +46,12 @@ QString colorFor(CubeEdge::Color color)
 
 void setWidgetStyleColor(QWidget * w, const QString& color)
 {
+    if(color.isEmpty())
+    {
+        w->setStyleSheet({});
+        return;
+    }
+
     const QString style = QString("background-color: %1").arg(color);
     w->setStyleSheet(style);
 }
@@ -107,18 +113,18 @@ void EdgeSettingsWidget::blinkEdgeButton()
     const int blinkTime = 200;
     auto button = m_ui->rotationButton;
 
-    // TODO: transparent support
-    setWidgetStyleColor(button, "black");
+    // reset
+    setWidgetStyleColor(button, "");
 
     QTimer::singleShot(blinkTime, button, [this, button] {
-        setWidgetStyleColor(button, colorFor(m_color));
+        setWidgetStyleColor(button, colorStrFor(m_color));
     });
 }
 
 void EdgeSettingsWidget::setEdgeButtonColor(CubeEdge::Color color)
 {
     m_color = color;
-    setWidgetStyleColor(m_ui->rotationButton, colorFor(m_color));
+    setWidgetStyleColor(m_ui->rotationButton, colorStrFor(m_color));
 }
 
 CubeEdge::Color EdgeSettingsWidget::edgeButtonColor() const
