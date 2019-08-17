@@ -8,6 +8,12 @@ CONFIG += c++14
 
 QT       += core gui bluetooth multimedia
 
+android{
+    QT       += androidextras
+}
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = MagicCubiano
@@ -53,7 +59,8 @@ MOBILITY =
 
 DISTFILES += \
     anticlockwize.png \
-    clockwize.png
+    clockwize.png \
+    android-sources/AndroidManifest.xml
 
 RESOURCES += \
     resources/Cubiano.qrc
