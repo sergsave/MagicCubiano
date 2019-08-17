@@ -34,28 +34,26 @@ void ConnectionDialog::connectionFailed()
 
 void ConnectionDialog::setStatus(ConnectionDialog::Status st)
 {
-    QString msg;
-    QString style;
-    switch (st) {
+    // Set stylesheet causes to dialog flikking. Use HTML formatting instead.
+    QString message;
+
+    switch (st)
+    {
     case READY:
-        style = "color: black";
-        msg = "Find your cube \n";
+        message = "<span>Find your cube<br> </span>";
         break;
     case IN_PROGRESS:
-        style = "color: black";
-        msg = "Connecting...\n";
+        message = "<span>Connecting...<br> </span>";
         break;
     case FAILED:
-        style = "color: red";
-        msg = "Failed.\n Turn on the bluetooth!";
+        message = "<span style=\" color:red;\">Failed!<br>Turn on the Bluetooth.</span>";
         break;
     default:
         assert("Unknow!");
         break;
     }
 
-    m_ui->statusLabel->setStyleSheet(style);
-    m_ui->statusLabel->setText(msg);
+    m_ui->statusLabel->setText(message);
 }
 
 ConnectionDialog::~ConnectionDialog() = default;

@@ -52,6 +52,6 @@ private:
     QMap<CubeEdge::Color, EdgeSettingsWidget*> m_color2edges;
     QScopedPointer<Ui::MainWindow> m_ui;
     // This dialog is free, without parent
-    QScopedPointer<ConnectionDialog> m_dialog;
+    ConnectionDialog * m_dialog;
 };
 

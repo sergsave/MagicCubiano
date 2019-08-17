@@ -11,8 +11,6 @@ using Rotation = CubeEdge::Rotation;
 
 namespace {
 
-const int g_buttonWidth { 140 };
-
 bool isClockwize(Rotation rot)
 {
     switch (rot)
@@ -100,8 +98,6 @@ EdgeSettingsWidget::EdgeSettingsWidget(QWidget * parent) :
     connect(button, &QAbstractButton::toggled, this, [this] (bool st) {
         setRotationPage(st ? Rotation::ANTICLOCKWIZE : Rotation::CLOCKWIZE);
     });
-
-    button->setFixedWidth(g_buttonWidth);
 }
 
 EdgeSettingsWidget::~EdgeSettingsWidget() = default;

@@ -4,6 +4,7 @@
 #include "ConnectionDialog.h"
 
 #include <QScopedPointer>
+#include <QDesktopWidget>
 
 #include <cassert>
 
@@ -19,15 +20,19 @@ MainWindow::MainWindow(QWidget *parent):
     connect(m_ui->groupStringCheckBox, &QCheckBox::toggled, this, &MainWindow::groupStringModeToggled);
 
     setMaxGuitarFretboardPos({GuitarFretboardPos::maxString, GuitarFretboardPos::maxFret});
+
+    QRect scr = QApplication::desktop()->screenGeometry();
+    move( scr.center() - rect().center() );
 }
 
 MainWindow::~MainWindow() = default;
 
 void MainWindow::start()
 {
-    m_dialog.reset(new ConnectionDialog);
-    connect(m_dialog.data(), &ConnectionDialog::connectAnyRequested, this, &MainWindow::connectAnyRequested);
-    connect(m_dialog.data(), &ConnectionDialog::connectByAddressRequested, this, &MainWindow::connectByAddressRequested);
+    m_dialog = new ConnectionDialog(this);
+
+    connect(m_dialog, &ConnectionDialog::connectAnyRequested, this, &MainWindow::connectAnyRequested);
+    connect(m_dialog, &ConnectionDialog::connectByAddressRequested, this, &MainWindow::connectByAddressRequested);
     m_dialog->exec();
 
     show();
