@@ -11,8 +11,7 @@ using Rotation = CubeEdge::Rotation;
 
 namespace {
 
-const QSize g_buttonSize { 140 , 140 };
-const QSize g_buttonIconSize { 100 , 90 };
+const int g_buttonWidth { 140 };
 
 bool isClockwize(Rotation rot)
 {
@@ -102,8 +101,7 @@ EdgeSettingsWidget::EdgeSettingsWidget(QWidget * parent) :
         setRotationPage(st ? Rotation::ANTICLOCKWIZE : Rotation::CLOCKWIZE);
     });
 
-    button->setIconSize(g_buttonIconSize);
-    button->setFixedSize(g_buttonSize);
+    button->setFixedWidth(g_buttonWidth);
 }
 
 EdgeSettingsWidget::~EdgeSettingsWidget() = default;
@@ -143,7 +141,8 @@ void EdgeSettingsWidget::updateButtonIcon()
     }
 
     const QString path = isClockwize(m_rotationPage) ? ":/clockwize.png" : ":/anticlockwize.png";
-    // Pixmap for fastest load
+
+    button->setIconSize(button->size() * 3 / 4);
     button->setIcon(QPixmap(path));
 }
 
