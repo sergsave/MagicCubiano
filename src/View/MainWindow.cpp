@@ -70,20 +70,20 @@ void MainWindow::createEdgeWidgets()
     if(!layout)
         layout = new QVBoxLayout(m_ui->edgesFrame);
 
-    auto factory = new GuitarEdgeSettingsFactory;
+    QScopedPointer<EdgeSettingsFactory> factory(new GuitarEdgeSettingsFactory);
 
-    auto addWidget = [layout, factory, this] (CubeEdge::Color col) {
-        auto w = new EdgeWidget(col, factory, this);
+    auto addWidget = [layout, &factory, this] (CubeEdge::Color col) {
+        auto w = new EdgeWidget(col, factory.data(), this);
         m_color2edges[col] = w;
         layout->addWidget(w);
     };
 
-    addWidget(Col::GREEN);
-    addWidget(Col::BLUE);
-    addWidget(Col::RED);
-    addWidget(Col::ORANGE);
-    addWidget(Col::WHITE);
     addWidget(Col::YELLOW);
+    addWidget(Col::ORANGE);
+    addWidget(Col::RED);
+    addWidget(Col::GREEN);
+    addWidget(Col::WHITE);
+    addWidget(Col::BLUE);
 }
 
 QList<EdgeWidget *> MainWindow::edgeWidgets()

@@ -57,8 +57,7 @@ void setWidgetStyleColor(QWidget * w, const QString& color)
 
 EdgeWidget::EdgeWidget(CubeEdge::Color col, EdgeSettingsFactory * factory, QWidget * parent) :
     QWidget(parent),
-    m_ui(new Ui::EdgeWidget),
-    m_settingsFactory(factory)
+    m_ui(new Ui::EdgeWidget)
 {
     m_ui->setupUi(this);
 
@@ -118,9 +117,9 @@ bool EdgeWidget::inRotationMode(bool) const
 
 void EdgeWidget::updateSettingsButtons()
 {
+    // TODO: Note icon
     auto text = [this](Rotation rot)
     {
-        QString text = "Notes: ";
         for(auto t: harmonyFor(rot).tones)
             text += t.toString() + " ";
         return text;

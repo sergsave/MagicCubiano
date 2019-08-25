@@ -2,9 +2,10 @@
 
 #include <QWidget>
 #include <QScopedPointer>
+#include <QMap>
 
 #include "src/CubeEdge.h"
-#include "src/MusicSounds.h"
+#include "src/Music.h"
 #include "EdgeSettingsFactory.h"
 
 namespace Ui {
@@ -16,7 +17,6 @@ class EdgeWidget : public QWidget
     Q_OBJECT
 
 public:
-    // Edge widget take a ownersheep of factory
     explicit EdgeWidget(CubeEdge::Color color,
                         EdgeSettingsFactory* factory,
                         QWidget * parent = nullptr);
@@ -48,6 +48,5 @@ private:
     QMap<CubeEdge::Rotation, EdgeSettingsDialog*> m_rotation2settings;
 
     QScopedPointer<Ui::EdgeWidget> m_ui;
-    QScopedPointer<EdgeSettingsFactory> m_settingsFactory;
 };
 

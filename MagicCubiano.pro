@@ -33,25 +33,27 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     src/View/MainWindow.cpp \
-    src/GiikerProtocol.cpp \
+    src/Protocol/GiikerProtocol.cpp \
     src/main.cpp \
-    src/SoundGenerator.cpp \
     src/View/ConnectionDialog.cpp \
-    src/MusicSounds.cpp \
     src/View/EdgeWidget.cpp \
-    src/View/GuitarEdgeSettingsDialog.cpp
+    src/View/GuitarEdgeSettingsDialog.cpp \
+    src/Music.cpp \
+    src/Sound/ToneGenerator.cpp
 
 HEADERS += \
     src/View/MainWindow.h \
-    src/GiikerProtocol.h \
-    src/SoundGenerator.h \
+    src/Protocol/GiikerProtocol.h \
     src/View/ConnectionDialog.h \
     src/CubeEdge.h \
-    src/MusicSounds.h \
     src/View/EdgeWidget.h \
     src/View/EdgeSettingsFactory.h \
     src/View/GuitarEdgeSettingsDialog.h \
-    src/View/EdgeSettingsDialog.h
+    src/View/EdgeSettingsDialog.h \
+    src/Music.h \
+    src/Sound/ToneGenerator.h \
+    src/Sound/SoundGenerator.h \
+    src/Sound/SoundGeneratorFactory.h
 
 FORMS += \
     src/View/MainWindow.ui \

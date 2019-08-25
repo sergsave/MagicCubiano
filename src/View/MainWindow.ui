@@ -22,7 +22,7 @@
      <item>
       <widget class="QLabel" name="chooseLabel">
        <property name="text">
-        <string>Guitar mode. Choose string and fret for cube faces:</string>
+        <string>Guitar mode</string>
        </property>
       </widget>
      </item>

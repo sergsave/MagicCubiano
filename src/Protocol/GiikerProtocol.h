@@ -4,7 +4,7 @@
 #include <QLowEnergyService>
 #include <QBluetoothDeviceInfo>
 
-#include "CubeEdge.h"
+#include "src/CubeEdge.h"
 
 class QBluetoothDeviceDiscoveryAgent;
 class QLowEnergyController;

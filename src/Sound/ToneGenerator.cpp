@@ -1,10 +1,34 @@
-#include "SoundGenerator.h"
+#include "ToneGenerator.h"
 
 #include <QIODevice>
 #include <QAudioOutput>
 #include <QDebug>
+#include <QVector>
 #include <qmath.h>
 #include <qendian.h>
+
+#include <functional>
+
+namespace {
+
+qreal frequencyFor(const Music::Tone& tone)
+{
+    // http://pages.mtu.edu/~suits/notefreqs.html
+    static const QVector<qreal> freqs
+    {
+        16.35, 17.32, 18.35, 19.45, 20.60, 21.83,  23.12, 24.50, 25.96, 27.50, 29.14, 30.87
+    };
+
+    static const auto tones = Music::allTonesForOctave(0);
+
+    const auto octave0Tone = Music::Tone(tone.note, 0);
+    const int idx = tones.indexOf(octave0Tone);
+
+    return freqs[idx] * qPow(2, tone.octave);
+}
+
+}
+
 
 // From Qt example
 class Generator : public QIODevice
@@ -111,15 +135,15 @@ private:
 
 };
 
-SoundGenerator::SoundGenerator(QObject * parent)
-    :   QObject(parent)
+ToneGenerator::ToneGenerator(QObject * parent)
+    :   SoundGenerator(parent)
     ,   m_device(QAudioDeviceInfo::defaultOutputDevice())
     ,   m_audioOutput(nullptr)
     ,   m_generator(nullptr)
 {
 }
 
-void SoundGenerator::initializeAudio(int hz, int msec)
+void ToneGenerator::initializeAudio(int hz, int msec)
 {
     const int dataSampleRateHz = 44100;
 
@@ -144,12 +168,9 @@ void SoundGenerator::initializeAudio(int hz, int msec)
     m_generator = new Generator(m_format, msec*1000, hz, this);
 
     createAudioOutput();
-
-    m_audioOutput->setNotifyInterval(msec);
-    connect(m_audioOutput, &QAudioOutput::notify, this, &SoundGenerator::stop);
 }
 
-void SoundGenerator::createAudioOutput()
+void ToneGenerator::createAudioOutput()
 {
     if(m_audioOutput)
     {
@@ -162,7 +183,7 @@ void SoundGenerator::createAudioOutput()
     m_audioOutput->start(m_generator);
 }
 
-void SoundGenerator::stop()
+void ToneGenerator::stop()
 {
     if(m_generator)
         m_generator->stop();
@@ -174,8 +195,23 @@ void SoundGenerator::stop()
     }
 }
 
-void SoundGenerator::playSound(int freqHz, int durMsec)
+void ToneGenerator::playTones()
 {
     stop();
-    initializeAudio(freqHz, durMsec);
+
+    if(m_harmonyCounter >= m_harmony.tones.size())
+        return;
+
+    auto freq = frequencyFor(m_harmony.tones[m_harmonyCounter++]);
+    initializeAudio(freq, m_harmony.delayMSec);
+    m_audioOutput->setNotifyInterval(m_harmony.delayMSec);
+    connect(m_audioOutput, &QAudioOutput::notify, this, &ToneGenerator::playTones);
+}
+
+void ToneGenerator::playHarmony(const Music::Harmony & harmony)
+{
+    m_harmonyCounter = 0;
+    m_harmony = harmony;
+
+    playTones();
 }

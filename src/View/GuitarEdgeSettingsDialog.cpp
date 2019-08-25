@@ -6,31 +6,17 @@
 
 #include <QCheckBox>
 #include <QDebug>
+#include <QDesktopWidget>
 
 namespace {
 // http://static1.squarespace.com/static/57a08f8a414fb546e8e35178/587dae1f9f7456b5f7fc5413/59e456f08dd041f0a6c9ed93/1508217399278/Guitar_fret_notes_and_frequency_hz.png?format=1500w
 
 using namespace Music;
-using T = Tone;
-
-const QVector<Tone> fullOctave(int n)
-{
-    return
-    {
-        Tone(T::C, T::None, n), Tone(T::C, T::Sharp, n),
-        Tone(T::D, T::None, n), Tone(T::D, T::Sharp, n),
-        Tone(T::E, T::None, n),
-        Tone(T::F, T::None, n), Tone(T::F, T::Sharp, n),
-        Tone(T::G, T::None, n), Tone(T::G, T::Sharp, n),
-        Tone(T::A, T::None, n), Tone(T::A, T::Sharp, n),
-        Tone(T::B, T::None, n)
-    };
-}
 
 const QVector<Tone> tonesForString(const Tone& firstTone)
 {
     const int fretsQuantity = 21;
-    const auto firstFullOctave = fullOctave(firstTone.octave);
+    const auto firstFullOctave = allTonesForOctave(firstTone.octave);
     const int octaveSize = firstFullOctave.size();
 
     const int firstOctaveOffset = firstFullOctave.indexOf(firstTone);
@@ -38,30 +24,32 @@ const QVector<Tone> tonesForString(const Tone& firstTone)
     const int fullOctavesQuantity = remainingFrets / octaveSize;
     const int lastOctaveOffset = remainingFrets % octaveSize;
 
-    QVector<Tone> ret = firstFullOctave.mid(firstOctaveOffset);
+    auto ret = firstFullOctave.mid(firstOctaveOffset);
 
     int octaveNumb = firstTone.octave;
     const int lastOctaveNumb = octaveNumb + fullOctavesQuantity + 1;
 
     while(++octaveNumb != lastOctaveNumb)
-        ret += fullOctave(octaveNumb);
+        ret += allTonesForOctave(octaveNumb);
 
-    ret += fullOctave(lastOctaveNumb).mid(0, lastOctaveOffset);
+    ret += allTonesForOctave(lastOctaveNumb).mid(0, lastOctaveOffset);
 
     return ret;
 }
 
 Music::Tone musicToneFor(int string, int fret)
 {
+    using T = Tone;
+
     static const QVector<QVector<Tone>> musicTones
     {
         // Start with first string
-        tonesForString(Tone(T::E, T::None, 2)),
-        tonesForString(Tone(T::B, T::None, 1)),
-        tonesForString(Tone(T::G, T::None, 1)),
-        tonesForString(Tone(T::D, T::None, 1)),
-        tonesForString(Tone(T::A, T::None, 0)),
-        tonesForString(Tone(T::E, T::None, 0)),
+        tonesForString(Tone(T::E, 4)),
+        tonesForString(Tone(T::B, 3)),
+        tonesForString(Tone(T::G, 3)),
+        tonesForString(Tone(T::D, 3)),
+        tonesForString(Tone(T::A, 2)),
+        tonesForString(Tone(T::E, 2)),
     };
 
     if(string < 0 || string >= musicTones.size())
@@ -151,6 +139,8 @@ GuitarEdgeSettingsDialog::GuitarEdgeSettingsDialog(QWidget *parent) :
     }
 
     m_strings.last()->setMuted(false);
+
+    setWindowFlags(Qt::Window);
 }
 
 GuitarEdgeSettingsDialog::~GuitarEdgeSettingsDialog() = default;
@@ -164,7 +154,7 @@ Music::Harmony GuitarEdgeSettingsDialog::harmony() const
         return !sw->isMuted();
     });
 
-    Music::Harmony::Tones tones;
+    Music::Tones tones;
 
     std::transform(activeStrings.begin(), activeStrings.end(), std::back_inserter(tones), [this](StringWidget * sw) {
         auto string = m_strings.indexOf(sw);

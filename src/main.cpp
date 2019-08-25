@@ -1,7 +1,8 @@
 #include <QApplication>
+#include <QScopedPointer>
 
-#include "GiikerProtocol.h"
-#include "SoundGenerator.h"
+#include "Protocol/GiikerProtocol.h"
+#include "Sound/SoundGeneratorFactory.h"
 #include "View/MainWindow.h"
 
 int main(int argc, char *argv[])
@@ -21,13 +22,13 @@ int main(int argc, char *argv[])
     QObject::connect(&protocol, &GiikerProtocol::cubeConnectionFailed,
         &window, &MainWindow::connectionFailed);
 
-    SoundGenerator soundGenerator;
+    QScopedPointer<SoundGenerator> soundGenerator(createSoundGenerator(GenType::TONE));
 
-    QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, &soundGenerator,
+    QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, soundGenerator.data(),
         [&soundGenerator, &window] (const CubeEdge& info) {
 
         window.highlightEdge(info.color);
-        // soundGenerator.playSound(window.harmonyFor(info.color));
+        soundGenerator->playHarmony(window.harmonyFor(info));
     });
 
     window.start();

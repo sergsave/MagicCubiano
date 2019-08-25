@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QDialog>
-#include <src/MusicSounds.h>
+#include <src/Music.h>
 
 class EdgeSettingsDialog: public QDialog
 {
