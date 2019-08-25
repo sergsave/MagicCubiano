@@ -29,7 +29,6 @@ GiikerProtocol::GiikerProtocol(QObject * parent):
     using Error = QBluetoothDeviceDiscoveryAgent::Error;
 
     auto errorOccured = [this](Error err) {
-        if(err == Error::PoweredOffError)
             emit cubeConnectionFailed();
     };
 

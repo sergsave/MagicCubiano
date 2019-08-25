@@ -1,7 +1,51 @@
 <RCC>
-    <qresource prefix="/" >
+    <qresource prefix="/">
         <file>images/clockwize.png</file>
         <file>images/anticlockwize.png</file>
-
+        <file>sounds/A0.mp3</file>
+        <file>sounds/A1.mp3</file>
+        <file>sounds/A2.mp3</file>
+        <file>sounds/A3.mp3</file>
+        <file>sounds/B0.mp3</file>
+        <file>sounds/B1.mp3</file>
+        <file>sounds/B2.mp3</file>
+        <file>sounds/B3.mp3</file>
+        <file>sounds/beep.mp3</file>
+        <file>sounds/C1.mp3</file>
+        <file>sounds/C2.mp3</file>
+        <file>sounds/C3.mp3</file>
+        <file>sounds/D1.mp3</file>
+        <file>sounds/D2.mp3</file>
+        <file>sounds/D3.mp3</file>
+        <file>sounds/E0.mp3</file>
+        <file>sounds/E1.mp3</file>
+        <file>sounds/E2.mp3</file>
+        <file>sounds/E3.mp3</file>
+        <file>sounds/F0.mp3</file>
+        <file>sounds/F1.mp3</file>
+        <file>sounds/F2.mp3</file>
+        <file>sounds/F3.mp3</file>
+        <file>sounds/G0.mp3</file>
+        <file>sounds/G1.mp3</file>
+        <file>sounds/G2.mp3</file>
+        <file>sounds/G3.mp3</file>
+        <file>sounds/Ais0.mp3</file>
+        <file>sounds/Ais1.mp3</file>
+        <file>sounds/Ais2.mp3</file>
+        <file>sounds/Ais3.mp3</file>
+        <file>sounds/Cis1.mp3</file>
+        <file>sounds/Cis2.mp3</file>
+        <file>sounds/Cis3.mp3</file>
+        <file>sounds/Dis1.mp3</file>
+        <file>sounds/Dis2.mp3</file>
+        <file>sounds/Dis3.mp3</file>
+        <file>sounds/Fis0.mp3</file>
+        <file>sounds/Fis1.mp3</file>
+        <file>sounds/Fis2.mp3</file>
+        <file>sounds/Fis3.mp3</file>
+        <file>sounds/Gis0.mp3</file>
+        <file>sounds/Gis1.mp3</file>
+        <file>sounds/Gis2.mp3</file>
+        <file>sounds/Gis3.mp3</file>
     </qresource>
 </RCC>

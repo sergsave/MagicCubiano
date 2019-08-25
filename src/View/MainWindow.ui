@@ -52,7 +52,7 @@
        <item>
         <widget class="QLineEdit" name="durLineEdit">
          <property name="text">
-          <string>200</string>
+          <string>100</string>
          </property>
         </widget>
        </item>

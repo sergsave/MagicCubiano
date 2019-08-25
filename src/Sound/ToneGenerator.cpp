@@ -207,6 +207,9 @@ void ToneGenerator::playTones()
 
 void ToneGenerator::playHarmony(const Music::Harmony & harmony)
 {
+    if (harmony.tones.empty())
+        return;
+
     m_harmonyCounter = 0;
     m_harmony = harmony;
 

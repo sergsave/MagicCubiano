@@ -122,7 +122,7 @@ void EdgeWidget::updateSettingsButtons()
     {
         QString ret;
         for(auto t: harmonyFor(rot).tones)
-            ret += t.toString() + " ";
+            ret += t.toString(Music::Tone::SHARP) + " ";
         return ret;
     };
 

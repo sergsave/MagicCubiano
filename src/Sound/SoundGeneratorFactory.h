@@ -19,7 +19,6 @@ SoundGenerator * createSoundGenerator(GenType type, QObject * parent = nullptr)
         return new ToneGenerator(parent);
     case GenType::GUITAR:
         return new GuitarGenerator(parent);
-        return nullptr;
     default:
         assert("unreal logic");
         return nullptr;

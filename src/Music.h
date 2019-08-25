@@ -8,11 +8,12 @@ namespace Music {
 struct Tone
 {
     enum Note { C, C_SHARP, D, D_SHARP, E, F, F_SHARP, G, G_SHARP, A, A_SHARP, B };
+    // Formats: A#0 or Ais0
+    enum Format { SHARP, IS};
 
     Tone(Note note = B, int octave = 0);
 
-    // Format: "A#0"
-    QString toString() const;
+    QString toString(Format) const;
 
     Note note;
     int octave;

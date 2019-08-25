@@ -22,7 +22,7 @@ public:
     Music::Harmony harmony() const override;
 
 private:
-    static const int m_fretQuantity = 13;
+    static const int m_fretQuantity = 15;
     static const int m_stringQuantity = 6;
 
     QScopedPointer<Ui::GuitarEdgeSettingsDialog> m_ui;
