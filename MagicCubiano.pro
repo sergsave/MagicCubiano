@@ -32,27 +32,32 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-    src/View/EdgeSettingsWidget.cpp \
     src/View/MainWindow.cpp \
     src/GiikerProtocol.cpp \
-    src/GuitarFretboardPos.cpp \
     src/main.cpp \
     src/SoundGenerator.cpp \
-    src/View/ConnectionDialog.cpp
+    src/View/ConnectionDialog.cpp \
+    src/MusicSounds.cpp \
+    src/View/EdgeWidget.cpp \
+    src/View/GuitarEdgeSettingsDialog.cpp
 
 HEADERS += \
-    src/View/EdgeSettingsWidget.h \
     src/View/MainWindow.h \
     src/GiikerProtocol.h \
-    src/GuitarFretboardPos.h \
-    src/MagicCubianoGlobal.h \
     src/SoundGenerator.h \
-    src/View/ConnectionDialog.h
+    src/View/ConnectionDialog.h \
+    src/CubeEdge.h \
+    src/MusicSounds.h \
+    src/View/EdgeWidget.h \
+    src/View/EdgeSettingsFactory.h \
+    src/View/GuitarEdgeSettingsDialog.h \
+    src/View/EdgeSettingsDialog.h
 
 FORMS += \
-    src/View/EdgeSettingsWidget.ui \
     src/View/MainWindow.ui \
-    src/View/ConnectionDialog.ui
+    src/View/ConnectionDialog.ui \
+    src/View/EdgeWidget.ui \
+    src/View/GuitarEdgeSettingsDialog.ui
 
 CONFIG += mobility
 MOBILITY = 

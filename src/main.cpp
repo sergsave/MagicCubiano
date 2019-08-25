@@ -26,12 +26,8 @@ int main(int argc, char *argv[])
     QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, &soundGenerator,
         [&soundGenerator, &window] (const CubeEdge& info) {
 
-        auto duration = window.soundDuration();
-        auto fretboardPos = window.guitarFretboardPosFor(info);
-        auto freq = fretboardPos.frequency();
-
         window.highlightEdge(info.color);
-        soundGenerator.playSound(freq, duration);
+        // soundGenerator.playSound(window.harmonyFor(info.color));
     });
 
     window.start();

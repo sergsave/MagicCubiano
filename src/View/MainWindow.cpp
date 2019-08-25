@@ -14,15 +14,12 @@ MainWindow::MainWindow(QWidget *parent):
 {
     m_ui->setupUi(this);
 
-    initEdgeWidgets();
-
-    connect(m_ui->bidrectCheckBox, &QCheckBox::toggled, this, &MainWindow::bedirectModeToggled);
-    connect(m_ui->groupStringCheckBox, &QCheckBox::toggled, this, &MainWindow::groupStringModeToggled);
-
-    setMaxGuitarFretboardPos({GuitarFretboardPos::maxString, GuitarFretboardPos::maxFret});
+    createEdgeWidgets();
 
     QRect scr = QApplication::desktop()->screenGeometry();
     move( scr.center() - rect().center() );
+
+    connect(m_ui->bidrectCheckBox, &QAbstractButton::toggled, this, &MainWindow::setRotationModeEnabled);
 }
 
 MainWindow::~MainWindow() = default;
@@ -38,6 +35,20 @@ void MainWindow::start()
     show();
 }
 
+Music::Harmony MainWindow::harmonyFor(const CubeEdge & edge) const
+{
+    auto edgeWidget = m_color2edges.value(edge.color, nullptr);
+
+    if(!edgeWidget)
+        return {};
+
+    auto harmony = edgeWidget->harmonyFor(edge.rotation);
+
+    if(harmony.delayMSec == 0)
+        harmony.delayMSec = defaultHarmonyDelayMsec();
+
+    return harmony;
+}
 
 void MainWindow::connected()
 {
@@ -49,92 +60,51 @@ void MainWindow::connectionFailed()
     if(m_dialog) m_dialog->connectionFailed();
 }
 
-void MainWindow::initEdgeWidgets()
+void MainWindow::createEdgeWidgets()
 {
     using Col = CubeEdge::Color;
+    qDeleteAll(m_color2edges);
     m_color2edges.clear();
 
-    m_color2edges[Col::GREEN] = m_ui->greenEdgeWidget;
-    m_color2edges[Col::BLUE] = m_ui->blueEdgeWidget;
-    m_color2edges[Col::RED] = m_ui->redEdgeWidget;
-    m_color2edges[Col::ORANGE] = m_ui->orangeEdgeWidget;
-    m_color2edges[Col::WHITE] = m_ui->whiteEdgeWidget;
-    m_color2edges[Col::YELLOW] = m_ui->yellowEdgeWidget;
+    auto layout = m_ui->edgesFrame->layout();
+    if(!layout)
+        layout = new QVBoxLayout(m_ui->edgesFrame);
 
-    for (auto key: m_color2edges.keys())
-    {
-        auto w = m_color2edges.value(key);
-        w->setEdgeButtonColor(key);
+    auto factory = new GuitarEdgeSettingsFactory;
 
-        // Set minimum by default
-        const auto minString = GuitarFretboardPos().string;
-        w->setMinStringNumber(minString);
-    }
+    auto addWidget = [layout, factory, this] (CubeEdge::Color col) {
+        auto w = new EdgeWidget(col, factory, this);
+        m_color2edges[col] = w;
+        layout->addWidget(w);
+    };
+
+    addWidget(Col::GREEN);
+    addWidget(Col::BLUE);
+    addWidget(Col::RED);
+    addWidget(Col::ORANGE);
+    addWidget(Col::WHITE);
+    addWidget(Col::YELLOW);
 }
 
-QList<EdgeSettingsWidget *> MainWindow::edgeWidgets()
+QList<EdgeWidget *> MainWindow::edgeWidgets()
 {
     assert(!m_color2edges.empty());
     return m_color2edges.values();
 }
 
-void MainWindow::groupStringModeToggled(bool st)
+int MainWindow::defaultHarmonyDelayMsec() const
 {
-    auto setStringForAllWidget = [this](int string)
-    {
-        for(auto w: edgeWidgets())
-            w->setCurrentString(string);
-    };
-
-    auto bindEdgeWidgets = [this, setStringForAllWidget]
-    {
-        setStringForAllWidget(GuitarFretboardPos().string);
-        for(auto w: edgeWidgets())
-            connect(w, &EdgeSettingsWidget::stringChanged, this, setStringForAllWidget);
-    };
-
-    auto unleashEdgeWidgets = [this]
-    {
-        for(auto w: edgeWidgets())
-            disconnect(w, 0, this, 0);
-    };
-
-    if(st)
-        bindEdgeWidgets();
-    else
-        unleashEdgeWidgets();
+    return m_ui->durLineEdit->text().toInt();
 }
 
-void MainWindow::bedirectModeToggled(bool st)
+void MainWindow::setRotationModeEnabled(bool en)
 {
-    for(auto w: edgeWidgets())
-        w->setRotationModeEnabled(st);
-}
-
-void MainWindow::setMaxGuitarFretboardPos(const GuitarFretboardPos & freatboardPos)
-{
-    for(auto w: edgeWidgets())
-    {
-        w->setMaxFretNumber(freatboardPos.fret);
-        w->setMaxStringNumber(freatboardPos.string);
-    }
-}
-
-GuitarFretboardPos MainWindow::guitarFretboardPosFor(const CubeEdge& info) const
-{
-    auto widget = m_color2edges.value(info.color, nullptr);
-    if(!widget)
-        return {};
-    return {widget->stringFor(info.rotation), widget->fretFor(info.rotation)};
+    for(auto ew: edgeWidgets())
+        ew->setRotationModeEnabled(en);
 }
 
 void MainWindow::highlightEdge(CubeEdge::Color color)
 {
     if(auto edge = m_color2edges.value(color, nullptr))
-        edge->blinkEdgeButton();
-}
-
-int MainWindow::soundDuration() const
-{
-    return m_ui->durLineEdit->text().toInt();
+        edge->indicate();
 }

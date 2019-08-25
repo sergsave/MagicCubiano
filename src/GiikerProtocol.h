@@ -4,7 +4,7 @@
 #include <QLowEnergyService>
 #include <QBluetoothDeviceInfo>
 
-#include "MagicCubianoGlobal.h"
+#include "CubeEdge.h"
 
 class QBluetoothDeviceDiscoveryAgent;
 class QLowEnergyController;
