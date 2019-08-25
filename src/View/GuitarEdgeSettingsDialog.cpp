@@ -5,8 +5,6 @@
 #include <algorithm>
 
 #include <QCheckBox>
-#include <QDebug>
-#include <QDesktopWidget>
 
 namespace {
 // http://static1.squarespace.com/static/57a08f8a414fb546e8e35178/587dae1f9f7456b5f7fc5413/59e456f08dd041f0a6c9ed93/1508217399278/Guitar_fret_notes_and_frequency_hz.png?format=1500w

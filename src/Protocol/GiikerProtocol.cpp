@@ -22,7 +22,7 @@ GiikerProtocol::GiikerProtocol(QObject * parent):
     m_discoveryDevAgent->setLowEnergyDiscoveryTimeout(0);
 
     auto deviceDiscovered = [this] (const QBluetoothDeviceInfo & device){
-        if(device.name().startsWith("GiC"))
+        if(device.name().startsWith("Gi"))
             connectToDevice(device);
     };
 

@@ -7,8 +7,6 @@
 #include <qmath.h>
 #include <qendian.h>
 
-#include <functional>
-
 namespace {
 
 qreal frequencyFor(const Music::Tone& tone)
@@ -28,7 +26,6 @@ qreal frequencyFor(const Music::Tone& tone)
 }
 
 }
-
 
 // From Qt example
 class Generator : public QIODevice

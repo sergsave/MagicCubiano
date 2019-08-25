@@ -3,7 +3,7 @@
 #include <cassert>
 
 #include "ToneGenerator.h"
-/*#include "GuitarGenerator.h"*/
+#include "GuitarGenerator.h"
 
 enum class GenType
 {
@@ -18,7 +18,7 @@ SoundGenerator * createSoundGenerator(GenType type, QObject * parent = nullptr)
     case GenType::TONE:
         return new ToneGenerator(parent);
     case GenType::GUITAR:
-        // return new GuitarGenerator(parent);
+        return new GuitarGenerator(parent);
         return nullptr;
     default:
         assert("unreal logic");

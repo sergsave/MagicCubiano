@@ -120,9 +120,10 @@ void EdgeWidget::updateSettingsButtons()
     // TODO: Note icon
     auto text = [this](Rotation rot)
     {
+        QString ret;
         for(auto t: harmonyFor(rot).tones)
-            text += t.toString() + " ";
-        return text;
+            ret += t.toString() + " ";
+        return ret;
     };
 
     m_ui->clockwizeButton->setText(text(Rotation::CLOCKWIZE));
@@ -146,7 +147,7 @@ void EdgeWidget::updateRotationButton()
         return;
     }
 
-    const QString path = isClockwize(m_rotationPage) ? ":/clockwize.png" : ":/anticlockwize.png";
+    const QString path = isClockwize(m_rotationPage) ? ":/images/clockwize.png" : ":/images/anticlockwize.png";
 
     button->setIconSize(button->size() * 3 / 4);
     button->setIcon(QPixmap(path));

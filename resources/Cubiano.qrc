@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/" >
-        <file>clockwize.png</file>
-        <file>anticlockwize.png</file>
+        <file>images/clockwize.png</file>
+        <file>images/anticlockwize.png</file>
+
     </qresource>
 </RCC>

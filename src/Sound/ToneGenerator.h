@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <QAudioFormat>
 #include <QAudioDeviceInfo>
 
@@ -17,7 +16,6 @@ class ToneGenerator : public SoundGenerator
 
 public:
     explicit ToneGenerator(QObject* parent = 0);
-    virtual ~ToneGenerator() = default;
 
     void playHarmony(const Music::Harmony&) override;
 
