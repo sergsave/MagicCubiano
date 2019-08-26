@@ -1,6 +1,8 @@
 #include "GuitarGenerator.h"
 
 #include <QMediaPlayer>
+#include <QSound>
+
 #include <QUrl>
 #include <QTimer>
 #include <QDebug>
@@ -18,6 +20,18 @@ QUrl resourceFor(const Music::Tone& tone)
 
     return prefix + copy.toString(Music::Tone::Format::IS) + postfix;
 }
+
+QString wavResourceFor(const Music::Tone& tone)
+{
+    auto copy = tone;
+    copy.octave -= 2;
+
+    QString prefix = ":/sounds/";
+    QString postfix = ".wav";
+
+    return prefix + copy.toString(Music::Tone::Format::IS) + postfix;
+}
+
 }
 
 GuitarGenerator::GuitarGenerator(QObject* parent):
@@ -28,8 +42,8 @@ GuitarGenerator::GuitarGenerator(QObject* parent):
     {
         for(auto t : tones)
         {
-            auto player = new QMediaPlayer(this);
-            player->setMedia(resourceFor(t));
+            auto player = new QSound(wavResourceFor(t), this);
+//            player->setMedia(resourceFor(t));
             m_players[t.toString()] = player;
         }
 
@@ -46,7 +60,8 @@ void GuitarGenerator::playHarmony(const Music::Harmony & harm)
     if(harm.tones.empty())
         return;
 
-    QVector<QMediaPlayer*> players;
+//    QVector<QMediaPlayer*> players;
+    QVector<QSound*> players;
 
     for(auto t: harm.tones)
         players.append(m_players[t.toString()]);

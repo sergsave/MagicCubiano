@@ -47,5 +47,19 @@
         <file>sounds/Gis1.mp3</file>
         <file>sounds/Gis2.mp3</file>
         <file>sounds/Gis3.mp3</file>
+        <file>sounds/A0.wav</file>
+        <file>sounds/Ais0.wav</file>
+        <file>sounds/B0.wav</file>
+        <file>sounds/B1.wav</file>
+        <file>sounds/C1.wav</file>
+        <file>sounds/Cis1.wav</file>
+        <file>sounds/D1.wav</file>
+        <file>sounds/E0.wav</file>
+        <file>sounds/E2.wav</file>
+        <file>sounds/F0.wav</file>
+        <file>sounds/Fis0.wav</file>
+        <file>sounds/G0.wav</file>
+        <file>sounds/G1.wav</file>
+        <file>sounds/Gis0.wav</file>
     </qresource>
 </RCC>

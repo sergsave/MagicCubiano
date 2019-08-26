@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QMap>
 
-class QMediaPlayer;
+class QSound;
 
 class GuitarGenerator : public SoundGenerator
 {
@@ -16,5 +16,5 @@ public:
     void playHarmony(const Music::Harmony& ) override;
 
 private:
-    QMap<QString, QMediaPlayer*> m_players;
+    QMap<QString, QSound*> m_players;
 };
