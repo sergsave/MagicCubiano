@@ -13,7 +13,7 @@ struct Tone
 
     Tone(Note note = B, int octave = 0);
 
-    QString toString(Format) const;
+    QString toString(Format = Format::IS) const;
 
     Note note;
     int octave;

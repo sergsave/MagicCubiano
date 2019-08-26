@@ -3,6 +3,7 @@
 #include "SoundGenerator.h"
 
 #include <QObject>
+#include <QMap>
 
 class QMediaPlayer;
 
@@ -15,5 +16,5 @@ public:
     void playHarmony(const Music::Harmony& ) override;
 
 private:
-    QVector<QMediaPlayer*> m_players;
+    QMap<QString, QMediaPlayer*> m_players;
 };

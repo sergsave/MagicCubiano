@@ -4,6 +4,7 @@
 #include <QUrl>
 #include <QTimer>
 #include <QDebug>
+#include <QTime>
 
 namespace {
 
@@ -22,6 +23,22 @@ QUrl resourceFor(const Music::Tone& tone)
 GuitarGenerator::GuitarGenerator(QObject* parent):
     SoundGenerator(parent)
 {
+
+    auto fillPlayers = [this](const Music::Tones& tones)
+    {
+        for(auto t : tones)
+        {
+            auto player = new QMediaPlayer(this);
+            player->setMedia(resourceFor(t));
+            m_players[t.toString()] = player;
+        }
+
+    };
+
+    fillPlayers(Music::allTonesForOctave(2));
+    fillPlayers(Music::allTonesForOctave(3));
+    fillPlayers(Music::allTonesForOctave(4));
+    fillPlayers(Music::allTonesForOctave(5));
 }
 
 void GuitarGenerator::playHarmony(const Music::Harmony & harm)
@@ -29,17 +46,22 @@ void GuitarGenerator::playHarmony(const Music::Harmony & harm)
     if(harm.tones.empty())
         return;
 
-    qDeleteAll(m_players);
-    m_players.clear();
+    QVector<QMediaPlayer*> players;
 
-    for (auto t : harm.tones)
-    {
-        auto player = new QMediaPlayer(this);
-        player->setMedia(resourceFor(t));
-        m_players.append(player);
-    }
+    for(auto t: harm.tones)
+        players.append(m_players[t.toString()]);
 
-    for (int i = 0; i != m_players.size(); ++i)
-        QTimer::singleShot(harm.delayMSec * i, m_players[i], &QMediaPlayer::play);
+    qDebug() << QTime::currentTime();
+
+    for (int i = 0; i != players.size(); ++i)
+        QTimer::singleShot(harm.delayMSec * i, players[i], [players,i] ()
+        {
+            qDebug() << QTime::currentTime();
+
+            players[i]->stop();
+            players[i]->play();
+        }
+
+    );
 }
 
