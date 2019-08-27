@@ -25,7 +25,7 @@ bool isClockwize(Rotation rot)
     }
 }
 
-QString colorStrFor(CubeEdge::Color color)
+QColor colorFor(CubeEdge::Color color)
 {
     using Col = CubeEdge::Color;
     QMap<Col, QColor> map
@@ -72,8 +72,16 @@ EdgeWidget::EdgeWidget(CubeEdge::Color col, EdgeSettingsFactory * factory, QWidg
     connect(m_ui->clockwizeButton, &QAbstractButton::clicked, this, &EdgeWidget::enterSettings);
     connect(m_ui->antiClockwizeButton, &QAbstractButton::clicked, this, &EdgeWidget::enterSettings);
 
-    m_rotation2settings[Rotation::CLOCKWIZE] = factory->create(this);
-    m_rotation2settings[Rotation::ANTICLOCKWIZE] = factory->create(this);
+    const QPixmap pm(":/images/musical-note.png");
+
+    m_ui->clockwizeButton->setIcon(pm);
+    m_ui->antiClockwizeButton->setIcon(pm);
+
+    // TODO: Rotation icon and no magic number
+    QPixmap icon(32, 32);
+    icon.fill(colorFor(col));
+    m_rotation2settings[Rotation::CLOCKWIZE] = factory->create(icon, this);
+    m_rotation2settings[Rotation::ANTICLOCKWIZE] = factory->create(icon, this);
 
     updateSettingsButtons();
 }
@@ -89,13 +97,13 @@ void EdgeWidget::indicate()
     setWidgetStyleColor(button, "");
 
     QTimer::singleShot(blinkTime, button, [this, button] {
-        setWidgetStyleColor(button, colorStrFor(m_color));
+        setWidgetStyleColor(button, colorFor(m_color).name());
     });
 }
 
 void EdgeWidget::setEdgeColor(CubeEdge::Color color)
 {
-    setWidgetStyleColor(m_ui->rotationButton, colorStrFor(color));
+    setWidgetStyleColor(m_ui->rotationButton, colorFor(color).name());
     m_color = color;
 }
 
@@ -117,7 +125,6 @@ bool EdgeWidget::inRotationMode(bool) const
 
 void EdgeWidget::updateSettingsButtons()
 {
-    // TODO: Note icon
     auto text = [this](Rotation rot)
     {
         QString ret;

@@ -2,6 +2,8 @@
 
 #include "SoundGenerator.h"
 
+class QSound;
+
 class SampleGenerator : public SoundGenerator
 {
     Q_OBJECT
@@ -10,4 +12,7 @@ public:
 
     void playHarmony(const Music::Harmony& ) override;
     virtual QString resourceFor(const Music::Tone&) const;
+
+private:
+    QList<QSound*> m_players;
 };

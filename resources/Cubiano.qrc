@@ -47,5 +47,6 @@
         <file>sounds/guitar/Gis1.wav</file>
         <file>sounds/guitar/Gis2.wav</file>
         <file>sounds/guitar/Gis3.wav</file>
+        <file>images/musical-note.png</file>
     </qresource>
 </RCC>

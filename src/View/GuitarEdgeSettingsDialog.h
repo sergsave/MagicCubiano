@@ -16,7 +16,7 @@ class GuitarEdgeSettingsDialog : public EdgeSettingsDialog
     Q_OBJECT
 
 public:
-    explicit GuitarEdgeSettingsDialog(QWidget *parent = 0);
+    explicit GuitarEdgeSettingsDialog(const QPixmap& icon, QWidget *parent = nullptr);
     ~GuitarEdgeSettingsDialog();
 
     Music::Harmony harmony() const override;

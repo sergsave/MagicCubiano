@@ -120,11 +120,13 @@ private:
     QSlider * m_slider = nullptr;
 };
 
-GuitarEdgeSettingsDialog::GuitarEdgeSettingsDialog(QWidget *parent) :
-    EdgeSettingsDialog(parent),
+GuitarEdgeSettingsDialog::GuitarEdgeSettingsDialog(const QPixmap& icon, QWidget *parent) :
+    EdgeSettingsDialog(icon, parent),
     m_ui(new Ui::GuitarEdgeSettingsDialog)
 {
     m_ui->setupUi(this);
+
+    m_ui->iconLabel->setPixmap(icon);
 
     auto layout = new QHBoxLayout(m_ui->frame);
     layout->setDirection(QBoxLayout::RightToLeft);

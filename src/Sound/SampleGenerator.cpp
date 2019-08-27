@@ -10,10 +10,17 @@ SampleGenerator::SampleGenerator(QObject* parent):
 
 void SampleGenerator::playHarmony(const Music::Harmony & harm)
 {
+    qDeleteAll(m_players);
+    m_players.clear();
+
     for(int i = 0; i != harm.tones.size(); ++i)
     {
         auto path = resourceFor(harm.tones[i]);
-        QTimer::singleShot(harm.delayMSec * i, this, [path] { QSound::play(path); });
+        auto player = new QSound(path, this);
+
+        QTimer::singleShot(harm.delayMSec * i, player, [player] { player->play(); });
+
+        m_players.append(player);
     }
 }
 
