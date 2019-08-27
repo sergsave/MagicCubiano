@@ -1,20 +1,20 @@
 #pragma once
 
-#include "SoundGenerator.h"
+#include "SampleGenerator.h"
 
-#include <QObject>
-#include <QMap>
-
-class QSound;
-
-class GuitarGenerator : public SoundGenerator
+class GuitarGenerator : public SampleGenerator
 {
-    Q_OBJECT
 public:
-    explicit GuitarGenerator(QObject* parent = nullptr);
+    using SampleGenerator::SampleGenerator;
 
-    void playHarmony(const Music::Harmony& ) override;
+    QString resourceFor(const Music::Tone& tone) const override
+    {
+        auto copy = tone;
+        copy.octave -= 2;
 
-private:
-    QMap<QString, QSound*> m_players;
+        QString prefix = ":/sounds/guitar/";
+        QString postfix = ".wav";
+
+        return prefix + copy.toString(Music::Tone::Format::IS) + postfix;
+    }
 };
