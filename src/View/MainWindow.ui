@@ -39,29 +39,41 @@
     </widget>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QLabel" name="durLabel">
-         <property name="text">
-          <string>Duration [mSec]:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="durLineEdit">
-         <property name="text">
-          <string>100</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="0" column="0">
-      <widget class="QCheckBox" name="bidrectCheckBox">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="syncButton">
        <property name="text">
-        <string>Bidirectional mode</string>
+        <string>Sync</string>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="durLabel">
+       <property name="text">
+        <string>Duration [mSec]:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="durLineEdit">
+       <property name="text">
+        <string>0</string>
        </property>
       </widget>
      </item>

@@ -13,6 +13,7 @@ public:
     {}
 
     virtual Music::Harmony harmony() const = 0;
+    virtual void setHarmony(const Music::Harmony&) = 0;
 
 protected:
     QPixmap icon() const { return m_icon; }

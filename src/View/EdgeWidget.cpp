@@ -35,10 +35,10 @@ QColor colorFor(CubeEdge::Color color)
         { Col::RED, "#FFB6C1" }, // Light pink Giiker V1 peculiarity
         { Col::ORANGE, "#FF4500"},  // Orangered Giiker V1 peculiarity
         { Col::YELLOW, Qt::yellow},
-        { Col::WHITE, Qt::white}
+        { Col::WHITE, "#DCDCDC"},  // Gainsboro for contrast
     };
 
-    return map.value(color, Qt::black).name();
+    return map.value(color, Qt::black);
 }
 
 void setWidgetStyleColor(QWidget * w, const QString& color)
@@ -61,12 +61,8 @@ EdgeWidget::EdgeWidget(CubeEdge::Color col, EdgeSettingsFactory * factory, QWidg
 {
     m_ui->setupUi(this);
 
-    setEdgeColor(col);
-    setRotationModeEnabled(false);
-    setRotationPage(Rotation::CLOCKWIZE);
-
     connect(m_ui->rotationButton, &QAbstractButton::toggled, this, [this] (bool st) {
-        setRotationPage(st ? Rotation::ANTICLOCKWIZE : Rotation::CLOCKWIZE);
+        setRotateDirection(st ? Rotation::ANTICLOCKWIZE : Rotation::CLOCKWIZE);
     });
 
     connect(m_ui->clockwizeButton, &QAbstractButton::clicked, this, &EdgeWidget::enterSettings);
@@ -83,6 +79,8 @@ EdgeWidget::EdgeWidget(CubeEdge::Color col, EdgeSettingsFactory * factory, QWidg
     m_rotation2settings[Rotation::CLOCKWIZE] = factory->create(icon, this);
     m_rotation2settings[Rotation::ANTICLOCKWIZE] = factory->create(icon, this);
 
+    setEdgeColor(col);
+    setRotateDirection(Rotation::CLOCKWIZE);
     updateSettingsButtons();
 }
 
@@ -112,15 +110,32 @@ CubeEdge::Color EdgeWidget::edgeColor() const
     return m_color;
 }
 
-void EdgeWidget::setRotationModeEnabled(bool enabled)
+Music::Harmony EdgeWidget::harmony(Rotation dir) const
 {
-    m_rotationMode = enabled;
-    updateRotationButton();
+    return settings(dir)->harmony();
 }
 
-bool EdgeWidget::inRotationMode(bool) const
+void EdgeWidget::setHarmony(const Music::Harmony &harmony, CubeEdge::Rotation dir)
 {
-    return m_rotationMode;
+    settings(dir)->setHarmony(harmony);
+    updateSettingsButtons();
+}
+
+Rotation EdgeWidget::rotateDirection() const
+{
+    return m_rotateDir;
+}
+
+void EdgeWidget::setRotateDirection(Rotation dir)
+{
+    if(isClockwize(dir))
+        m_ui->stackedWidget->setCurrentWidget(m_ui->clockwizePage);
+    else
+        m_ui->stackedWidget->setCurrentWidget(m_ui->antiClockwizePage);
+
+    m_rotateDir = dir;
+
+    updateRotationButton();
 }
 
 void EdgeWidget::updateSettingsButtons()
@@ -128,7 +143,7 @@ void EdgeWidget::updateSettingsButtons()
     auto text = [this](Rotation rot)
     {
         QString ret;
-        for(auto t: harmonyFor(rot).tones)
+        for(auto t: harmony(rot).tones)
             ret += t.toString(Music::Tone::SHARP) + " ";
         return ret;
     };
@@ -137,51 +152,25 @@ void EdgeWidget::updateSettingsButtons()
     m_ui->antiClockwizeButton->setText(text(Rotation::ANTICLOCKWIZE));
 }
 
-void EdgeWidget::enterSettings()
-{
-    m_rotation2settings[m_rotationPage]->exec();
-    updateSettingsButtons();
-}
-
 void EdgeWidget::updateRotationButton()
 {
+    // TODO: correct icon size on start
     auto button = m_ui->rotationButton;
 
-    if(!m_rotationMode)
-    {
-        button->setIcon({});
-        button->setEnabled(false);
-        return;
-    }
-
-    const QString path = isClockwize(m_rotationPage) ? ":/images/clockwize.png" : ":/images/anticlockwize.png";
+    const QString path = isClockwize(m_rotateDir) ? ":/images/clockwize.png" : ":/images/anticlockwize.png";
 
     button->setIconSize(button->size() * 3 / 4);
     button->setIcon(QPixmap(path));
-    button->setEnabled(true);
 }
 
-void EdgeWidget::setRotationPage(Rotation page)
+void EdgeWidget::enterSettings()
 {
-    if(isClockwize(page))
-        m_ui->stackedWidget->setCurrentWidget(m_ui->clockwizePage);
-    else
-        m_ui->stackedWidget->setCurrentWidget(m_ui->antiClockwizePage);
-
-    m_rotationPage = page;
-
-    updateRotationButton();
+    settings(m_rotateDir)->exec();
+    updateSettingsButtons();
 }
 
-Music::Harmony EdgeWidget::harmonyFor(Rotation rot) const
+EdgeSettingsDialog * EdgeWidget::settings(Rotation rot) const
 {
-    if(!m_rotationMode)
-        return currentHarmony();
-
-    return m_rotation2settings[rot]->harmony();
-}
-
-Music::Harmony EdgeWidget::currentHarmony() const
-{
-    return m_rotation2settings[m_rotationPage]->harmony();
+    assert("Not inited settings!");
+    return m_rotation2settings.value(rot, nullptr);
 }

@@ -24,29 +24,27 @@ public:
 
     void indicate();
 
-    void setEdgeColor(CubeEdge::Color color);
     CubeEdge::Color edgeColor() const;
+    void setEdgeColor(CubeEdge::Color color);
 
-    void setRotationModeEnabled(bool);
-    bool inRotationMode(bool) const;
+    Music::Harmony harmony(CubeEdge::Rotation dir) const;
+    void setHarmony(const Music::Harmony& harmony, CubeEdge::Rotation dir);
 
-    Music::Harmony harmonyFor(CubeEdge::Rotation) const;
+    CubeEdge::Rotation rotateDirection() const;
+    void setRotateDirection(CubeEdge::Rotation dir);
 
 private:
-    void setRotationPage(CubeEdge::Rotation rot);
-    void updateRotationButton();
     void updateSettingsButtons();
+    void updateRotationButton();
     void enterSettings();
 
-    Music::Harmony currentHarmony() const;
+    EdgeSettingsDialog * settings(CubeEdge::Rotation) const;
 
 private:
     CubeEdge::Color m_color = CubeEdge::GREEN;
+    CubeEdge::Rotation m_rotateDir = CubeEdge::CLOCKWIZE;
 
-    CubeEdge::Rotation m_rotationPage = CubeEdge::CLOCKWIZE;
-    bool m_rotationMode = false;
     QMap<CubeEdge::Rotation, EdgeSettingsDialog*> m_rotation2settings;
-
     QScopedPointer<Ui::EdgeWidget> m_ui;
 };
 

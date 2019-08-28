@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include <QCheckBox>
+#include <set>
 
 namespace {
 // http://static1.squarespace.com/static/57a08f8a414fb546e8e35178/587dae1f9f7456b5f7fc5413/59e456f08dd041f0a6c9ed93/1508217399278/Guitar_fret_notes_and_frequency_hz.png?format=1500w
@@ -35,28 +36,43 @@ const QVector<Tone> tonesForString(const Tone& firstTone)
     return ret;
 }
 
-Music::Tone musicToneFor(int string, int fret)
+static const QVector<QVector<Tone>> g_musicTones
 {
-    using T = Tone;
+    // Start with sixth string
+    tonesForString(Tone(Tone::E, 2)),
+    tonesForString(Tone(Tone::A, 2)),
+    tonesForString(Tone(Tone::D, 3)),
+    tonesForString(Tone(Tone::G, 3)),
+    tonesForString(Tone(Tone::B, 3)),
+    tonesForString(Tone(Tone::E, 4)),
+};
 
-    static const QVector<QVector<Tone>> musicTones
+struct FretboardPos
+{
+    int string = -1;
+    int fret = -1;
+
+    bool isValid() const { return string != -1 && fret != -1; }
+};
+
+Tone musicToneFor(const FretboardPos& frPos)
+{
+    if(!frPos.isValid())
     {
-        // Start with first string
-        tonesForString(Tone(T::E, 4)),
-        tonesForString(Tone(T::B, 3)),
-        tonesForString(Tone(T::G, 3)),
-        tonesForString(Tone(T::D, 3)),
-        tonesForString(Tone(T::A, 2)),
-        tonesForString(Tone(T::E, 2)),
-    };
+        assert("not valid");
+        return {};
+    }
 
-    if(string < 0 || string >= musicTones.size())
+    const int string = frPos.string;
+    const int fret = frPos.fret;
+
+    if(string < 0 || string >= g_musicTones.size())
     {
         assert("out of range");
         return {};
     }
 
-    const auto tonesForString  = musicTones[string];
+    const auto tonesForString  = g_musicTones[string];
 
     if(fret < 0 || fret >= tonesForString.size())
     {
@@ -65,6 +81,21 @@ Music::Tone musicToneFor(int string, int fret)
     }
 
     return tonesForString[fret];
+}
+
+FretboardPos fretboardPosFor(const Tone& tone, const std::set<int>& stringsNumb)
+{
+    for(int string: stringsNumb)
+    {
+        int fret = g_musicTones[string].indexOf(tone);
+
+        if(fret == -1)
+            continue;
+
+        return {string, fret};
+    }
+
+    return {};
 }
 
 }
@@ -125,11 +156,9 @@ GuitarEdgeSettingsDialog::GuitarEdgeSettingsDialog(const QPixmap& icon, QWidget 
     m_ui(new Ui::GuitarEdgeSettingsDialog)
 {
     m_ui->setupUi(this);
-
     m_ui->iconLabel->setPixmap(icon);
 
     auto layout = new QHBoxLayout(m_ui->frame);
-    layout->setDirection(QBoxLayout::RightToLeft);
 
     for(int i = 0; i != m_stringQuantity; ++i)
     {
@@ -137,8 +166,6 @@ GuitarEdgeSettingsDialog::GuitarEdgeSettingsDialog(const QPixmap& icon, QWidget 
         m_strings.append(w);
         layout->addWidget(w);
     }
-
-    m_strings.last()->setMuted(false);
 
     setWindowFlags(Qt::Window);
 }
@@ -149,8 +176,7 @@ Music::Harmony GuitarEdgeSettingsDialog::harmony() const
 {
     QVector<StringWidget*> activeStrings;
 
-    // Reverse order. Sound of last string is first.
-    std::copy_if(m_strings.begin(), m_strings.end(), std::front_inserter(activeStrings), [](StringWidget * sw){
+    std::copy_if(m_strings.begin(), m_strings.end(), std::back_inserter(activeStrings), [](StringWidget const * sw){
         return !sw->isMuted();
     });
 
@@ -159,8 +185,38 @@ Music::Harmony GuitarEdgeSettingsDialog::harmony() const
     std::transform(activeStrings.begin(), activeStrings.end(), std::back_inserter(tones), [this](StringWidget * sw) {
         auto string = m_strings.indexOf(sw);
         auto fret = sw->fretValue();
-        return musicToneFor(string, fret);
+        return musicToneFor({string, fret});
     });
 
-    return { tones, m_delayMSec };
+    return {tones, m_delayMSec};
+}
+
+void GuitarEdgeSettingsDialog::setHarmony(const Harmony& harmony)
+{
+    std::set<int> vacantStringsNumb;
+
+    for(int strNumb = 0; strNumb != m_stringQuantity; ++strNumb)
+        vacantStringsNumb.insert(strNumb);
+
+    QVector<FretboardPos> positions;
+
+    for(const auto &tone : harmony.tones)
+    {
+        auto pos = fretboardPosFor(tone, vacantStringsNumb);
+
+        if(!pos.isValid())
+            continue;
+
+        positions.append(pos);
+        vacantStringsNumb.erase(pos.string);
+    }
+
+    for(auto sw: m_strings)
+        sw->setMuted(true);
+
+    for(const auto& pos: positions)
+    {
+        m_strings[pos.string]->setMuted(false);
+        m_strings[pos.string]->setFretValue(pos.fret);
+    }
 }

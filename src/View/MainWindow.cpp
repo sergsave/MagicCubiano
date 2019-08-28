@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent):
     QRect scr = QApplication::desktop()->screenGeometry();
     move( scr.center() - rect().center() );
 
-    connect(m_ui->bidrectCheckBox, &QAbstractButton::toggled, this, &MainWindow::setRotationModeEnabled);
+    connect(m_ui->syncButton, &QAbstractButton::clicked, this, &MainWindow::synchronizeEdgesRotation);
 }
 
 MainWindow::~MainWindow() = default;
@@ -42,12 +42,18 @@ Music::Harmony MainWindow::harmonyFor(const CubeEdge & edge) const
     if(!edgeWidget)
         return {};
 
-    auto harmony = edgeWidget->harmonyFor(edge.rotation);
+    auto harmony = edgeWidget->harmony(edge.rotation);
 
     if(harmony.delayMSec == 0)
         harmony.delayMSec = defaultHarmonyDelayMsec();
 
     return harmony;
+}
+
+void MainWindow::highlightEdge(CubeEdge::Color color)
+{
+    if(auto edge = m_color2edges.value(color, nullptr))
+        edge->indicate();
 }
 
 void MainWindow::connected()
@@ -63,8 +69,8 @@ void MainWindow::connectionFailed()
 void MainWindow::createEdgeWidgets()
 {
     using Col = CubeEdge::Color;
-    qDeleteAll(m_color2edges);
-    m_color2edges.clear();
+
+    assert(m_color2edges.empty());
 
     auto layout = m_ui->edgesFrame->layout();
     if(!layout)
@@ -72,10 +78,23 @@ void MainWindow::createEdgeWidgets()
 
     QScopedPointer<EdgeSettingsFactory> factory(new GuitarEdgeSettingsFactory);
 
-    auto addWidget = [layout, &factory, this] (CubeEdge::Color col) {
+    auto setDefaultHarmony = [this] (EdgeWidget * ew) {
+        using namespace Music;
+
+        auto tone = Tone(Tone::E, 2);
+        auto delay = defaultHarmonyDelayMsec();
+        auto harmony = Harmony({tone}, delay);
+
+        setAllDirectionHarmony(ew, harmony);
+    };
+
+    auto addWidget = [layout, &factory, &setDefaultHarmony, this] (CubeEdge::Color col) {
         auto w = new EdgeWidget(col, factory.data(), this);
-        m_color2edges[col] = w;
         layout->addWidget(w);
+
+        setDefaultHarmony(w);
+
+        m_color2edges[col] = w;
     };
 
     addWidget(Col::YELLOW);
@@ -97,14 +116,21 @@ int MainWindow::defaultHarmonyDelayMsec() const
     return m_ui->durLineEdit->text().toInt();
 }
 
-void MainWindow::setRotationModeEnabled(bool en)
+void MainWindow::setAllDirectionHarmony(EdgeWidget *ew, const Music::Harmony& harm)
 {
-    for(auto ew: edgeWidgets())
-        ew->setRotationModeEnabled(en);
+    ew->setHarmony(harm, CubeEdge::Rotation::ANTICLOCKWIZE);
+    ew->setHarmony(harm, CubeEdge::Rotation::CLOCKWIZE);
 }
 
-void MainWindow::highlightEdge(CubeEdge::Color color)
+void MainWindow::synchronizeEdgesRotation()
 {
-    if(auto edge = m_color2edges.value(color, nullptr))
-        edge->indicate();
+    for(auto ew: edgeWidgets())
+    {
+        if(!ew) continue;
+
+        ew->indicate();
+
+        auto currHarmony = ew->harmony(ew->rotateDirection());
+        setAllDirectionHarmony(ew, currHarmony);
+    }
 }

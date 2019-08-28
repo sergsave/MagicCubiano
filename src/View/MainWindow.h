@@ -38,10 +38,11 @@ private:
     void createEdgeWidgets();
     QList<EdgeWidget*> edgeWidgets();
 
+    void setAllDirectionHarmony(EdgeWidget *, const Music::Harmony &);
     int defaultHarmonyDelayMsec() const;
 
 private slots:
-    void setRotationModeEnabled(bool en);
+    void synchronizeEdgesRotation();
 
 private:
     QMap<CubeEdge::Color, EdgeWidget*> m_color2edges;

@@ -20,6 +20,7 @@ public:
     ~GuitarEdgeSettingsDialog();
 
     Music::Harmony harmony() const override;
+    void setHarmony(const Music::Harmony&) override;
 
 private:
     static const int m_fretQuantity = 15;
