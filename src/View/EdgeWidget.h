@@ -37,6 +37,9 @@ private:
     void updateSettingsButtons();
     void updateRotationButton();
     void enterSettings();
+    void updateSettingsIcon(CubeEdge::Rotation rot);
+
+    QString rotIconPath() const;
 
     EdgeSettingsDialog * settings(CubeEdge::Rotation) const;
 

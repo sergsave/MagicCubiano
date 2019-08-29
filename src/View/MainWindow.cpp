@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent):
     move( scr.center() - rect().center() );
 
     connect(m_ui->syncButton, &QAbstractButton::clicked, this, &MainWindow::synchronizeEdgesRotation);
+    connect(m_ui->resetButton, &QAbstractButton::clicked, this, &MainWindow::setDefaultHarmonies);
 }
 
 MainWindow::~MainWindow() = default;
@@ -78,21 +79,9 @@ void MainWindow::createEdgeWidgets()
 
     QScopedPointer<EdgeSettingsFactory> factory(new GuitarEdgeSettingsFactory);
 
-    auto setDefaultHarmony = [this] (EdgeWidget * ew) {
-        using namespace Music;
-
-        auto tone = Tone(Tone::E, 2);
-        auto delay = defaultHarmonyDelayMsec();
-        auto harmony = Harmony({tone}, delay);
-
-        setAllDirectionHarmony(ew, harmony);
-    };
-
-    auto addWidget = [layout, &factory, &setDefaultHarmony, this] (CubeEdge::Color col) {
+    auto addWidget = [layout, &factory, this] (CubeEdge::Color col) {
         auto w = new EdgeWidget(col, factory.data(), this);
         layout->addWidget(w);
-
-        setDefaultHarmony(w);
 
         m_color2edges[col] = w;
     };
@@ -103,6 +92,8 @@ void MainWindow::createEdgeWidgets()
     addWidget(Col::GREEN);
     addWidget(Col::WHITE);
     addWidget(Col::BLUE);
+
+    setDefaultHarmonies();
 }
 
 QList<EdgeWidget *> MainWindow::edgeWidgets()
@@ -127,10 +118,26 @@ void MainWindow::synchronizeEdgesRotation()
     for(auto ew: edgeWidgets())
     {
         if(!ew) continue;
-
         ew->indicate();
 
         auto currHarmony = ew->harmony(ew->rotateDirection());
         setAllDirectionHarmony(ew, currHarmony);
+    }
+}
+
+void MainWindow::setDefaultHarmonies()
+{
+    for(auto ew: edgeWidgets())
+    {
+        if(!ew) continue;
+        ew->indicate();
+
+        using namespace Music;
+
+        auto tone = Tone(Tone::E, 2);
+        auto delay = defaultHarmonyDelayMsec();
+        auto harmony = Harmony({tone}, delay);
+
+        setAllDirectionHarmony(ew, harmony);
     }
 }

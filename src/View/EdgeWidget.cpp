@@ -6,6 +6,7 @@
 #include <QColor>
 #include <QTimer>
 #include <QSize>
+#include <QPainter>
 
 using Rotation = CubeEdge::Rotation;
 
@@ -73,11 +74,8 @@ EdgeWidget::EdgeWidget(CubeEdge::Color col, EdgeSettingsFactory * factory, QWidg
     m_ui->clockwizeButton->setIcon(pm);
     m_ui->antiClockwizeButton->setIcon(pm);
 
-    // TODO: Rotation icon and no magic number
-    QPixmap icon(32, 32);
-    icon.fill(colorFor(col));
-    m_rotation2settings[Rotation::CLOCKWIZE] = factory->create(icon, this);
-    m_rotation2settings[Rotation::ANTICLOCKWIZE] = factory->create(icon, this);
+    m_rotation2settings[Rotation::CLOCKWIZE] = factory->create(this);
+    m_rotation2settings[Rotation::ANTICLOCKWIZE] = factory->create(this);
 
     setEdgeColor(col);
     setRotateDirection(Rotation::CLOCKWIZE);
@@ -152,20 +150,38 @@ void EdgeWidget::updateSettingsButtons()
     m_ui->antiClockwizeButton->setText(text(Rotation::ANTICLOCKWIZE));
 }
 
+QString EdgeWidget::rotIconPath() const
+{
+    return isClockwize(m_rotateDir) ? ":/images/clockwize.png" : ":/images/anticlockwize.png";
+}
+
 void EdgeWidget::updateRotationButton()
 {
     // TODO: correct icon size on start
     auto button = m_ui->rotationButton;
 
-    const QString path = isClockwize(m_rotateDir) ? ":/images/clockwize.png" : ":/images/anticlockwize.png";
-
     button->setIconSize(button->size() * 3 / 4);
-    button->setIcon(QPixmap(path));
+    button->setIcon(QPixmap(rotIconPath()));
+}
+
+void EdgeWidget::updateSettingsIcon(Rotation rot)
+{
+    const QSize iconSize(32, 32);
+    QPixmap pm(iconSize);
+    pm.fill(colorFor(m_color));
+
+    QPainter painter(&pm);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.drawPixmap(QRect(QPoint(), pm.size()), QPixmap(rotIconPath()));
+
+    settings(rot)->setIcon(pm);
 }
 
 void EdgeWidget::enterSettings()
 {
+    updateSettingsIcon(m_rotateDir);
     settings(m_rotateDir)->exec();
+
     updateSettingsButtons();
 }
 

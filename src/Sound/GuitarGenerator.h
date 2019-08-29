@@ -15,6 +15,8 @@ public:
         QString prefix = ":/sounds/guitar/";
         QString postfix = ".wav";
 
+        // TODO: call of base class, if not exist
+
         return prefix + copy.toString(Music::Tone::Format::IS) + postfix;
     }
 };

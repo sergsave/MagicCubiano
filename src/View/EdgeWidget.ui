@@ -45,7 +45,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="clockwizePage">
       <layout class="QGridLayout" name="gridLayout_3" columnstretch="0">
@@ -66,6 +66,12 @@
        </property>
        <item row="0" column="0">
         <widget class="QPushButton" name="clockwizeButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>Notes: </string>
          </property>
@@ -92,6 +98,12 @@
        </property>
        <item row="0" column="0">
         <widget class="QPushButton" name="antiClockwizeButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>Notes: </string>
          </property>

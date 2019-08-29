@@ -213,5 +213,6 @@ void ToneGenerator::playHarmony(const Music::Harmony & harmony)
     m_harmonyCounter = 0;
     m_harmony = harmony;
 
+    // TODO: play without stop
     playTones();
 }

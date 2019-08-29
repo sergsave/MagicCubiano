@@ -43,6 +43,7 @@ private:
 
 private slots:
     void synchronizeEdgesRotation();
+    void setDefaultHarmonies();
 
 private:
     QMap<CubeEdge::Color, EdgeWidget*> m_color2edges;

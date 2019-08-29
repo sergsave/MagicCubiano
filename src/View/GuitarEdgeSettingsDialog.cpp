@@ -49,8 +49,9 @@ static const QVector<QVector<Tone>> g_musicTones
 
 struct FretboardPos
 {
-    int string = -1;
-    int fret = -1;
+    FretboardPos(int str = -1, int fret = -1) : string(str), fret(fret) {}
+    int string;
+    int fret;
 
     bool isValid() const { return string != -1 && fret != -1; }
 };
@@ -96,6 +97,24 @@ FretboardPos fretboardPosFor(const Tone& tone, const std::set<int>& stringsNumb)
     }
 
     return {};
+}
+
+FretboardPos findFretboardPos(const Tone& tone, const std::set<int>& strings, int maxFret)
+{
+    auto copyStrings = strings;
+
+    auto pos = fretboardPosFor(tone, copyStrings);
+
+    if(!pos.isValid())
+        return pos;
+
+    if(pos.fret > maxFret)
+    {
+        copyStrings.erase(pos.string);
+        pos = findFretboardPos(tone, copyStrings, maxFret);
+    }
+
+    return pos;
 }
 
 }
@@ -151,12 +170,11 @@ private:
     QSlider * m_slider = nullptr;
 };
 
-GuitarEdgeSettingsDialog::GuitarEdgeSettingsDialog(const QPixmap& icon, QWidget *parent) :
-    EdgeSettingsDialog(icon, parent),
+GuitarEdgeSettingsDialog::GuitarEdgeSettingsDialog(QWidget *parent) :
+    EdgeSettingsDialog(parent),
     m_ui(new Ui::GuitarEdgeSettingsDialog)
 {
     m_ui->setupUi(this);
-    m_ui->iconLabel->setPixmap(icon);
 
     auto layout = new QHBoxLayout(m_ui->frame);
 
@@ -168,6 +186,11 @@ GuitarEdgeSettingsDialog::GuitarEdgeSettingsDialog(const QPixmap& icon, QWidget 
     }
 
     setWindowFlags(Qt::Window);
+}
+
+void GuitarEdgeSettingsDialog::setIcon(const QPixmap &pm)
+{
+    m_ui->iconLabel->setPixmap(pm);
 }
 
 GuitarEdgeSettingsDialog::~GuitarEdgeSettingsDialog() = default;
@@ -185,7 +208,7 @@ Music::Harmony GuitarEdgeSettingsDialog::harmony() const
     std::transform(activeStrings.begin(), activeStrings.end(), std::back_inserter(tones), [this](StringWidget * sw) {
         auto string = m_strings.indexOf(sw);
         auto fret = sw->fretValue();
-        return musicToneFor({string, fret});
+        return musicToneFor(FretboardPos{string, fret});
     });
 
     return {tones, m_delayMSec};
@@ -202,17 +225,20 @@ void GuitarEdgeSettingsDialog::setHarmony(const Harmony& harmony)
 
     for(const auto &tone : harmony.tones)
     {
-        auto pos = fretboardPosFor(tone, vacantStringsNumb);
+        auto pos = findFretboardPos(tone, vacantStringsNumb, m_fretQuantity);
 
         if(!pos.isValid())
             continue;
 
-        positions.append(pos);
         vacantStringsNumb.erase(pos.string);
+        positions.append(pos);
     }
 
     for(auto sw: m_strings)
+    {
+        sw->setFretValue(0);
         sw->setMuted(true);
+    }
 
     for(const auto& pos: positions)
     {

@@ -4,14 +4,14 @@ class EdgeSettingsFactory
 {
 public:
     virtual ~EdgeSettingsFactory() = default;
-    virtual EdgeSettingsDialog * create(const QPixmap&, QWidget * parent) const = 0;
+    virtual EdgeSettingsDialog * create(QWidget * parent) const = 0;
 };
 
 class GuitarEdgeSettingsFactory : public EdgeSettingsFactory
 {
 public:
-    EdgeSettingsDialog * create(const QPixmap& icon, QWidget * parent) const override
+    EdgeSettingsDialog * create(QWidget * parent) const override
     {
-        return new GuitarEdgeSettingsDialog(icon, parent);
+        return new GuitarEdgeSettingsDialog(parent);
     }
 };

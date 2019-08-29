@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file>images/clockwize.png</file>
         <file>images/anticlockwize.png</file>
+        <file>sounds/beep.wav</file>
         <file>sounds/guitar/A0.wav</file>
         <file>sounds/guitar/A1.wav</file>
         <file>sounds/guitar/A2.wav</file>
@@ -14,7 +15,6 @@
         <file>sounds/guitar/B1.wav</file>
         <file>sounds/guitar/B2.wav</file>
         <file>sounds/guitar/B3.wav</file>
-        <file>sounds/guitar/beep.wav</file>
         <file>sounds/guitar/C1.wav</file>
         <file>sounds/guitar/C2.wav</file>
         <file>sounds/guitar/C3.wav</file>
