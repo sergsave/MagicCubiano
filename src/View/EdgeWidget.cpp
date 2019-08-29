@@ -157,7 +157,6 @@ QString EdgeWidget::rotIconPath() const
 
 void EdgeWidget::updateRotationButton()
 {
-    // TODO: correct icon size on start
     auto button = m_ui->rotationButton;
 
     button->setIconSize(button->size() * 3 / 4);
@@ -189,4 +188,11 @@ EdgeSettingsDialog * EdgeWidget::settings(Rotation rot) const
 {
     assert("Not inited settings!");
     return m_rotation2settings.value(rot, nullptr);
+}
+
+void EdgeWidget::showEvent(QShowEvent *event)
+{
+    // For correct icon size on start
+    updateRotationButton();
+    QWidget::showEvent(event);
 }

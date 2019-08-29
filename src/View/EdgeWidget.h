@@ -40,8 +40,9 @@ private:
     void updateSettingsIcon(CubeEdge::Rotation rot);
 
     QString rotIconPath() const;
-
     EdgeSettingsDialog * settings(CubeEdge::Rotation) const;
+
+    void showEvent(QShowEvent *event) override;
 
 private:
     CubeEdge::Color m_color = CubeEdge::GREEN;
