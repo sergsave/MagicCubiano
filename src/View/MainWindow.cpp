@@ -104,7 +104,8 @@ QList<EdgeWidget *> MainWindow::edgeWidgets()
 
 int MainWindow::defaultHarmonyDelayMsec() const
 {
-    return m_ui->durLineEdit->text().toInt();
+    // TODO
+    return 0;
 }
 
 void MainWindow::setAllDirectionHarmony(EdgeWidget *ew, const Music::Harmony& harm)
