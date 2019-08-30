@@ -1,5 +1,7 @@
 #include "GuitarEdgeSettingsDialog.h"
 
+#include "src/Configuration.h"
+
 class EdgeSettingsFactory
 {
 public:
@@ -12,6 +14,7 @@ class GuitarEdgeSettingsFactory : public EdgeSettingsFactory
 public:
     EdgeSettingsDialog * create(QWidget * parent) const override
     {
-        return new GuitarEdgeSettingsDialog(parent);
+        auto interval = Configuration::intervalFor(Music::Instrument::GUITAR);
+        return new GuitarEdgeSettingsDialog(interval, parent);
     }
 };

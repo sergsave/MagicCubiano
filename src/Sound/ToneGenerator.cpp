@@ -1,5 +1,6 @@
 #include "ToneGenerator.h"
 
+#include <cassert>
 #include <QIODevice>
 #include <QAudioOutput>
 #include <QDebug>
@@ -17,10 +18,13 @@ qreal frequencyFor(const Music::Tone& tone)
         16.35, 17.32, 18.35, 19.45, 20.60, 21.83,  23.12, 24.50, 25.96, 27.50, 29.14, 30.87
     };
 
-    static const auto tones = Music::allTonesForOctave(0);
+    static const auto tones = Music::allTonesFor(0);
 
     const auto octave0Tone = Music::Tone(tone.note, 0);
     const int idx = tones.indexOf(octave0Tone);
+
+    if(idx < 0 || idx >= freqs.size())
+        return 0;
 
     return freqs[idx] * qPow(2, tone.octave);
 }
@@ -132,12 +136,13 @@ private:
 
 };
 
-ToneGenerator::ToneGenerator(QObject * parent)
+ToneGenerator::ToneGenerator(const Music::Interval & interval, QObject * parent)
     :   SoundGenerator(parent)
     ,   m_device(QAudioDeviceInfo::defaultOutputDevice())
     ,   m_audioOutput(nullptr)
     ,   m_generator(nullptr)
 {
+    assert(!qFuzzyIsNull(frequencyFor(interval.min)) && !qFuzzyIsNull(frequencyFor(interval.max)));
 }
 
 void ToneGenerator::initializeAudio(int hz, int msec)

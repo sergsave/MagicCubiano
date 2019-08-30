@@ -43,12 +43,57 @@ Harmony::Harmony(const Tones & tones, int delayMSec):
     tones(tones), delayMSec(delayMSec)
 {}
 
-Tones allTonesForOctave(int n)
+Tones allTonesFor(int o)
 {
     using T = Tone;
-    return { Tone(T::C, n), Tone(T::C_SHARP, n), Tone(T::D, n), Tone(T::D_SHARP, n), Tone(T::E, n),
-             Tone(T::F, n), Tone(T::F_SHARP, n), Tone(T::G, n), Tone(T::G_SHARP, n), Tone(T::A, n),
-             Tone(T::A_SHARP, n), Tone(T::B, n) };
+    return { Tone(T::C, o), Tone(T::C_SHARP, o), Tone(T::D, o), Tone(T::D_SHARP, o), Tone(T::E, o),
+             Tone(T::F, o), Tone(T::F_SHARP, o), Tone(T::G, o), Tone(T::G_SHARP, o), Tone(T::A, o),
+             Tone(T::A_SHARP, o), Tone(T::B, o) };
 }
+
+Tones allTonesFor(const Interval &interval)
+{
+    Music::Tones allTones;
+
+    auto min = interval.min;
+    auto max = interval.max;
+
+    auto fullOctave = Music::allTonesFor(0);
+
+    auto minIdx = fullOctave.indexOf(min.note);
+    auto maxIdx = fullOctave.indexOf(max.note);
+
+    allTones << Music::allTonesFor(min.octave).mid(minIdx);
+
+    for(int octave = (min.octave + 1); octave < (max.octave - 1); ++octave)
+        allTones << Music::allTonesFor(octave);
+
+    allTones << Music::allTonesFor(max.octave).mid(0, fullOctave.size() - maxIdx);
+
+    return allTones;
+}
+
+bool operator == (const Tone& lhs, const Tone& rhs)
+{
+    return lhs.note == rhs.note && lhs.octave == rhs.octave;
+}
+
+bool operator > (const Tone& lhs, const Tone& rhs)
+{
+    if(lhs.octave != rhs.octave)
+        return lhs.octave > rhs.octave;
+
+    return static_cast<int>(lhs.note) > static_cast<int>(rhs.note);
+}
+
+bool operator < (const Tone& lhs, const Tone& rhs)
+{
+    if(lhs.octave != rhs.octave)
+        return lhs.octave < rhs.octave;
+
+    return static_cast<int>(lhs.note) < static_cast<int>(rhs.note);
+}
+
+
 
 }

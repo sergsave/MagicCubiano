@@ -15,7 +15,7 @@ class ToneGenerator : public SoundGenerator
     Q_OBJECT
 
 public:
-    explicit ToneGenerator(QObject* parent = 0);
+    explicit ToneGenerator(const Music::Interval& , QObject* parent = nullptr);
 
     void playHarmony(const Music::Harmony&) override;
 

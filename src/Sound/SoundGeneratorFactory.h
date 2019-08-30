@@ -3,24 +3,24 @@
 #include <cassert>
 
 #include "ToneGenerator.h"
-#include "GuitarGenerator.h"
+#include "GuitarGenerators.h"
 
-enum class GenType
-{
-    TONE,
-    GUITAR
-};
+#include "src/Configuration.h"
 
-SoundGenerator * createSoundGenerator(GenType type, QObject * parent = nullptr)
-{
+SoundGenerator * createSoundGenerator(Music::Instrument type, QObject * parent = nullptr)
+{    
+    auto interval = Configuration::intervalFor(type);
+
     switch (type)
     {
-    case GenType::TONE:
-        return new ToneGenerator(parent);
-    case GenType::GUITAR:
-        return new GuitarGenerator(parent);
+    case Music::Instrument::BEEPER:
+        return new ToneGenerator(interval, parent);
+    case Music::Instrument::GUITAR:
+        return new GuitarGenerator(interval, parent);
+    case Music::Instrument::DISTORTION_GUITAR:
+        return new DistortionGuitarGenerator(interval, parent);
     default:
-        assert("unreal logic");
+        assert("unsupported");
         return nullptr;
     }
 }

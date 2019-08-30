@@ -40,7 +40,8 @@ SOURCES += \
     src/View/GuitarEdgeSettingsDialog.cpp \
     src/Music.cpp \
     src/Sound/ToneGenerator.cpp \
-    src/Sound/SampleGenerator.cpp
+    src/Sound/SampleGenerator.cpp \
+    src/Sound/GuitarGenerators.cpp
 
 HEADERS += \
     src/View/MainWindow.h \
@@ -56,7 +57,8 @@ HEADERS += \
     src/Sound/SoundGenerator.h \
     src/Sound/SoundGeneratorFactory.h \
     src/Sound/SampleGenerator.h \
-    src/Sound/GuitarGenerator.h
+    src/Configuration.h \
+    src/Sound/GuitarGenerators.h
 
 FORMS += \
     src/View/MainWindow.ui \

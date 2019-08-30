@@ -7,7 +7,7 @@
 class SoundGenerator : public QObject
 {
 public:
-    using QObject::QObject;
+    SoundGenerator(QObject * parent = nullptr) : QObject(parent) {}
     virtual ~SoundGenerator() = default;
 
     virtual void playHarmony(const Music::Harmony&) = 0;

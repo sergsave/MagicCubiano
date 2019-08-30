@@ -1,10 +1,14 @@
 #include "SampleGenerator.h"
 
+#include <cassert>
+
 #include <QSound>
 #include <QTimer>
+#include <QFileInfo>
 
-SampleGenerator::SampleGenerator(QObject* parent):
-    SoundGenerator(parent)
+SampleGenerator::SampleGenerator(const Music::Interval& interval, QObject* parent):
+    SoundGenerator(parent),
+    m_interval(interval)
 {
 }
 
@@ -15,7 +19,7 @@ void SampleGenerator::playHarmony(const Music::Harmony & harm)
 
     for(int i = 0; i != harm.tones.size(); ++i)
     {
-        auto path = resourceFor(harm.tones[i]);
+        auto path = resourcePathFor(harm.tones[i]);
         auto player = new QSound(path, this);
 
         QTimer::singleShot(harm.delayMSec * i, player, [player] { player->play(); });
@@ -24,8 +28,29 @@ void SampleGenerator::playHarmony(const Music::Harmony & harm)
     }
 }
 
-QString SampleGenerator::resourceFor(const Music::Tone &) const
+void SampleGenerator::setResourcePathFunc(const std::function<QString (const Music::Tone &)> &func)
 {
-    return ":/sounds/beep.wav";
+    // Check of all resources are presented
+    for(auto& tone: allTonesFor(m_interval))
+    {
+        QFileInfo info(func(tone));
+        assert(info.exists());
+    }
+    m_pathFunc = func;
 }
 
+QString SampleGenerator::resourcePathFor(const Music::Tone & tone) const
+{
+    QString beepPath = ":/sounds/beep.wav";
+
+    if(!m_pathFunc)
+        return beepPath;
+
+    auto path = m_pathFunc(tone);
+    QFileInfo info(path);
+
+    if(info.exists())
+        return path;
+
+    return beepPath;
+}

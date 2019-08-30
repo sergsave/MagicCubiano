@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     QObject::connect(&protocol, &GiikerProtocol::cubeConnectionFailed,
         &window, &MainWindow::connectionFailed);
 
-    QScopedPointer<SoundGenerator> soundGenerator(createSoundGenerator(GenType::GUITAR));
+    QScopedPointer<SoundGenerator> soundGenerator(createSoundGenerator(Music::Instrument::GUITAR));
 
     QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, soundGenerator.data(),
         [&soundGenerator, &window] (const CubeEdge& info) {
