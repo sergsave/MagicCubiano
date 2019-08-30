@@ -34,7 +34,7 @@ QColor colorFor(CubeEdge::Color color)
         { Col::RED, "#FFB6C1" }, // Light pink Giiker V1 peculiarity
         { Col::ORANGE, "#FF4500"},  // Orangered Giiker V1 peculiarity
         { Col::YELLOW, Qt::yellow},
-        { Col::WHITE, "#DCDCDC"},  // Gainsboro for contrast
+        { Col::WHITE, "white"}
     };
 
     return map.value(color, Qt::black);

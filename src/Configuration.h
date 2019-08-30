@@ -13,7 +13,7 @@ public:
 
     static QList<Music::Instrument> supportedInstruments()
     {
-        return { Ins::GUITAR, Ins::DISTORTION_GUITAR, Ins::BEEPER };
+        return { Ins::GUITAR, Ins::DISTORTION_GUITAR };
     }
 
     static int noteDurationMSec(Music::Instrument type)
@@ -33,8 +33,7 @@ public:
         {
         case Ins::GUITAR:
         case Ins::DISTORTION_GUITAR:
-        case Ins::BEEPER:
-            return { T(T::E, 2), T(T::B, 4) };
+            return { T(T::E, 2), T(T::B, 5) };
         default:
             return { };
         }

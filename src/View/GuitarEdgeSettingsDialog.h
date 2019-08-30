@@ -25,7 +25,11 @@ public:
     void setIcon(const QPixmap &pm) override;
 
 private:
-    static const int m_fretQuantity = 16;
+    int maxFret() const { return m_fretQuantity - 1; }
+    int maxString() const { return m_stringQuantity - 1; }
+
+private:
+    static const int m_fretQuantity = 20; // with 0 open
     static const int m_stringQuantity = 6;
 
     QScopedPointer<Ui::GuitarEdgeSettingsDialog> m_ui;

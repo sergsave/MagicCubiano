@@ -53,22 +53,31 @@ Tones allTonesFor(int o)
 
 Tones allTonesFor(const Interval &interval)
 {
+    const auto min = interval.min;
+    const auto max = interval.max;
+
+    const auto fullOctave = Music::allTonesFor(0);
+
+    const auto minIdx = fullOctave.indexOf(min.note);
+    const auto maxIdx = fullOctave.indexOf(max.note);
+
     Music::Tones allTones;
 
-    auto min = interval.min;
-    auto max = interval.max;
+    for(int o = min.octave; o <= max.octave; ++o)
+    {
+        int pos = 0;
+        int len = -1;
 
-    auto fullOctave = Music::allTonesFor(0);
+        if(o == min.octave)
+            pos = minIdx;
 
-    auto minIdx = fullOctave.indexOf(min.note);
-    auto maxIdx = fullOctave.indexOf(max.note);
+        if(o == max.octave)
+            len = maxIdx - pos;
 
-    allTones << Music::allTonesFor(min.octave).mid(minIdx);
+        if(len > 0) ++len;
 
-    for(int octave = (min.octave + 1); octave < (max.octave - 1); ++octave)
-        allTones << Music::allTonesFor(octave);
-
-    allTones << Music::allTonesFor(max.octave).mid(0, fullOctave.size() - maxIdx);
+        allTones << Music::allTonesFor(o).mid(pos, len);
+    }
 
     return allTones;
 }
