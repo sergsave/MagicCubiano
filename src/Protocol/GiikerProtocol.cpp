@@ -114,11 +114,8 @@ void GiikerProtocol::serviceStateChanged(QLowEnergyService::ServiceState st)
 
 void GiikerProtocol::onCharacteristicChanged(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
-    qDebug() << "BLE characteristic changed ";
     if (c.uuid().toString() != serviceCharUuid)
         return;
-
-    qDebug() << "Wanted characteristic ";
 
     const QMap<char, CubeEdge::Color> code2edges
     {
