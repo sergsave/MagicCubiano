@@ -60,7 +60,7 @@ Tone musicToneFor(const FretboardPos& frPos)
 {
     if(!frPos.isValid())
     {
-        assert("not valid");
+        assert(!"not valid");
         return {};
     }
 
@@ -69,7 +69,7 @@ Tone musicToneFor(const FretboardPos& frPos)
 
     if(string < 0 || string >= g_musicTones.size())
     {
-        assert("out of range");
+        assert(!"out of range");
         return {};
     }
 
@@ -77,7 +77,7 @@ Tone musicToneFor(const FretboardPos& frPos)
 
     if(fret < 0 || fret >= tonesForString.size())
     {
-        assert("out of range");
+        assert(!"out of range");
         return {};
     }
 

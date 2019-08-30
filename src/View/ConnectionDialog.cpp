@@ -49,7 +49,7 @@ void ConnectionDialog::setStatus(ConnectionDialog::Status st)
         message = "<span style=\" color:red;\">Failed!<br>Check the Bluetooth.</span>";
         break;
     default:
-        assert("Unknow!");
+        assert(!"Unknow!");
         break;
     }
 

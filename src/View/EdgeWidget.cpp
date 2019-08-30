@@ -1,8 +1,6 @@
 #include "EdgeWidget.h"
 #include "ui_EdgeWidget.h"
 
-#include <cassert>
-
 #include <QColor>
 #include <QTimer>
 #include <QSize>
@@ -186,7 +184,6 @@ void EdgeWidget::enterSettings()
 
 EdgeSettingsDialog * EdgeWidget::settings(Rotation rot) const
 {
-    assert("Not inited settings!");
     return m_rotation2settings.value(rot, nullptr);
 }
 

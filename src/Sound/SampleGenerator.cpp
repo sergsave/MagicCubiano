@@ -34,8 +34,13 @@ void SampleGenerator::setResourcePathFunc(const std::function<QString (const Mus
     for(auto& tone: allTonesFor(m_interval))
     {
         QFileInfo info(func(tone));
-        assert(info.exists());
+        if(!info.exists())
+        {
+            assert(!"resource not found");
+            break;
+        }
     }
+
     m_pathFunc = func;
 }
 

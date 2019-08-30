@@ -20,7 +20,7 @@ SoundGenerator * createSoundGenerator(Music::Instrument type, QObject * parent =
     case Music::Instrument::DISTORTION_GUITAR:
         return new DistortionGuitarGenerator(interval, parent);
     default:
-        assert("unsupported");
+        assert(!"unsupported");
         return nullptr;
     }
 }

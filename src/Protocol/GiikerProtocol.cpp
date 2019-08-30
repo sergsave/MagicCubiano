@@ -4,8 +4,6 @@
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QLowEnergyController>
 
-#include <cassert>
-
 const QString GiikerProtocol::serviceUuid =
         QString("{0000aadb-0000-1000-8000-00805f9b34fb}");
 const QString GiikerProtocol::serviceCharUuid =
