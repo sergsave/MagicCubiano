@@ -23,11 +23,17 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1">
      <item>
-      <widget class="QLabel" name="headerLabel">
-       <property name="text">
-        <string>Guitar mode</string>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
-      </widget>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
      <item>
       <widget class="QToolButton" name="settingsButton">
@@ -59,25 +65,6 @@
      <property name="spacing">
       <number>12</number>
      </property>
-     <item row="0" column="1">
-      <widget class="QToolButton" name="distortionButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">*:checked { background-color: red }</string>
-       </property>
-       <property name="text">
-        <string>Distortion</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="1">
       <widget class="QToolButton" name="toolButton">
        <property name="sizePolicy">
@@ -120,11 +107,22 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="1">
+      <widget class="InstrumentSelectionWidget" name="instrumentsWidget" native="true"/>
+     </item>
     </layout>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>InstrumentSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>src/View/InstrumentSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

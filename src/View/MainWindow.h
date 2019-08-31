@@ -29,6 +29,7 @@ public:
 signals:
     void connectAnyRequested();
     void connectByAddressRequested(const QString&);
+    void instrumentTypeChanged(Music::Instrument);
 
 public slots:
     void connected();
@@ -38,17 +39,22 @@ private:
     void createEdgeWidgets();
     QList<EdgeWidget*> edgeWidgets();
 
+    void createSettingsFactory();
+    void updateSettingsFactory();
+
     void setAllDirectionHarmony(EdgeWidget *, const Music::Harmony &);
     int defaultHarmonyDelayMsec() const;
 
 private slots:
     void synchronizeEdgesRotation();
     void setDefaultHarmonies();
+    void onInstrumentTypeChanged(Music::Instrument);
 
 private:
     QMap<CubeEdge::Color, EdgeWidget*> m_color2edges;
-    QScopedPointer<Ui::MainWindow> m_ui;
+    QScopedPointer<const EdgeSettingsFactory> m_settingsFactory;
 
-    ConnectionDialog * m_dialog;
+    QScopedPointer<Ui::MainWindow> m_ui;
+    ConnectionDialog * m_dialog = nullptr;
 };
 

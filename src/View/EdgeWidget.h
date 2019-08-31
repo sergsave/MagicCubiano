@@ -17,10 +17,11 @@ class EdgeWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit EdgeWidget(CubeEdge::Color color,
-                        EdgeSettingsFactory* factory,
-                        QWidget * parent = nullptr);
+    // EdgeWidget doesn't take ownersheep of factory
+    explicit EdgeWidget(CubeEdge::Color color, EdgeSettingsFactory const * factory, QWidget * parent = nullptr);
     ~EdgeWidget();
+
+    void setSettingsFactory(EdgeSettingsFactory const * factory);
 
     void indicate();
 

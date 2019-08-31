@@ -1,6 +1,8 @@
 #include "EdgeWidget.h"
 #include "ui_EdgeWidget.h"
 
+#include <cassert>
+
 #include <QColor>
 #include <QTimer>
 #include <QSize>
@@ -34,7 +36,7 @@ QColor colorFor(CubeEdge::Color color)
         { Col::RED, "#FFB6C1" }, // Light pink Giiker V1 peculiarity
         { Col::ORANGE, "#FF4500"},  // Orangered Giiker V1 peculiarity
         { Col::YELLOW, Qt::yellow},
-        { Col::WHITE, "white"}
+        { Col::WHITE, Qt::white}
     };
 
     return map.value(color, Qt::black);
@@ -54,7 +56,7 @@ void setWidgetStyleColor(QWidget * w, const QString& color)
 
 }
 
-EdgeWidget::EdgeWidget(CubeEdge::Color col, EdgeSettingsFactory * factory, QWidget * parent) :
+EdgeWidget::EdgeWidget(CubeEdge::Color col, const EdgeSettingsFactory *factory, QWidget * parent) :
     QWidget(parent),
     m_ui(new Ui::EdgeWidget)
 {
@@ -78,6 +80,23 @@ EdgeWidget::EdgeWidget(CubeEdge::Color col, EdgeSettingsFactory * factory, QWidg
     setEdgeColor(col);
     setRotateDirection(Rotation::CLOCKWIZE);
     updateSettingsButtons();
+}
+
+void EdgeWidget::setSettingsFactory(const EdgeSettingsFactory *factory)
+{
+    if(!factory)
+        return;
+
+    auto clockwizeHarmony = settings(Rotation::CLOCKWIZE)->harmony();
+    auto anticlockwizeHarmony = settings(Rotation::ANTICLOCKWIZE)->harmony();
+
+    qDeleteAll(m_rotation2settings);
+
+    m_rotation2settings[Rotation::CLOCKWIZE] = factory->create(this);
+    m_rotation2settings[Rotation::ANTICLOCKWIZE] = factory->create(this);
+
+    settings(Rotation::CLOCKWIZE)->setHarmony(clockwizeHarmony);
+    settings(Rotation::ANTICLOCKWIZE)->setHarmony(anticlockwizeHarmony);
 }
 
 EdgeWidget::~EdgeWidget() = default;
@@ -184,7 +203,9 @@ void EdgeWidget::enterSettings()
 
 EdgeSettingsDialog * EdgeWidget::settings(Rotation rot) const
 {
-    return m_rotation2settings.value(rot, nullptr);
+    auto settings =  m_rotation2settings.value(rot, nullptr);
+    assert(settings);
+    return settings;
 }
 
 void EdgeWidget::showEvent(QShowEvent *event)

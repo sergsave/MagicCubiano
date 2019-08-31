@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent):
 {
     m_ui->setupUi(this);
 
+    createSettingsFactory();
     createEdgeWidgets();
 
     QRect scr = QApplication::desktop()->screenGeometry();
@@ -21,9 +22,14 @@ MainWindow::MainWindow(QWidget *parent):
 
     connect(m_ui->syncButton, &QAbstractButton::clicked, this, &MainWindow::synchronizeEdgesRotation);
     connect(m_ui->resetButton, &QAbstractButton::clicked, this, &MainWindow::setDefaultHarmonies);
+    connect(m_ui->instrumentsWidget, &InstrumentSelectionWidget::instrumentTypeChanged,
+            this, &MainWindow::onInstrumentTypeChanged);
 }
 
-MainWindow::~MainWindow() = default;
+MainWindow::~MainWindow()
+{
+    for(auto w: edgeWidgets()) w->setSettingsFactory(nullptr);
+}
 
 void MainWindow::start()
 {
@@ -77,10 +83,8 @@ void MainWindow::createEdgeWidgets()
     if(!layout)
         layout = new QVBoxLayout(m_ui->edgesFrame);
 
-    QScopedPointer<EdgeSettingsFactory> factory(new GuitarEdgeSettingsFactory);
-
-    auto addWidget = [layout, &factory, this] (CubeEdge::Color col) {
-        auto w = new EdgeWidget(col, factory.data(), this);
+    auto addWidget = [layout, this] (CubeEdge::Color col) {
+        auto w = new EdgeWidget(col, m_settingsFactory.data(), this);
         layout->addWidget(w);
 
         m_color2edges[col] = w;
@@ -94,6 +98,26 @@ void MainWindow::createEdgeWidgets()
     addWidget(Col::BLUE);
 
     setDefaultHarmonies();
+}
+
+void MainWindow::onInstrumentTypeChanged(Music::Instrument ins)
+{
+    updateSettingsFactory();
+    emit instrumentTypeChanged(ins);
+}
+
+void MainWindow::createSettingsFactory()
+{
+    auto type = m_ui->instrumentsWidget->instrumentType();
+    m_settingsFactory.reset(EdgeSettingsFactory::createInstance(type));
+}
+
+void MainWindow::updateSettingsFactory()
+{
+    createSettingsFactory();
+
+    for(auto ew: edgeWidgets())
+        ew->setSettingsFactory(m_settingsFactory.data());
 }
 
 QList<EdgeWidget *> MainWindow::edgeWidgets()

@@ -41,7 +41,9 @@ SOURCES += \
     src/Music.cpp \
     src/Sound/ToneGenerator.cpp \
     src/Sound/SampleGenerator.cpp \
-    src/Sound/GuitarGenerators.cpp
+    src/Sound/GuitarGenerators.cpp \
+    src/View/InstrumentSelectionWidget.cpp \
+    src/View/EdgeSettingsFactory.cpp
 
 HEADERS += \
     src/View/MainWindow.h \
@@ -58,13 +60,15 @@ HEADERS += \
     src/Sound/SoundGeneratorFactory.h \
     src/Sound/SampleGenerator.h \
     src/Configuration.h \
-    src/Sound/GuitarGenerators.h
+    src/Sound/GuitarGenerators.h \
+    src/View/InstrumentSelectionWidget.h
 
 FORMS += \
     src/View/MainWindow.ui \
     src/View/ConnectionDialog.ui \
     src/View/EdgeWidget.ui \
-    src/View/GuitarEdgeSettingsDialog.ui
+    src/View/GuitarEdgeSettingsDialog.ui \
+    src/View/InstrumentSelectionWidget.ui
 
 CONFIG += mobility
 MOBILITY = 
