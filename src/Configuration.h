@@ -16,12 +16,8 @@ public:
         return { Ins::GUITAR, Ins::DISTORTION_GUITAR };
     }
 
-    static int noteDurationMSec(Music::Instrument type)
+    static int noteDurationMSec()
     {
-        Q_UNUSED(type);
-
-        assert(supportedInstruments().contains(type) && "Unsupported instrument");
-
         return 0;
     }
 

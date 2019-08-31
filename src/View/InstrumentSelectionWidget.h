@@ -2,6 +2,7 @@
 
 #include <QWidget>
 #include <QList>
+#include <QScopedPointer>
 
 #include "src/Music.h"
 
@@ -33,7 +34,7 @@ private:
     void onIndexUpdated();
 
 private:
-    Ui::InstrumentSelectionWidget * m_ui;
+    QScopedPointer<Ui::InstrumentSelectionWidget> m_ui;
 
     QList<Music::Instrument> m_instruments;
     int m_index = 0;

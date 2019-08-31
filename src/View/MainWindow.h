@@ -5,6 +5,7 @@
 #include <QScopedPointer>
 
 #include "EdgeWidget.h"
+#include "SettingsDialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -12,7 +13,6 @@ class MainWindow;
 
 class ConnectionDialog;
 
-// Now support only guitar mode
 class MainWindow : public QWidget
 {
     Q_OBJECT
@@ -43,12 +43,13 @@ private:
     void updateSettingsFactory();
 
     void setAllDirectionHarmony(EdgeWidget *, const Music::Harmony &);
-    int defaultHarmonyDelayMsec() const;
+    int harmonyDelayMsec() const;
 
 private slots:
     void synchronizeEdgesRotation();
     void setDefaultHarmonies();
     void onInstrumentTypeChanged(Music::Instrument);
+    void enterGlobalSettings();
 
 private:
     QMap<CubeEdge::Color, EdgeWidget*> m_color2edges;
@@ -56,5 +57,6 @@ private:
 
     QScopedPointer<Ui::MainWindow> m_ui;
     ConnectionDialog * m_dialog = nullptr;
+    Settings m_globalSettings;
 };
 

@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent):
 
     connect(m_ui->syncButton, &QAbstractButton::clicked, this, &MainWindow::synchronizeEdgesRotation);
     connect(m_ui->resetButton, &QAbstractButton::clicked, this, &MainWindow::setDefaultHarmonies);
+    connect(m_ui->settingsButton, &QAbstractButton::clicked, this, &MainWindow::enterGlobalSettings);
     connect(m_ui->instrumentsWidget, &InstrumentSelectionWidget::instrumentTypeChanged,
             this, &MainWindow::onInstrumentTypeChanged);
 }
@@ -50,9 +51,7 @@ Music::Harmony MainWindow::harmonyFor(const CubeEdge & edge) const
         return {};
 
     auto harmony = edgeWidget->harmony(edge.rotation);
-
-    if(harmony.delayMSec == 0)
-        harmony.delayMSec = defaultHarmonyDelayMsec();
+    harmony.delayMSec = harmonyDelayMsec();
 
     return harmony;
 }
@@ -126,12 +125,6 @@ QList<EdgeWidget *> MainWindow::edgeWidgets()
     return m_color2edges.values();
 }
 
-int MainWindow::defaultHarmonyDelayMsec() const
-{
-    // TODO
-    return 0;
-}
-
 void MainWindow::setAllDirectionHarmony(EdgeWidget *ew, const Music::Harmony& harm)
 {
     ew->setHarmony(harm, CubeEdge::Rotation::ANTICLOCKWIZE);
@@ -160,9 +153,21 @@ void MainWindow::setDefaultHarmonies()
         using namespace Music;
 
         auto tone = Tone(Tone::E, 2);
-        auto delay = defaultHarmonyDelayMsec();
+        auto delay = harmonyDelayMsec();
         auto harmony = Harmony({tone}, delay);
 
         setAllDirectionHarmony(ew, harmony);
     }
+}
+
+int MainWindow::harmonyDelayMsec() const
+{
+    return m_globalSettings.delayMSec;
+}
+
+void MainWindow::enterGlobalSettings()
+{
+   SettingsDialog dialog(m_globalSettings);
+   if(dialog.exec() == QDialog::Accepted)
+       m_globalSettings = dialog.settings();
 }
