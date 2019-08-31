@@ -16,7 +16,7 @@ QString instrumentToString(Music::Instrument ins)
     static const QMap<Ins, QString> map
     {
         { Ins::GUITAR, "Guitar" },
-        { Ins::DISTORTION_GUITAR, "Distortion \nGuitar" },
+        { Ins::DISTORTION_GUITAR, "Distortion Guitar" },
         { Ins::PIANO, "Piano"},
         { Ins::BEEPER, "Beeper"}
     };
@@ -30,64 +30,30 @@ QString instrumentToString(Music::Instrument ins)
 }
 
 InstrumentSelectionWidget::InstrumentSelectionWidget(QWidget * parent) :
-    QWidget(parent),
-    m_ui(new Ui::InstrumentSelectionWidget),
+    SelectionWidget(parent),
     m_instruments(Configuration::supportedInstruments())
 {
     assert(!m_instruments.empty());
-    m_ui->setupUi(this);
 
-    connect(m_ui->leftButton, &QAbstractButton::clicked, this, &InstrumentSelectionWidget::increase);
-    connect(m_ui->rightButton, &QAbstractButton::clicked, this, &InstrumentSelectionWidget::decrease);
+    setTitle("Mode: ");
 
-    onIndexUpdated();
+    QStringList values;
+    for(auto ins: m_instruments)
+        values.append(instrumentToString(ins));
+    setValues(values);
+
+    connect(this, &SelectionWidget::indexChanged, this, [this] (int idx) {
+        if(idx < m_instruments.size() && idx >= 0) emit instrumentTypeChanged(m_instruments[idx]);
+    });
 }
 
-QList<Music::Instrument> InstrumentSelectionWidget::supportedInstruments() const
+QList<Music::Instrument> InstrumentSelectionWidget::instrumentTypes() const
 {
     return m_instruments;
 }
 
-void InstrumentSelectionWidget::setInstrumentType(Music::Instrument type)
-{
-    if(!m_instruments.contains(type))
-    {
-        assert(!"not supported");
-        return;
-    }
-
-    m_index = m_instruments.indexOf(type);
-}
-
 Music::Instrument InstrumentSelectionWidget::instrumentType() const
 {
-    return m_instruments[m_index];
+    assert(!m_instruments.empty());
+    return m_instruments[index()];
 }
-
-void InstrumentSelectionWidget::increase()
-{
-    if(++m_index == m_instruments.size())
-        m_index = 0;
-
-    onIndexUpdated();
-}
-
-void InstrumentSelectionWidget::decrease()
-{
-    if(m_index-- == 0)
-        m_index = m_instruments.size() - 1;
-
-    onIndexUpdated();
-}
-
-void InstrumentSelectionWidget::onIndexUpdated()
-{
-    emit instrumentTypeChanged(m_instruments[m_index]);
-
-    m_ui->leftButton->setEnabled(m_index > 0);
-    m_ui->rightButton->setEnabled(m_index < (m_instruments.size() - 1));
-
-    m_ui->modeLabel->setText(instrumentToString(m_instruments[m_index]) + " mode");
-}
-
-InstrumentSelectionWidget::~InstrumentSelectionWidget() = default;

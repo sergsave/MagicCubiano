@@ -13,6 +13,7 @@ enum class Instrument
     BEEPER
 };
 
+// Attention! enum Note is used for preset serialization
 struct Tone
 {
     // Order in frequency increasement

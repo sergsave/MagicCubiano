@@ -65,19 +65,6 @@
      <property name="spacing">
       <number>12</number>
      </property>
-     <item row="1" column="1">
-      <widget class="QToolButton" name="toolButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Presets</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QToolButton" name="resetButton">
        <property name="sizePolicy">
@@ -110,6 +97,9 @@
      <item row="0" column="1">
       <widget class="InstrumentSelectionWidget" name="instrumentsWidget" native="true"/>
      </item>
+     <item row="1" column="1">
+      <widget class="PresetSelectionWidget" name="presetsWidget" native="true"/>
+     </item>
     </layout>
    </item>
   </layout>
@@ -120,6 +110,12 @@
    <class>InstrumentSelectionWidget</class>
    <extends>QWidget</extends>
    <header>src/View/InstrumentSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PresetSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>src/View/PresetSelectionWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
