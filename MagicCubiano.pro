@@ -12,8 +12,6 @@ android{
     QT       += androidextras
 }
 
-ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = MagicCubiano
@@ -80,9 +78,6 @@ FORMS += \
     src/View/GuitarEdgeSettingsDialog.ui \
     src/View/SettingsDialog.ui \
     src/View/SelectionWidget.ui
-
-CONFIG += mobility
-MOBILITY = 
 
 RESOURCES += \
     resources/Guitar.qrc \
