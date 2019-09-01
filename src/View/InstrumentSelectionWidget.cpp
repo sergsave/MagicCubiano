@@ -1,5 +1,4 @@
 #include "InstrumentSelectionWidget.h"
-#include "ui_InstrumentSelectionWidget.h"
 
 #include <cassert>
 #include <QString>
