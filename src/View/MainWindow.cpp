@@ -64,6 +64,11 @@ void MainWindow::highlightEdge(CubeEdge::Color color)
         edge->indicate();
 }
 
+Music::Instrument MainWindow::instrumentType() const
+{
+    return m_ui->instrumentsWidget->instrumentType();
+}
+
 void MainWindow::connected()
 {
     if(m_dialog) m_dialog->connected();

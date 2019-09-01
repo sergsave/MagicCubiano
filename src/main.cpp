@@ -9,7 +9,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    // order is important
     MainWindow window;
+    QScopedPointer<SoundGenerator> soundGenerator(createSoundGenerator(window.instrumentType()));
     GiikerProtocol protocol;
 
     QObject::connect(&window, &MainWindow::connectAnyRequested, &protocol,
@@ -22,13 +24,16 @@ int main(int argc, char *argv[])
     QObject::connect(&protocol, &GiikerProtocol::cubeConnectionFailed,
         &window, &MainWindow::connectionFailed);
 
-    QScopedPointer<SoundGenerator> soundGenerator(createSoundGenerator(Music::Instrument::GUITAR));
+    QObject::connect(&window, &MainWindow::instrumentTypeChanged, [&soundGenerator] (Music::Instrument inst) {
+        soundGenerator.reset(createSoundGenerator(inst));
+    });
 
-    QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, soundGenerator.data(),
+    QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, &window,
         [&soundGenerator, &window] (const CubeEdge& info) {
 
         window.highlightEdge(info.color);
-        soundGenerator->playHarmony(window.harmonyFor(info));
+        if(soundGenerator)
+            soundGenerator->playHarmony(window.harmonyFor(info));
     });
 
     window.start();

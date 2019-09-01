@@ -26,6 +26,7 @@ public:
 
     Music::Harmony harmonyFor(const CubeEdge& ) const;
     void highlightEdge(CubeEdge::Color col);
+    Music::Instrument instrumentType() const;
 
 signals:
     void connectAnyRequested();
