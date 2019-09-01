@@ -84,11 +84,6 @@ FORMS += \
 CONFIG += mobility
 MOBILITY = 
 
-DISTFILES += \
-    anticlockwize.png \
-    clockwize.png \
-    android-sources/AndroidManifest.xml
-
 RESOURCES += \
     resources/Guitar.qrc \
     resources/DistortionGuitar.qrc \
