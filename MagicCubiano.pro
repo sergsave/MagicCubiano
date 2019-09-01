@@ -90,4 +90,6 @@ DISTFILES += \
     android-sources/AndroidManifest.xml
 
 RESOURCES += \
-    resources/Cubiano.qrc
+    resources/Guitar.qrc \
+    resources/DistortionGuitar.qrc \
+    resources/Other.qrc
