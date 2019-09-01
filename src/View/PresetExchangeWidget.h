@@ -5,11 +5,11 @@
 #include <src/Preset.h>
 #include <functional>
 
-class ExportImportWidget : public QWidget
+class PresetExchangeWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ExportImportWidget(QWidget *parent = nullptr);
+    explicit PresetExchangeWidget(QWidget *parent = nullptr);
 
     void setPresetCompositor(const std::function<Preset()>& compositor);
 

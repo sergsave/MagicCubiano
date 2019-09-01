@@ -1,4 +1,4 @@
-#include "ExportImportWidget.h"
+#include "PresetExchangeWidget.h"
 
 #include <QBoxLayout>
 #include <QToolButton>
@@ -32,7 +32,7 @@ QString openFileDialog(QFileDialog::AcceptMode mode)
 
 }
 
-ExportImportWidget::ExportImportWidget(QWidget *parent) : QWidget(parent)
+PresetExchangeWidget::PresetExchangeWidget(QWidget *parent) : QWidget(parent)
 {
     auto layout = new QHBoxLayout(this);
 
@@ -44,23 +44,23 @@ ExportImportWidget::ExportImportWidget(QWidget *parent) : QWidget(parent)
         return button;
     };
 
-    auto save = createButton("Save");
-    auto load = createButton("Load");
+    auto save = createButton("Save Preset");
+    auto load = createButton("Load Preset");
 
     auto status = new QLabel(this);
     layout->addWidget(status);
 
     connect(save, &QAbstractButton::clicked, this, [this, status] { onSaveClicked(); status->clear(); });
     connect(load, &QAbstractButton::clicked, this, [this, status] { onLoadClicked(); status->clear(); });
-    connect(this, &ExportImportWidget::presetImportFailed, status, [status] {status->setText("Failed!");});
+    connect(this, &PresetExchangeWidget::presetImportFailed, status, [status] {status->setText("Failed!");});
 }
 
-void ExportImportWidget::setPresetCompositor(const std::function<Preset ()> &compositor)
+void PresetExchangeWidget::setPresetCompositor(const std::function<Preset ()> &compositor)
 {
     m_compositor = compositor;
 }
 
-void ExportImportWidget::onSaveClicked()
+void PresetExchangeWidget::onSaveClicked()
 {
     if(!m_compositor)
         return assert(!"not inited");
@@ -79,7 +79,7 @@ void ExportImportWidget::onSaveClicked()
     saveFile.write(presetToJson(preset));
 }
 
-void ExportImportWidget::onLoadClicked()
+void PresetExchangeWidget::onLoadClicked()
 {
     if(!m_compositor)
         return assert(!"not inited");

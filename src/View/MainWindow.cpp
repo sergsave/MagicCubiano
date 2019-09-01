@@ -190,10 +190,10 @@ void MainWindow::enterGlobalSettings()
 
 void MainWindow::initPresets()
 {
-    auto exportW = m_ui->exportWidget;
-    auto selectionW = m_ui->presetsWidget;
+    auto exchangeW = m_ui->presetExchangeWidget;
+    auto selectionW = m_ui->presetSelectionWidget;
 
-    exportW->setPresetCompositor([this]{
+    exchangeW->setPresetCompositor([this]{
         Preset preset;
 
         for(auto w: edgeWidgets())
@@ -206,7 +206,7 @@ void MainWindow::initPresets()
         return preset;
     });
 
-    connect(exportW, &ExportImportWidget::presetImported, selectionW, [selectionW] (auto name, auto preset) {
+    connect(exchangeW, &PresetExchangeWidget::presetImported, selectionW, [selectionW] (auto name, auto preset) {
         selectionW->addPreset({name, preset});
     });
 

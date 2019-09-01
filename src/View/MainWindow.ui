@@ -23,7 +23,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,3,1">
      <item>
-      <widget class="PresetExportWidget" name="exportWidget" native="true"/>
+      <widget class="PresetExchangeWidget" name="presetExchangeWidget" native="true"/>
      </item>
      <item>
       <spacer name="horizontalSpacer">
@@ -101,7 +101,7 @@
       <widget class="InstrumentSelectionWidget" name="instrumentsWidget" native="true"/>
      </item>
      <item row="1" column="1">
-      <widget class="PresetSelectionWidget" name="presetsWidget" native="true"/>
+      <widget class="PresetSelectionWidget" name="presetSelectionWidget" native="true"/>
      </item>
     </layout>
    </item>
@@ -122,9 +122,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>PresetExportWidget</class>
+   <class>PresetExchangeWidget</class>
    <extends>QWidget</extends>
-   <header>src/View/ExportImportWidget.h</header>
+   <header>src/View/PresetExchangeWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
