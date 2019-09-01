@@ -12,9 +12,8 @@ class InstrumentSelectionWidget : public SelectionWidget
 public:
     explicit InstrumentSelectionWidget(QWidget *parent = nullptr);
 
-    QList<Music::Instrument> instrumentTypes() const;
-
     Music::Instrument instrumentType() const;
+    QList<Music::Instrument> instrumentTypes() const;
 
 signals:
     void instrumentTypeChanged(Music::Instrument);

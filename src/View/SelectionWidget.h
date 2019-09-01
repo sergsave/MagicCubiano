@@ -15,6 +15,9 @@ public:
     ~SelectionWidget();
 
     int index() const;
+    void setIndex(int);
+
+    int maxIndex() const;
 
 signals:
     void indexChanged(int);
@@ -31,9 +34,6 @@ private slots:
     void decrease();
     void increase();
     void onIndexUpdated(int);
-
-private:
-    int maxIndex() const;
 
 private:
     int m_index = -1;

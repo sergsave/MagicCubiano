@@ -33,7 +33,7 @@ QJsonObject writeHarmony(const Music::Harmony& har)
         tonesArray.append(writeTone(tone));
 
     obj[g_tonesKey] = tonesArray;
-    obj[g_octaveKey] = har.delayMSec;
+    obj[g_delayKey] = har.delayMSec;
 
     return obj;
 }

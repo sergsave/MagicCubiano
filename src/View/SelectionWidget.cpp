@@ -31,7 +31,6 @@ void SelectionWidget::setValues(const QStringList & list)
 
     auto idx = list.empty() ? -1 : 0;
     onIndexUpdated(idx);
-    m_index = idx;
 }
 
 QStringList SelectionWidget::values() const
@@ -44,6 +43,12 @@ int SelectionWidget::index() const
     return m_index;
 }
 
+void SelectionWidget::setIndex(int idx)
+{
+    idx = qBound(0, idx, maxIndex());
+    onIndexUpdated(idx);
+}
+
 void SelectionWidget::increase()
 {
     auto idx = m_index;
@@ -51,7 +56,6 @@ void SelectionWidget::increase()
         idx = 0;
 
     onIndexUpdated(idx);
-    m_index = idx;
 }
 
 void SelectionWidget::decrease()
@@ -61,18 +65,21 @@ void SelectionWidget::decrease()
         idx = maxIndex();
 
     onIndexUpdated(idx);
-    m_index = idx;
 }
 
 void SelectionWidget::onIndexUpdated(int idx)
 {
-    if(idx != m_index)
-        emit indexChanged(idx);
+    bool changed = idx != m_index;
+
+    m_index = idx;
 
     m_ui->leftButton->setEnabled(idx > 0);
     m_ui->rightButton->setEnabled(idx < maxIndex());
 
     m_ui->valueLabel->setText(m_list.value(idx));
+
+    if(changed)
+        emit indexChanged(idx);
 }
 
 int SelectionWidget::maxIndex() const

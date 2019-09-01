@@ -33,14 +33,14 @@ InstrumentSelectionWidget::InstrumentSelectionWidget(QWidget * parent) :
     SelectionWidget(parent),
     m_instruments(Configuration::supportedInstruments())
 {
-    assert(!m_instruments.empty());
-
     setTitle("Mode: ");
 
     QStringList values;
     for(auto ins: m_instruments)
         values.append(instrumentToString(ins));
     setValues(values);
+
+    assert(m_instruments.size() == values.size());
 
     connect(this, &SelectionWidget::indexChanged, this, [this] (int idx) {
         if(idx < m_instruments.size() && idx >= 0) emit instrumentTypeChanged(m_instruments[idx]);

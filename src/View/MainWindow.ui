@@ -21,7 +21,10 @@
     <number>3</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,3,1">
+     <item>
+      <widget class="PresetExportWidget" name="exportWidget" native="true"/>
+     </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -116,6 +119,12 @@
    <class>PresetSelectionWidget</class>
    <extends>QWidget</extends>
    <header>src/View/PresetSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PresetExportWidget</class>
+   <extends>QWidget</extends>
+   <header>src/View/ExportImportWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

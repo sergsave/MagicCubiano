@@ -25,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent):
     connect(m_ui->settingsButton, &QAbstractButton::clicked, this, &MainWindow::enterGlobalSettings);
     connect(m_ui->instrumentsWidget, &InstrumentSelectionWidget::instrumentTypeChanged,
             this, &MainWindow::onInstrumentTypeChanged);
+
+    initPresets();
 }
 
 MainWindow::~MainWindow()
@@ -105,6 +107,20 @@ void MainWindow::onInstrumentTypeChanged(Music::Instrument ins)
     emit instrumentTypeChanged(ins);
 }
 
+void MainWindow::onPresetChanged(const PresetSelectionWidget::NamedPreset& preset)
+{
+    auto setupEdgeWidgets = [this, &preset](CubeEdge::Rotation rot){
+        auto ews = edgeWidgets();
+        auto colors = preset.second[rot];
+
+        for(auto key: colors.keys())
+            ews[key]->setHarmony(colors.value(key), rot);
+    };
+
+    setupEdgeWidgets(CubeEdge::CLOCKWIZE);
+    setupEdgeWidgets(CubeEdge::ANTICLOCKWIZE);
+}
+
 void MainWindow::createSettingsFactory()
 {
     auto type = m_ui->instrumentsWidget->instrumentType();
@@ -170,4 +186,29 @@ void MainWindow::enterGlobalSettings()
    SettingsDialog dialog(m_globalSettings);
    if(dialog.exec() == QDialog::Accepted)
        m_globalSettings = dialog.settings();
+}
+
+void MainWindow::initPresets()
+{
+    auto exportW = m_ui->exportWidget;
+    auto selectionW = m_ui->presetsWidget;
+
+    exportW->setPresetCompositor([this]{
+        Preset preset;
+
+        for(auto w: edgeWidgets())
+        {
+            auto color = w->edgeColor();
+            preset[CubeEdge::CLOCKWIZE][color] = w->harmony(CubeEdge::CLOCKWIZE);
+            preset[CubeEdge::ANTICLOCKWIZE][color] = w->harmony(CubeEdge::ANTICLOCKWIZE);
+        }
+
+        return preset;
+    });
+
+    connect(exportW, &ExportImportWidget::presetImported, selectionW, [selectionW] (auto name, auto preset) {
+        selectionW->addPreset({name, preset});
+    });
+
+    connect(selectionW, &PresetSelectionWidget::presetChanged, this, &MainWindow::onPresetChanged);
 }

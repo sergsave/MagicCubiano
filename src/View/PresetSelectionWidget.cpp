@@ -6,18 +6,28 @@ PresetSelectionWidget::PresetSelectionWidget(QWidget * parent):
     setTitle("Preset: ");
     connect(this, &SelectionWidget::indexChanged, this, [this] (int idx) {
         if(idx < m_presets.size() && idx >=0 )
-            emit presetChanged(m_presets.values()[idx]);
+            emit presetChanged(m_presets[idx]);
     });
 }
 
-void PresetSelectionWidget::setPresets(const QMap<QString, Preset> & presets)
+void PresetSelectionWidget::addPreset(const NamedPreset& preset)
 {
-    m_presets = presets;
+    m_presets.append(preset);
 
-    setValues(presets.keys());
+    QStringList values;
+    for(auto& p: m_presets) values.append(p.first);
+
+    setValues(values);
+    // Last preset is active
+    setIndex(maxIndex());
 }
 
-QMap<QString, Preset> PresetSelectionWidget::presets() const
+PresetSelectionWidget::NamedPreset PresetSelectionWidget::preset() const
+{
+    return m_presets.value(index());
+}
+
+QList<PresetSelectionWidget::NamedPreset> PresetSelectionWidget::presets() const
 {
     return m_presets;
 }

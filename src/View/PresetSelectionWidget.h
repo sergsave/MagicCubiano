@@ -9,16 +9,18 @@ class PresetSelectionWidget: public SelectionWidget
 {
     Q_OBJECT
 public:
+    using NamedPreset = QPair<QString, Preset>;
+
     PresetSelectionWidget(QWidget * parent = nullptr);
 
-    void setPresets(const QMap<QString, Preset>&);
-    QMap<QString, Preset> presets() const;
+    void addPreset(const NamedPreset&);
 
-    Preset preset() const;
+    NamedPreset preset() const;
+    QList<NamedPreset> presets() const;
 
 signals:
-    void presetChanged(const Preset& preset);
+    void presetChanged(const NamedPreset& preset);
 
 private:
-    QMap<QString, Preset> m_presets;
+    QList<NamedPreset> m_presets;
 };

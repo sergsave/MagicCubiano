@@ -47,7 +47,8 @@ SOURCES += \
     src/View/SettingsDialog.cpp \
     src/View/SelectionWidget.cpp \
     src/View/PresetSelectionWidget.cpp \
-    src/Preset.cpp
+    src/Preset.cpp \
+    src/View/ExportImportWidget.cpp
 
 HEADERS += \
     src/View/MainWindow.h \
@@ -69,7 +70,8 @@ HEADERS += \
     src/View/SettingsDialog.h \
     src/View/SelectionWidget.h \
     src/View/PresetSelectionWidget.h \
-    src/Preset.h
+    src/Preset.h \
+    src/View/ExportImportWidget.h
 
 FORMS += \
     src/View/MainWindow.ui \

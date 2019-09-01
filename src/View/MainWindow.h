@@ -6,6 +6,7 @@
 
 #include "EdgeWidget.h"
 #include "SettingsDialog.h"
+#include "PresetSelectionWidget.h"
 
 namespace Ui {
 class MainWindow;
@@ -49,7 +50,9 @@ private slots:
     void synchronizeEdgesRotation();
     void setDefaultHarmonies();
     void onInstrumentTypeChanged(Music::Instrument);
+    void onPresetChanged(const PresetSelectionWidget::NamedPreset&);
     void enterGlobalSettings();
+    void initPresets();
 
 private:
     QMap<CubeEdge::Color, EdgeWidget*> m_color2edges;
