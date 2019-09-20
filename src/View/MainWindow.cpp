@@ -69,6 +69,11 @@ Music::Instrument MainWindow::instrumentType() const
     return m_ui->instrumentsWidget->instrumentType();
 }
 
+int MainWindow::volume() const
+{
+    return m_globalSettings.volume;
+}
+
 void MainWindow::connected()
 {
     if(m_dialog) m_dialog->connected();
@@ -188,9 +193,15 @@ int MainWindow::harmonyDelayMsec() const
 
 void MainWindow::enterGlobalSettings()
 {
-   SettingsDialog dialog(m_globalSettings);
-   if(dialog.exec() == QDialog::Accepted)
+    auto oldSettings = m_globalSettings;
+
+    SettingsDialog dialog(oldSettings);
+    if(dialog.exec() == QDialog::Accepted)
        m_globalSettings = dialog.settings();
+
+    auto vol = m_globalSettings.volume;
+    if(vol != oldSettings.volume)
+        emit volumeChanged(vol);
 }
 
 void MainWindow::initPresets()

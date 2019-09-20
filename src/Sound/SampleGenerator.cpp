@@ -2,7 +2,8 @@
 
 #include <cassert>
 
-#include <QSound>
+#include <QSoundEffect>
+#include <QAudio>
 #include <QTimer>
 #include <QFileInfo>
 
@@ -12,7 +13,7 @@ SampleGenerator::SampleGenerator(const Music::Interval& interval, QObject* paren
 {
 }
 
-void SampleGenerator::playHarmony(const Music::Harmony & harm)
+void SampleGenerator::doPlay(const Music::Harmony & harm, int volume)
 {
     qDeleteAll(m_players);
     m_players.clear();
@@ -20,7 +21,13 @@ void SampleGenerator::playHarmony(const Music::Harmony & harm)
     for(int i = 0; i != harm.tones.size(); ++i)
     {
         auto path = resourcePathFor(harm.tones[i]);
-        auto player = new QSound(path, this);
+        auto player = new QSoundEffect(this);
+        player->setSource(QUrl::fromLocalFile(path));
+
+        qreal linearVolume = QAudio::convertVolume(volume / qreal(100.0),
+                                                   QAudio::LogarithmicVolumeScale,
+                                                   QAudio::LinearVolumeScale);
+        player->setVolume(linearVolume);
 
         QTimer::singleShot(harm.delayMSec * i, player, [player] { player->play(); });
 

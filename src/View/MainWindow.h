@@ -24,14 +24,17 @@ public:
 
     void start();
 
-    Music::Harmony harmonyFor(const CubeEdge& ) const;
     void highlightEdge(CubeEdge::Color col);
+
+    Music::Harmony harmonyFor(const CubeEdge& ) const;
     Music::Instrument instrumentType() const;
+    int volume() const;
 
 signals:
     void connectAnyRequested();
     void connectByAddressRequested(const QString&);
     void instrumentTypeChanged(Music::Instrument);
+    void volumeChanged(int vol);
 
 public slots:
     void connected();

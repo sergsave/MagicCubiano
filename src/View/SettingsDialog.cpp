@@ -3,16 +3,19 @@
 
 SettingsDialog::SettingsDialog(const Settings &sett, QWidget *parent) :
     QDialog(parent),
-    m_ui(new Ui::SettingsDialog),
-    m_settings(sett)
+    m_ui(new Ui::SettingsDialog)
 {
     m_ui->setupUi(this);
-    m_ui->durationLineEdit->setValue(m_settings.delayMSec);
+    m_ui->delaySpinBox->setValue(sett.delayMSec);
+    m_ui->volumeSpinBox->setValue(sett.volume);
 }
 
 Settings SettingsDialog::settings() const
 {
-    return { m_ui->durationLineEdit->value() };
+    auto delay = m_ui->delaySpinBox->value();
+    auto volume = m_ui->volumeSpinBox->value();
+
+    return { delay, volume };
 }
 
 SettingsDialog::~SettingsDialog() = default;

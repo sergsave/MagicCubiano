@@ -11,8 +11,12 @@ class SettingsDialog;
 
 struct Settings
 {
-    Settings(int msec = Configuration::noteDurationMSec()) : delayMSec(msec) {}
+    Settings(int msec = Configuration::noteDurationMSec(), int vol = 100) :
+        delayMSec(msec),
+        volume(vol)
+    {}
     int delayMSec;
+    int volume;
 };
 
 class SettingsDialog : public QDialog
@@ -27,6 +31,5 @@ public:
 
 private:
     QScopedPointer<Ui::SettingsDialog> m_ui;
-    Settings m_settings;
 };
 

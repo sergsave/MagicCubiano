@@ -210,14 +210,16 @@ void ToneGenerator::playTones()
     connect(m_audioOutput, &QAudioOutput::notify, this, &ToneGenerator::playTones);
 }
 
-void ToneGenerator::playHarmony(const Music::Harmony & harmony)
+void ToneGenerator::doPlay(const Music::Harmony & harmony, int vol)
 {
+    assert(vol == 100);
+    Q_UNUSED(vol)
+
     if (harmony.tones.empty())
         return;
 
     m_harmonyCounter = 0;
     m_harmony = harmony;
 
-    // TODO: play without stop
     playTones();
 }

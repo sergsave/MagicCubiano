@@ -10,6 +10,8 @@ class QAudioOutput;
 
 class Generator;
 
+// TODO: Play harmony without stop
+// TODO: Volume support
 class ToneGenerator : public SoundGenerator
 {
     Q_OBJECT
@@ -17,13 +19,12 @@ class ToneGenerator : public SoundGenerator
 public:
     explicit ToneGenerator(const Music::Interval& , QObject* parent = nullptr);
 
-    void playHarmony(const Music::Harmony&) override;
-
 private slots:
     void stop();
     void playTones();
 
 private:
+    void doPlay(const Music::Harmony&, int vol) override;
     void initializeAudio(int, int);
     void createAudioOutput();
 
