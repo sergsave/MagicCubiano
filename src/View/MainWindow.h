@@ -4,54 +4,66 @@
 #include <QMap>
 #include <QScopedPointer>
 
-#include "src/MagicCubianoGlobal.h"
-#include "src/GuitarFretboardPos.h"
+#include "EdgeWidget.h"
+#include "SettingsDialog.h"
+#include "PresetSelectionWidget.h"
 
 namespace Ui {
 class MainWindow;
 }
-class EdgeSettingsWidget;
+
 class ConnectionDialog;
 
-// Now support only guitar mode
 class MainWindow : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
     void start();
 
-    // TODO: Add abstract music info, and specific types for piano, notes etc.
-    void setMaxGuitarFretboardPos(const GuitarFretboardPos&);
-    GuitarFretboardPos guitarFretboardPosFor(const CubeEdge& ) const;
-
     void highlightEdge(CubeEdge::Color col);
 
-    int soundDuration() const;
+    Music::Harmony harmonyFor(const CubeEdge& ) const;
+    Music::Instrument instrumentType() const;
+    int volume() const;
 
 signals:
     void connectAnyRequested();
     void connectByAddressRequested(const QString&);
+    void instrumentTypeChanged(Music::Instrument);
+    void volumeChanged(int vol);
 
 public slots:
     void connected();
     void connectionFailed();
 
+private:
+    void createEdgeWidgets();
+    QList<EdgeWidget*> edgeWidgets();
+
+    void createSettingsFactory();
+    void updateSettingsFactory();
+
+    void setAllDirectionHarmony(EdgeWidget *, const Music::Harmony &);
+    int harmonyDelayMsec() const;
+
 private slots:
-    void groupStringModeToggled(bool st);
-    void bedirectModeToggled(bool st);
+    void synchronizeEdgesRotation();
+    void setDefaultHarmonies();
+    void onInstrumentTypeChanged(Music::Instrument);
+    void onPresetChanged(const PresetSelectionWidget::NamedPreset&);
+    void enterGlobalSettings();
+    void initPresets();
 
 private:
-    void initEdgeWidgets();
-    QList<EdgeSettingsWidget*> edgeWidgets();
+    QMap<CubeEdge::Color, EdgeWidget*> m_color2edges;
+    QScopedPointer<const EdgeSettingsFactory> m_settingsFactory;
 
-private:
-    QMap<CubeEdge::Color, EdgeSettingsWidget*> m_color2edges;
     QScopedPointer<Ui::MainWindow> m_ui;
-    // This dialog is free, without parent
-    ConnectionDialog * m_dialog;
+    ConnectionDialog * m_dialog = nullptr;
+    Settings m_globalSettings;
 };
 

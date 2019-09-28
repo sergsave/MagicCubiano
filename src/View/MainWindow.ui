@@ -13,72 +13,95 @@
   <property name="windowTitle">
    <string>Magic Cubiano</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <property name="styleSheet">
+   <string notr="true">QToolButton {background-color: &quot;#dcdcdc&quot;}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,3,1">
    <property name="spacing">
     <number>3</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,3,1">
      <item>
-      <widget class="QLabel" name="chooseLabel">
+      <widget class="PresetExchangeWidget" name="presetExchangeWidget" native="true"/>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="settingsButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
-        <string>Guitar mode. Choose string and fret for cube faces:</string>
+        <string>...</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="EdgeSettingsWidget" name="yellowEdgeWidget" native="true"/>
+    <widget class="QFrame" name="edgesFrame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
    </item>
    <item>
-    <widget class="EdgeSettingsWidget" name="orangeEdgeWidget" native="true"/>
-   </item>
-   <item>
-    <widget class="EdgeSettingsWidget" name="redEdgeWidget" native="true"/>
-   </item>
-   <item>
-    <widget class="EdgeSettingsWidget" name="greenEdgeWidget" native="true"/>
-   </item>
-   <item>
-    <widget class="EdgeSettingsWidget" name="whiteEdgeWidget" native="true"/>
-   </item>
-   <item>
-    <widget class="EdgeSettingsWidget" name="blueEdgeWidget" native="true"/>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="QCheckBox" name="groupStringCheckBox">
+    <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
+     <property name="spacing">
+      <number>12</number>
+     </property>
+     <item row="1" column="0">
+      <widget class="QToolButton" name="resetButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
-        <string>Group strings mode</string>
+        <string>Reset</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QLabel" name="durLabel">
-         <property name="text">
-          <string>Duration [mSec]:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="durLineEdit">
-         <property name="text">
-          <string>200</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+     <item row="0" column="0">
+      <widget class="QToolButton" name="syncButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Sync</string>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QCheckBox" name="bidrectCheckBox">
-       <property name="text">
-        <string>Bidirectional mode</string>
-       </property>
-      </widget>
+      <widget class="InstrumentSelectionWidget" name="instrumentsWidget" native="true"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="PresetSelectionWidget" name="presetSelectionWidget" native="true"/>
      </item>
     </layout>
    </item>
@@ -87,9 +110,21 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>EdgeSettingsWidget</class>
+   <class>InstrumentSelectionWidget</class>
    <extends>QWidget</extends>
-   <header>src/View/EdgeSettingsWidget.h</header>
+   <header>src/View/InstrumentSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PresetSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>src/View/PresetSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PresetExchangeWidget</class>
+   <extends>QWidget</extends>
+   <header>src/View/PresetExchangeWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

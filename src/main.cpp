@@ -1,13 +1,16 @@
 #include <QApplication>
+#include <QScopedPointer>
 
-#include "GiikerProtocol.h"
-#include "SoundGenerator.h"
+#include "Protocol/GiikerProtocol.h"
+#include "Sound/SoundGeneratorFactory.h"
 #include "View/MainWindow.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    // order is important
+    QScopedPointer<SoundGenerator> soundGenerator;
     MainWindow window;
     GiikerProtocol protocol;
 
@@ -21,17 +24,20 @@ int main(int argc, char *argv[])
     QObject::connect(&protocol, &GiikerProtocol::cubeConnectionFailed,
         &window, &MainWindow::connectionFailed);
 
-    SoundGenerator soundGenerator;
+    auto updateGenerator = [&soundGenerator] (Music::Instrument inst) {
+        soundGenerator.reset(createSoundGenerator(inst));
+    };
 
-    QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, &soundGenerator,
+    updateGenerator(window.instrumentType());
+    QObject::connect(&window, &MainWindow::instrumentTypeChanged, updateGenerator);
+
+    QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, &window,
         [&soundGenerator, &window] (const CubeEdge& info) {
 
-        auto duration = window.soundDuration();
-        auto fretboardPos = window.guitarFretboardPosFor(info);
-        auto freq = fretboardPos.frequency();
-
         window.highlightEdge(info.color);
-        soundGenerator.playSound(freq, duration);
+
+        if(soundGenerator)
+            soundGenerator->play(window.harmonyFor(info), window.volume());
     });
 
     window.start();

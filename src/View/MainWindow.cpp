@@ -14,18 +14,25 @@ MainWindow::MainWindow(QWidget *parent):
 {
     m_ui->setupUi(this);
 
-    initEdgeWidgets();
-
-    connect(m_ui->bidrectCheckBox, &QCheckBox::toggled, this, &MainWindow::bedirectModeToggled);
-    connect(m_ui->groupStringCheckBox, &QCheckBox::toggled, this, &MainWindow::groupStringModeToggled);
-
-    setMaxGuitarFretboardPos({GuitarFretboardPos::maxString, GuitarFretboardPos::maxFret});
+    createSettingsFactory();
+    createEdgeWidgets();
 
     QRect scr = QApplication::desktop()->screenGeometry();
     move( scr.center() - rect().center() );
+
+    connect(m_ui->syncButton, &QAbstractButton::clicked, this, &MainWindow::synchronizeEdgesRotation);
+    connect(m_ui->resetButton, &QAbstractButton::clicked, this, &MainWindow::setDefaultHarmonies);
+    connect(m_ui->settingsButton, &QAbstractButton::clicked, this, &MainWindow::enterGlobalSettings);
+    connect(m_ui->instrumentsWidget, &InstrumentSelectionWidget::instrumentTypeChanged,
+            this, &MainWindow::onInstrumentTypeChanged);
+
+    initPresets();
 }
 
-MainWindow::~MainWindow() = default;
+MainWindow::~MainWindow()
+{
+    for(auto w: edgeWidgets()) w->setSettingsFactory(nullptr);
+}
 
 void MainWindow::start()
 {
@@ -38,6 +45,34 @@ void MainWindow::start()
     show();
 }
 
+Music::Harmony MainWindow::harmonyFor(const CubeEdge & edge) const
+{
+    auto edgeWidget = m_color2edges.value(edge.color, nullptr);
+
+    if(!edgeWidget)
+        return {};
+
+    auto harmony = edgeWidget->harmony(edge.rotation);
+    harmony.delayMSec = harmonyDelayMsec();
+
+    return harmony;
+}
+
+void MainWindow::highlightEdge(CubeEdge::Color color)
+{
+    if(auto edge = m_color2edges.value(color, nullptr))
+        edge->indicate();
+}
+
+Music::Instrument MainWindow::instrumentType() const
+{
+    return m_ui->instrumentsWidget->instrumentType();
+}
+
+int MainWindow::volume() const
+{
+    return m_globalSettings.volume;
+}
 
 void MainWindow::connected()
 {
@@ -49,92 +84,147 @@ void MainWindow::connectionFailed()
     if(m_dialog) m_dialog->connectionFailed();
 }
 
-void MainWindow::initEdgeWidgets()
+void MainWindow::createEdgeWidgets()
 {
     using Col = CubeEdge::Color;
-    m_color2edges.clear();
 
-    m_color2edges[Col::GREEN] = m_ui->greenEdgeWidget;
-    m_color2edges[Col::BLUE] = m_ui->blueEdgeWidget;
-    m_color2edges[Col::RED] = m_ui->redEdgeWidget;
-    m_color2edges[Col::ORANGE] = m_ui->orangeEdgeWidget;
-    m_color2edges[Col::WHITE] = m_ui->whiteEdgeWidget;
-    m_color2edges[Col::YELLOW] = m_ui->yellowEdgeWidget;
+    assert(m_color2edges.empty());
 
-    for (auto key: m_color2edges.keys())
-    {
-        auto w = m_color2edges.value(key);
-        w->setEdgeButtonColor(key);
+    auto layout = m_ui->edgesFrame->layout();
+    if(!layout)
+        layout = new QVBoxLayout(m_ui->edgesFrame);
 
-        // Set minimum by default
-        const auto minString = GuitarFretboardPos().string;
-        w->setMinStringNumber(minString);
-    }
+    auto addWidget = [layout, this] (CubeEdge::Color col) {
+        auto w = new EdgeWidget(col, m_settingsFactory.data(), this);
+        layout->addWidget(w);
+
+        m_color2edges[col] = w;
+    };
+
+    addWidget(Col::YELLOW);
+    addWidget(Col::ORANGE);
+    addWidget(Col::RED);
+    addWidget(Col::GREEN);
+    addWidget(Col::WHITE);
+    addWidget(Col::BLUE);
+
+    setDefaultHarmonies();
 }
 
-QList<EdgeSettingsWidget *> MainWindow::edgeWidgets()
+void MainWindow::onInstrumentTypeChanged(Music::Instrument ins)
+{
+    updateSettingsFactory();
+    emit instrumentTypeChanged(ins);
+}
+
+void MainWindow::onPresetChanged(const PresetSelectionWidget::NamedPreset& preset)
+{
+    auto setupEdgeWidgets = [this, &preset](CubeEdge::Rotation rot){
+        auto ews = edgeWidgets();
+        auto colors = preset.second[rot];
+
+        for(auto key: colors.keys())
+            ews[key]->setHarmony(colors.value(key), rot);
+    };
+
+    setupEdgeWidgets(CubeEdge::CLOCKWIZE);
+    setupEdgeWidgets(CubeEdge::ANTICLOCKWIZE);
+}
+
+void MainWindow::createSettingsFactory()
+{
+    auto type = m_ui->instrumentsWidget->instrumentType();
+    m_settingsFactory.reset(EdgeSettingsFactory::createInstance(type));
+}
+
+void MainWindow::updateSettingsFactory()
+{
+    createSettingsFactory();
+
+    for(auto ew: edgeWidgets())
+        ew->setSettingsFactory(m_settingsFactory.data());
+}
+
+QList<EdgeWidget *> MainWindow::edgeWidgets()
 {
     assert(!m_color2edges.empty());
     return m_color2edges.values();
 }
 
-void MainWindow::groupStringModeToggled(bool st)
+void MainWindow::setAllDirectionHarmony(EdgeWidget *ew, const Music::Harmony& harm)
 {
-    auto setStringForAllWidget = [this](int string)
-    {
-        for(auto w: edgeWidgets())
-            w->setCurrentString(string);
-    };
-
-    auto bindEdgeWidgets = [this, setStringForAllWidget]
-    {
-        setStringForAllWidget(GuitarFretboardPos().string);
-        for(auto w: edgeWidgets())
-            connect(w, &EdgeSettingsWidget::stringChanged, this, setStringForAllWidget);
-    };
-
-    auto unleashEdgeWidgets = [this]
-    {
-        for(auto w: edgeWidgets())
-            disconnect(w, 0, this, 0);
-    };
-
-    if(st)
-        bindEdgeWidgets();
-    else
-        unleashEdgeWidgets();
+    ew->setHarmony(harm, CubeEdge::Rotation::ANTICLOCKWIZE);
+    ew->setHarmony(harm, CubeEdge::Rotation::CLOCKWIZE);
 }
 
-void MainWindow::bedirectModeToggled(bool st)
+void MainWindow::synchronizeEdgesRotation()
 {
-    for(auto w: edgeWidgets())
-        w->setRotationModeEnabled(st);
-}
-
-void MainWindow::setMaxGuitarFretboardPos(const GuitarFretboardPos & freatboardPos)
-{
-    for(auto w: edgeWidgets())
+    for(auto ew: edgeWidgets())
     {
-        w->setMaxFretNumber(freatboardPos.fret);
-        w->setMaxStringNumber(freatboardPos.string);
+        if(!ew) continue;
+        ew->indicate();
+
+        auto currHarmony = ew->harmony(ew->rotateDirection());
+        setAllDirectionHarmony(ew, currHarmony);
     }
 }
 
-GuitarFretboardPos MainWindow::guitarFretboardPosFor(const CubeEdge& info) const
+void MainWindow::setDefaultHarmonies()
 {
-    auto widget = m_color2edges.value(info.color, nullptr);
-    if(!widget)
-        return {};
-    return {widget->stringFor(info.rotation), widget->fretFor(info.rotation)};
+    for(auto ew: edgeWidgets())
+    {
+        if(!ew) continue;
+        ew->indicate();
+
+        using namespace Music;
+
+        auto tone = Tone(Tone::E, 2);
+        auto delay = harmonyDelayMsec();
+        auto harmony = Harmony({tone}, delay);
+
+        setAllDirectionHarmony(ew, harmony);
+    }
 }
 
-void MainWindow::highlightEdge(CubeEdge::Color color)
+int MainWindow::harmonyDelayMsec() const
 {
-    if(auto edge = m_color2edges.value(color, nullptr))
-        edge->blinkEdgeButton();
+    return m_globalSettings.delayMSec;
 }
 
-int MainWindow::soundDuration() const
+void MainWindow::enterGlobalSettings()
 {
-    return m_ui->durLineEdit->text().toInt();
+    auto oldSettings = m_globalSettings;
+
+    SettingsDialog dialog(oldSettings);
+    if(dialog.exec() == QDialog::Accepted)
+       m_globalSettings = dialog.settings();
+
+    auto vol = m_globalSettings.volume;
+    if(vol != oldSettings.volume)
+        emit volumeChanged(vol);
+}
+
+void MainWindow::initPresets()
+{
+    auto exchangeW = m_ui->presetExchangeWidget;
+    auto selectionW = m_ui->presetSelectionWidget;
+
+    exchangeW->setPresetCompositor([this]{
+        Preset preset;
+
+        for(auto w: edgeWidgets())
+        {
+            auto color = w->edgeColor();
+            preset[CubeEdge::CLOCKWIZE][color] = w->harmony(CubeEdge::CLOCKWIZE);
+            preset[CubeEdge::ANTICLOCKWIZE][color] = w->harmony(CubeEdge::ANTICLOCKWIZE);
+        }
+
+        return preset;
+    });
+
+    connect(exchangeW, &PresetExchangeWidget::presetImported, selectionW, [selectionW] (auto name, auto preset) {
+        selectionW->addPreset({name, preset});
+    });
+
+    connect(selectionW, &PresetSelectionWidget::presetChanged, this, &MainWindow::onPresetChanged);
 }

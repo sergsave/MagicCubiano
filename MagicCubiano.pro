@@ -12,8 +12,6 @@ android{
     QT       += androidextras
 }
 
-ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = MagicCubiano
@@ -32,35 +30,56 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-    src/View/EdgeSettingsWidget.cpp \
     src/View/MainWindow.cpp \
-    src/GiikerProtocol.cpp \
-    src/GuitarFretboardPos.cpp \
+    src/Protocol/GiikerProtocol.cpp \
     src/main.cpp \
-    src/SoundGenerator.cpp \
-    src/View/ConnectionDialog.cpp
+    src/View/ConnectionDialog.cpp \
+    src/View/EdgeWidget.cpp \
+    src/View/GuitarEdgeSettingsDialog.cpp \
+    src/Music.cpp \
+    src/Sound/ToneGenerator.cpp \
+    src/Sound/SampleGenerator.cpp \
+    src/Sound/GuitarGenerators.cpp \
+    src/View/InstrumentSelectionWidget.cpp \
+    src/View/EdgeSettingsFactory.cpp \
+    src/View/SettingsDialog.cpp \
+    src/View/SelectionWidget.cpp \
+    src/View/PresetSelectionWidget.cpp \
+    src/Preset.cpp \
+    src/View/PresetExchangeWidget.cpp
 
 HEADERS += \
-    src/View/EdgeSettingsWidget.h \
     src/View/MainWindow.h \
-    src/GiikerProtocol.h \
-    src/GuitarFretboardPos.h \
-    src/MagicCubianoGlobal.h \
-    src/SoundGenerator.h \
-    src/View/ConnectionDialog.h
+    src/Protocol/GiikerProtocol.h \
+    src/View/ConnectionDialog.h \
+    src/CubeEdge.h \
+    src/View/EdgeWidget.h \
+    src/View/EdgeSettingsFactory.h \
+    src/View/GuitarEdgeSettingsDialog.h \
+    src/View/EdgeSettingsDialog.h \
+    src/Music.h \
+    src/Sound/ToneGenerator.h \
+    src/Sound/SoundGenerator.h \
+    src/Sound/SoundGeneratorFactory.h \
+    src/Sound/SampleGenerator.h \
+    src/Configuration.h \
+    src/Sound/GuitarGenerators.h \
+    src/View/InstrumentSelectionWidget.h \
+    src/View/SettingsDialog.h \
+    src/View/SelectionWidget.h \
+    src/View/PresetSelectionWidget.h \
+    src/Preset.h \
+    src/View/PresetExchangeWidget.h
 
 FORMS += \
-    src/View/EdgeSettingsWidget.ui \
     src/View/MainWindow.ui \
-    src/View/ConnectionDialog.ui
-
-CONFIG += mobility
-MOBILITY = 
-
-DISTFILES += \
-    anticlockwize.png \
-    clockwize.png \
-    android-sources/AndroidManifest.xml
+    src/View/ConnectionDialog.ui \
+    src/View/EdgeWidget.ui \
+    src/View/GuitarEdgeSettingsDialog.ui \
+    src/View/SettingsDialog.ui \
+    src/View/SelectionWidget.ui
 
 RESOURCES += \
-    resources/Cubiano.qrc
+    resources/Guitar.qrc \
+    resources/DistortionGuitar.qrc \
+    resources/Other.qrc
