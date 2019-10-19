@@ -1,69 +1,39 @@
 #pragma once
 
-#include <QWidget>
-#include <QMap>
+#include <QMainWindow>
 #include <QScopedPointer>
 
-#include "EdgeWidget.h"
-#include "SettingsDialog.h"
-#include "PresetSelectionWidget.h"
+#include "src/CubeEdge.h"
 
 namespace Ui {
 class MainWindow;
 }
 
-class ConnectionDialog;
+namespace Preset {
+class Storage;
+class AbstractPreset;
+}
 
-class MainWindow : public QWidget
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(Preset::Storage * storage, QWidget *parent = nullptr);
     ~MainWindow();
 
     void start();
 
-    void highlightEdge(CubeEdge::Color col);
+    void onEdgeTurned(const CubeEdge& edge);
 
-    Music::Harmony harmonyFor(const CubeEdge& ) const;
-    Music::Instrument instrumentType() const;
-    int volume() const;
-
-signals:
-    void connectAnyRequested();
-    void connectByAddressRequested(const QString&);
-    void instrumentTypeChanged(Music::Instrument);
-    void volumeChanged(int vol);
-
-public slots:
-    void connected();
-    void connectionFailed();
-
-private:
-    void createEdgeWidgets();
-    QList<EdgeWidget*> edgeWidgets();
-
-    void createSettingsFactory();
-    void updateSettingsFactory();
-
-    void setAllDirectionHarmony(EdgeWidget *, const Music::Harmony &);
-    int harmonyDelayMsec() const;
 
 private slots:
-    void synchronizeEdgesRotation();
-    void setDefaultHarmonies();
-    void onInstrumentTypeChanged(Music::Instrument);
-    void onPresetChanged(const PresetSelectionWidget::NamedPreset&);
-    void enterGlobalSettings();
-    void initPresets();
+    void onCreateNew();
+    void onEditRequested(const QString& name);
+    void updatePresetPage();
 
 private:
-    QMap<CubeEdge::Color, EdgeWidget*> m_color2edges;
-    QScopedPointer<const EdgeSettingsFactory> m_settingsFactory;
-
     QScopedPointer<Ui::MainWindow> m_ui;
-    ConnectionDialog * m_dialog = nullptr;
-    Settings m_globalSettings;
+    Preset::Storage * m_storage = nullptr;
 };
 

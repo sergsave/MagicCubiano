@@ -1,230 +1,81 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
-#include "ConnectionDialog.h"
-
-#include <QScopedPointer>
 #include <QDesktopWidget>
 
-#include <cassert>
+#include "src/Preset/Storage.h"
+#include "PresetDialog.h"
+#include "Utils.h"
 
-MainWindow::MainWindow(QWidget *parent):
-    QWidget(parent),
-    m_ui(new Ui::MainWindow)
+MainWindow::MainWindow(Preset::Storage *storage, QWidget *parent):
+    QMainWindow(parent),
+    m_ui(new Ui::MainWindow),
+    m_storage(storage)
 {
     m_ui->setupUi(this);
-
-    createSettingsFactory();
-    createEdgeWidgets();
 
     QRect scr = QApplication::desktop()->screenGeometry();
     move( scr.center() - rect().center() );
 
-    connect(m_ui->syncButton, &QAbstractButton::clicked, this, &MainWindow::synchronizeEdgesRotation);
-    connect(m_ui->resetButton, &QAbstractButton::clicked, this, &MainWindow::setDefaultHarmonies);
-    connect(m_ui->settingsButton, &QAbstractButton::clicked, this, &MainWindow::enterGlobalSettings);
-    connect(m_ui->instrumentsWidget, &InstrumentSelectionWidget::instrumentTypeChanged,
-            this, &MainWindow::onInstrumentTypeChanged);
+    updatePresetPage();
 
-    initPresets();
+    connect(m_ui->createNewButton, &QAbstractButton::clicked, this, &MainWindow::onCreateNew);
+    connect(m_ui->testButton, &QAbstractButton::clicked, this, &MainWindow::onCreateNew);
+
+    connect(m_ui->presetSelectionWidget, &PresetSelectionWidget::presetEditRequested, this,
+            &MainWindow::onEditRequested);
+
+    connect(m_ui->presetSelectionWidget, &PresetSelectionWidget::presetRenamed, this,
+            [this] (auto oldName, auto newName) {
+        m_storage->renamePreset(oldName, newName);
+    });
 }
 
-MainWindow::~MainWindow()
-{
-    for(auto w: edgeWidgets()) w->setSettingsFactory(nullptr);
-}
+MainWindow::~MainWindow() = default;
 
 void MainWindow::start()
 {
-    m_dialog = new ConnectionDialog(this);
-
-    connect(m_dialog, &ConnectionDialog::connectAnyRequested, this, &MainWindow::connectAnyRequested);
-    connect(m_dialog, &ConnectionDialog::connectByAddressRequested, this, &MainWindow::connectByAddressRequested);
-    m_dialog->exec();
-
     show();
 }
 
-Music::Harmony MainWindow::harmonyFor(const CubeEdge & edge) const
+void MainWindow::onEdgeTurned(const CubeEdge& edge)
 {
-    auto edgeWidget = m_color2edges.value(edge.color, nullptr);
 
-    if(!edgeWidget)
-        return {};
-
-    auto harmony = edgeWidget->harmony(edge.rotation);
-    harmony.delayMSec = harmonyDelayMsec();
-
-    return harmony;
 }
 
-void MainWindow::highlightEdge(CubeEdge::Color color)
+void MainWindow::onCreateNew()
 {
-    if(auto edge = m_color2edges.value(color, nullptr))
-        edge->indicate();
+    PresetDialog dialog;
+    auto sourceName = Preset::generateVacantName(*m_storage, "New preset");
+    dialog.openCreatePresetPage(sourceName);
+    dialog.exec();
+
+    auto preset = dialog.currentPreset();
+
+    if(!preset)
+        return;
+
+    auto name = Preset::generateVacantName(*m_storage, dialog.currentPresetName());
+    m_storage->addPreset(name, preset);
+    m_ui->presetSelectionWidget->add(name, instrumentName(preset));
+
+    updatePresetPage();
 }
 
-Music::Instrument MainWindow::instrumentType() const
+void MainWindow::onEditRequested(const QString &name)
 {
-    return m_ui->instrumentsWidget->instrumentType();
+    PresetDialog dialog;
+    dialog.openEditPresetPage(name, m_storage->findPreset(name));
+
+    dialog.exec();
+    updatePresetPage();
 }
 
-int MainWindow::volume() const
+void MainWindow::updatePresetPage()
 {
-    return m_globalSettings.volume;
+    if(!m_storage->allPresets().isEmpty())
+        m_ui->stackedWidget->setCurrentWidget(m_ui->presetsPage);
+    else
+        m_ui->stackedWidget->setCurrentWidget(m_ui->noPresetPage);
 }
 
-void MainWindow::connected()
-{
-    if(m_dialog) m_dialog->connected();
-}
-
-void MainWindow::connectionFailed()
-{
-    if(m_dialog) m_dialog->connectionFailed();
-}
-
-void MainWindow::createEdgeWidgets()
-{
-    using Col = CubeEdge::Color;
-
-    assert(m_color2edges.empty());
-
-    auto layout = m_ui->edgesFrame->layout();
-    if(!layout)
-        layout = new QVBoxLayout(m_ui->edgesFrame);
-
-    auto addWidget = [layout, this] (CubeEdge::Color col) {
-        auto w = new EdgeWidget(col, m_settingsFactory.data(), this);
-        layout->addWidget(w);
-
-        m_color2edges[col] = w;
-    };
-
-    addWidget(Col::YELLOW);
-    addWidget(Col::ORANGE);
-    addWidget(Col::RED);
-    addWidget(Col::GREEN);
-    addWidget(Col::WHITE);
-    addWidget(Col::BLUE);
-
-    setDefaultHarmonies();
-}
-
-void MainWindow::onInstrumentTypeChanged(Music::Instrument ins)
-{
-    updateSettingsFactory();
-    emit instrumentTypeChanged(ins);
-}
-
-void MainWindow::onPresetChanged(const PresetSelectionWidget::NamedPreset& preset)
-{
-    auto setupEdgeWidgets = [this, &preset](CubeEdge::Rotation rot){
-        auto ews = edgeWidgets();
-        auto colors = preset.second[rot];
-
-        for(auto key: colors.keys())
-            ews[key]->setHarmony(colors.value(key), rot);
-    };
-
-    setupEdgeWidgets(CubeEdge::CLOCKWIZE);
-    setupEdgeWidgets(CubeEdge::ANTICLOCKWIZE);
-}
-
-void MainWindow::createSettingsFactory()
-{
-    auto type = m_ui->instrumentsWidget->instrumentType();
-    m_settingsFactory.reset(EdgeSettingsFactory::createInstance(type));
-}
-
-void MainWindow::updateSettingsFactory()
-{
-    createSettingsFactory();
-
-    for(auto ew: edgeWidgets())
-        ew->setSettingsFactory(m_settingsFactory.data());
-}
-
-QList<EdgeWidget *> MainWindow::edgeWidgets()
-{
-    assert(!m_color2edges.empty());
-    return m_color2edges.values();
-}
-
-void MainWindow::setAllDirectionHarmony(EdgeWidget *ew, const Music::Harmony& harm)
-{
-    ew->setHarmony(harm, CubeEdge::Rotation::ANTICLOCKWIZE);
-    ew->setHarmony(harm, CubeEdge::Rotation::CLOCKWIZE);
-}
-
-void MainWindow::synchronizeEdgesRotation()
-{
-    for(auto ew: edgeWidgets())
-    {
-        if(!ew) continue;
-        ew->indicate();
-
-        auto currHarmony = ew->harmony(ew->rotateDirection());
-        setAllDirectionHarmony(ew, currHarmony);
-    }
-}
-
-void MainWindow::setDefaultHarmonies()
-{
-    for(auto ew: edgeWidgets())
-    {
-        if(!ew) continue;
-        ew->indicate();
-
-        using namespace Music;
-
-        auto tone = Tone(Tone::E, 2);
-        auto delay = harmonyDelayMsec();
-        auto harmony = Harmony({tone}, delay);
-
-        setAllDirectionHarmony(ew, harmony);
-    }
-}
-
-int MainWindow::harmonyDelayMsec() const
-{
-    return m_globalSettings.delayMSec;
-}
-
-void MainWindow::enterGlobalSettings()
-{
-    auto oldSettings = m_globalSettings;
-
-    SettingsDialog dialog(oldSettings);
-    if(dialog.exec() == QDialog::Accepted)
-       m_globalSettings = dialog.settings();
-
-    auto vol = m_globalSettings.volume;
-    if(vol != oldSettings.volume)
-        emit volumeChanged(vol);
-}
-
-void MainWindow::initPresets()
-{
-    auto exchangeW = m_ui->presetExchangeWidget;
-    auto selectionW = m_ui->presetSelectionWidget;
-
-    exchangeW->setPresetCompositor([this]{
-        Preset preset;
-
-        for(auto w: edgeWidgets())
-        {
-            auto color = w->edgeColor();
-            preset[CubeEdge::CLOCKWIZE][color] = w->harmony(CubeEdge::CLOCKWIZE);
-            preset[CubeEdge::ANTICLOCKWIZE][color] = w->harmony(CubeEdge::ANTICLOCKWIZE);
-        }
-
-        return preset;
-    });
-
-    connect(exchangeW, &PresetExchangeWidget::presetImported, selectionW, [selectionW] (auto name, auto preset) {
-        selectionW->addPreset({name, preset});
-    });
-
-    connect(selectionW, &PresetSelectionWidget::presetChanged, this, &MainWindow::onPresetChanged);
-}

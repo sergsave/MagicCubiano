@@ -1,7 +1,7 @@
 #pragma once
 
 // Magic cube always has 6 edges
-// Attention! enums are used for preset serialization
+// Attention! enums are used for serialization
 struct CubeEdge
 {
     enum Color

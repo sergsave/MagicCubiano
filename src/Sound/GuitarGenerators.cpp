@@ -1,6 +1,7 @@
 #include "GuitarGenerators.h"
 
 #include <QString>
+#include "src/Instruments/Common.h"
 
 namespace {
 
@@ -17,15 +18,17 @@ QString resourcePath(const Music::Tone& tone, const QString& folderName)
 
 }
 
-GuitarGenerator::GuitarGenerator(const Music::Interval &interval, QObject *parent):
-    SampleGenerator(interval, parent)
-{
-    setResourcePathFunc([] (const Music::Tone& tone){ return resourcePath(tone, "guitar"); });
-}
+GuitarGenerator::GuitarGenerator(QObject * parent):
+    SampleGenerator(
+        [] (auto tone){ return resourcePath(tone, "guitar"); },
+        Instruments::defineInterval<Instruments::GuitarTag>(),
+        parent)
+{}
 
-DistortionGuitarGenerator::DistortionGuitarGenerator(const Music::Interval &interval, QObject *parent):
-    SampleGenerator(interval, parent)
-{
-    setResourcePathFunc([] (const Music::Tone& tone){ return resourcePath(tone, "distortion_guitar"); });
-}
+ElectricGuitarGenerator::ElectricGuitarGenerator(QObject * parent):
+    SampleGenerator(
+        [] (auto tone){ return resourcePath(tone, "distortion_guitar"); },
+        Instruments::defineInterval<Instruments::ElectricGuitarTag>(),
+        parent)
+{}
 

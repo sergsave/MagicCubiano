@@ -4,38 +4,32 @@
 #include <QList>
 
 #include "Music.h"
+#include "src/Instruments/Common.h"
 
 // TODO: set in .ini or .txt
-class Configuration
+namespace Configuration
 {
-public:
-    Configuration() = delete;
 
-    static QList<Music::Instrument> supportedInstruments()
-    {
-        return { Ins::GUITAR, Ins::DISTORTION_GUITAR };
-    }
+static QList<Instruments::Type> supportedInstruments()
+{
+    using Ins = Instruments::Type;
+    return { Ins::GUITAR, Ins::ELECTRIC_GUITAR };
+}
 
-    static int noteDurationMSec()
-    {
-        return 0;
-    }
+static QList<Instruments::Type> soonInstruments()
+{
+    using Ins = Instruments::Type;
+    return { Ins::PIANO };
+}
 
-    static Music::Interval intervalFor(Music::Instrument type)
-    {
-        assert(supportedInstruments().contains(type) && "Unsupported instrument");
+static int defaultMinNoteDurationMSec()
+{
+    return 0;
+}
 
-        switch (type)
-        {
-        case Ins::GUITAR:
-        case Ins::DISTORTION_GUITAR:
-            return { T(T::E, 2), T(T::B, 5) };
-        default:
-            return { };
-        }
-    }
+static int defaultVolume()
+{
+    return 100;
+}
 
-private:
-    using Ins = Music::Instrument;
-    using T = Music::Tone;
-};
+}

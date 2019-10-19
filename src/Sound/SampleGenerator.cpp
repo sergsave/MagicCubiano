@@ -7,10 +7,28 @@
 #include <QTimer>
 #include <QFileInfo>
 
-SampleGenerator::SampleGenerator(const Music::Interval& interval, QObject* parent):
+SampleGenerator::SampleGenerator(const PathFunc& func, const Music::Interval& interval, QObject * parent):
     SoundGenerator(parent),
-    m_interval(interval)
+    m_interval(interval),
+    m_pathFunc(func)
 {
+    // Check of all resources are presented
+    for(auto& tone: Music::allTonesFor(m_interval))
+    {
+        QFileInfo info(func(tone));
+        if(!info.exists())
+        {
+            assert(!"resource not found");
+            break;
+        }
+    }
+
+    m_pathFunc = func;
+}
+
+Music::Interval SampleGenerator::interval() const
+{
+    return m_interval;
 }
 
 void SampleGenerator::doPlay(const Music::Harmony & harm, int volume)
@@ -29,26 +47,10 @@ void SampleGenerator::doPlay(const Music::Harmony & harm, int volume)
                                                    QAudio::LinearVolumeScale);
         player->setVolume(linearVolume);
 
-        QTimer::singleShot(harm.delayMSec * i, player, [player] { player->play(); });
+        QTimer::singleShot(harm.minToneDurationMSec * i, player, [player] { player->play(); });
 
         m_players.append(player);
     }
-}
-
-void SampleGenerator::setResourcePathFunc(const std::function<QString (const Music::Tone &)> &func)
-{
-    // Check of all resources are presented
-    for(auto& tone: allTonesFor(m_interval))
-    {
-        QFileInfo info(func(tone));
-        if(!info.exists())
-        {
-            assert(!"resource not found");
-            break;
-        }
-    }
-
-    m_pathFunc = func;
 }
 
 QString SampleGenerator::resourcePathFor(const Music::Tone & tone) const

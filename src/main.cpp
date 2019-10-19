@@ -2,18 +2,20 @@
 #include <QScopedPointer>
 
 #include "Protocol/GiikerProtocol.h"
-#include "Sound/SoundGeneratorFactory.h"
 #include "View/MainWindow.h"
+#include "SoundHelper.h"
+#include "Preset/Storage.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
     // order is important
+    Preset::Storage storage;
     QScopedPointer<SoundGenerator> soundGenerator;
-    MainWindow window;
+    MainWindow window(&storage);
     GiikerProtocol protocol;
-
+/*
     QObject::connect(&window, &MainWindow::connectAnyRequested, &protocol,
         [&protocol]() { protocol.connectToCube();});
     QObject::connect(&window, &MainWindow::connectByAddressRequested, &protocol,
@@ -24,7 +26,7 @@ int main(int argc, char *argv[])
     QObject::connect(&protocol, &GiikerProtocol::cubeConnectionFailed,
         &window, &MainWindow::connectionFailed);
 
-    auto updateGenerator = [&soundGenerator] (Music::Instrument inst) {
+    auto updateGenerator = [&soundGenerator] (Instruments::Type inst) {
         soundGenerator.reset(createSoundGenerator(inst));
     };
 
@@ -34,12 +36,12 @@ int main(int argc, char *argv[])
     QObject::connect(&protocol, &GiikerProtocol::cubeEdgeTurned, &window,
         [&soundGenerator, &window] (const CubeEdge& info) {
 
-        window.highlightEdge(info.color);
+        window.onEdgeTurned(info.color);
 
         if(soundGenerator)
             soundGenerator->play(window.harmonyFor(info), window.volume());
     });
-
+*/
     window.start();
 
     return a.exec();

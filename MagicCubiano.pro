@@ -34,50 +34,61 @@ SOURCES += \
     src/Protocol/GiikerProtocol.cpp \
     src/main.cpp \
     src/View/ConnectionDialog.cpp \
-    src/View/EdgeWidget.cpp \
-    src/View/GuitarEdgeSettingsDialog.cpp \
     src/Music.cpp \
-    src/Sound/ToneGenerator.cpp \
     src/Sound/SampleGenerator.cpp \
     src/Sound/GuitarGenerators.cpp \
-    src/View/InstrumentSelectionWidget.cpp \
-    src/View/EdgeSettingsFactory.cpp \
     src/View/SettingsDialog.cpp \
-    src/View/SelectionWidget.cpp \
+    src/Preset/SaveLoader.cpp \
+    src/Instruments/Descriptions.cpp \
     src/View/PresetSelectionWidget.cpp \
-    src/Preset.cpp \
-    src/View/PresetExchangeWidget.cpp
+    src/View/GuitarPresetEditorWidgets.cpp \
+    src/View/GuitarStringWidget.cpp \
+    src/Preset/NotationSerializer.cpp \
+    src/View/PresetDialog.cpp \
+    src/View/PresetEditingWidget.cpp \
+    src/View/PresetCreatingWidget.cpp \
+    src/Preset/Storage.cpp
 
 HEADERS += \
     src/View/MainWindow.h \
     src/Protocol/GiikerProtocol.h \
     src/View/ConnectionDialog.h \
     src/CubeEdge.h \
-    src/View/EdgeWidget.h \
-    src/View/EdgeSettingsFactory.h \
-    src/View/GuitarEdgeSettingsDialog.h \
-    src/View/EdgeSettingsDialog.h \
     src/Music.h \
-    src/Sound/ToneGenerator.h \
     src/Sound/SoundGenerator.h \
     src/Sound/SoundGeneratorFactory.h \
     src/Sound/SampleGenerator.h \
     src/Configuration.h \
     src/Sound/GuitarGenerators.h \
-    src/View/InstrumentSelectionWidget.h \
     src/View/SettingsDialog.h \
-    src/View/SelectionWidget.h \
+    src/Instruments/Notations.h \
+    src/Instruments/Descriptions.h \
+    src/Instruments/Common.h \
+    src/Preset/Storage.h \
+    src/Preset/SaveLoader.h \
+    src/Preset/NotationSerializer.h \
+    src/Preset/Serializer.h \
     src/View/PresetSelectionWidget.h \
-    src/Preset.h \
-    src/View/PresetExchangeWidget.h
+    src/Preset/Model.h \
+    src/Preset/Visitor.h \
+    src/View/BasePresetEditorWidget.h \
+    src/View/GuitarPresetEditorWidgets.h \
+    src/View/Utils.h \
+    src/View/GuitarStringWidget.h \
+    src/SoundHelper.h \
+    src/View/PresetDialog.h \
+    src/View/PresetEditingWidget.h \
+    src/View/PresetCreatingWidget.h
 
 FORMS += \
-    src/View/MainWindow.ui \
     src/View/ConnectionDialog.ui \
-    src/View/EdgeWidget.ui \
-    src/View/GuitarEdgeSettingsDialog.ui \
     src/View/SettingsDialog.ui \
-    src/View/SelectionWidget.ui
+    src/View/PresetSelectionWidget.ui \
+    src/View/GuitarStringWidget.ui \
+    src/View/MainWindow.ui \
+    src/View/PresetEditingWidget.ui \
+    src/View/PresetCreatingWidget.ui \
+    src/View/PresetDialog.ui
 
 RESOURCES += \
     resources/Guitar.qrc \

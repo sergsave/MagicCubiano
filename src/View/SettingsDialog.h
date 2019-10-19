@@ -11,7 +11,7 @@ class SettingsDialog;
 
 struct Settings
 {
-    Settings(int msec = Configuration::noteDurationMSec(), int vol = 100) :
+    Settings(int msec = Configuration::defaultMinNoteDurationMSec(), int vol = 100) :
         delayMSec(msec),
         volume(vol)
     {}
