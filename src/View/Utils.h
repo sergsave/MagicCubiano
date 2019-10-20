@@ -7,13 +7,13 @@
 #include "src/Preset/Model.h"
 
 // TODO: Common utils
-class InstrumentTypeFetchVisitor : public Preset::Visitor
+class InstrumentTypeFetchVisitor : public Preset::ConstVisitor
 {
     using T = Instruments::Type;
 public:
-    void visit(Preset::GuitarPreset*) override { m_type = T::GUITAR; }
-    void visit(Preset::ElectricGuitarPreset*) override { m_type = T::ELECTRIC_GUITAR; }
-    void visit(Preset::PianoPreset*) override { m_type = T::PIANO; }
+    void visit(const Preset::GuitarPreset&) override { m_type = T::GUITAR; }
+    void visit(const Preset::ElectricGuitarPreset&) override { m_type = T::ELECTRIC_GUITAR; }
+    void visit(const Preset::PianoPreset&) override { m_type = T::PIANO; }
 
     Instruments::Type type() const { return m_type; }
 
@@ -42,6 +42,6 @@ static QString instrumentName(Instruments::Type type)
 static QString instrumentName(Preset::AbstractPreset * preset)
 {
     InstrumentTypeFetchVisitor visitor;
-    preset->acceptVisitor(&visitor);
+    preset->acceptVisitor(visitor);
     return instrumentName(visitor.type());
 }

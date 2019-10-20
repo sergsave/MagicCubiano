@@ -47,7 +47,8 @@ SOURCES += \
     src/View/PresetDialog.cpp \
     src/View/PresetEditingWidget.cpp \
     src/View/PresetCreatingWidget.cpp \
-    src/Preset/Storage.cpp
+    src/Preset/Storage.cpp \
+    src/View/SaveLoadHelper.cpp
 
 HEADERS += \
     src/View/MainWindow.h \
@@ -78,7 +79,8 @@ HEADERS += \
     src/SoundHelper.h \
     src/View/PresetDialog.h \
     src/View/PresetEditingWidget.h \
-    src/View/PresetCreatingWidget.h
+    src/View/PresetCreatingWidget.h \
+    src/View/SaveLoadHelper.h
 
 FORMS += \
     src/View/ConnectionDialog.ui \

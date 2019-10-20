@@ -24,6 +24,8 @@ public:
     int fretValue() const;
     void setFretValue(int val);
 
+    void reset();
+
 signals:
     void fretValueChanged(int);
     void muteChaged(bool);

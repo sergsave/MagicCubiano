@@ -5,20 +5,17 @@
 
 namespace Preset {
 
-class Storage;
+class AbstractPreset;
 
 class SaveLoader
 {
 public:
-    SaveLoader(Storage * storage);
+    SaveLoader();
     ~SaveLoader();
 
-// TODO: check result
-    bool load(const QString& dir, const QString& name);
-    bool save(const QString& dir, const QString& name);
-
-private:
-    Storage * m_storage = nullptr;
+    // load method create new preset, doesn't take ownership
+    AbstractPreset * load(const QString& filePath);
+    bool save(const QString& filePath, AbstractPreset const * preset);
 };
 
 }

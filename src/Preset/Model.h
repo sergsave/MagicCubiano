@@ -11,21 +11,19 @@ namespace Preset {
 template <class InstrumentTag>
 struct Unit
 {
-    int duration = 0;
-    typename InstrumentTag::Notation notation;
+    int minDurationMSec = 0;
+    QList<typename InstrumentTag::Notation> notations;
 };
 
 template <class InstrumentTag>
-using Units = QList<Unit<InstrumentTag>>;
-
-template <class InstrumentTag>
-using Data = QMap<CubeEdge::Rotation, QMap<CubeEdge::Color, Units<InstrumentTag>>>;
+using Data = QMap<CubeEdge::Rotation, QMap<CubeEdge::Color, Unit<InstrumentTag>>>;
 
 class AbstractPreset
 {
 public:
     virtual ~AbstractPreset() {}
-    virtual void acceptVisitor(Visitor * v) = 0;
+    virtual void acceptVisitor(Visitor& v) = 0;
+    virtual void acceptVisitor(ConstVisitor& v) const = 0;
     // TODO: Remove toHarmony??
     virtual Music::Harmony toHarmony(const CubeEdge&) const = 0;
 };
@@ -34,17 +32,21 @@ template <class Instrument>
 class TPreset : public AbstractPreset
 {
 public:
-    void acceptVisitor(Visitor * v) override { v->visit(this); }
+    void acceptVisitor(Visitor& v) override { v.visit(*this); }
+    void acceptVisitor(ConstVisitor& cv) const override { cv.visit(*this); }
 
     Music::Harmony toHarmony(const CubeEdge& ce) const override
     {
         Music::Harmony ret;
-        for(auto unit: m_data[ce.rotation][ce.color])
-            ret.tones.append(Desc::toneFor(unit.notation));
+        auto unit = m_data[ce.rotation][ce.color];
+
+        ret.minToneDurationMSec = unit.minDurationMSec;
+        for(auto notation: unit.notations)
+            ret.tones.append(Desc::toneFor(notation));
         return ret;
     }
 
-    Data<Instrument> data() { return m_data; }
+    Data<Instrument> data() const { return m_data; }
     void setData(const Data<Instrument>& data) { m_data = data; }
 
 private:

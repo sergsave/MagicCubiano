@@ -31,6 +31,7 @@ private slots:
     void onCreateNew();
     void onEditRequested(const QString& name);
     void updatePresetPage();
+    void addToSelectionWidget(const QString& name);
 
 private:
     QScopedPointer<Ui::MainWindow> m_ui;

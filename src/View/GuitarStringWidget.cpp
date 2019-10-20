@@ -28,7 +28,7 @@ GuitarStringWidget::~GuitarStringWidget() = default;
 
 int GuitarStringWidget::number() const
 {
-    return m_ui->fretNumberLabel->text().toInt();
+    return m_ui->stringNumberLabel->text().toInt();
 }
 
 bool GuitarStringWidget::isMuted() const
@@ -57,4 +57,10 @@ void GuitarStringWidget::setFretValue(int val)
 
     m_ui->fretSlider->setValue(val);
     emit fretValueChanged(val);
+}
+
+void GuitarStringWidget::reset()
+{
+    m_ui->fretSlider->setValue(0);
+    m_ui->muteCheckBox->setChecked(false);
 }

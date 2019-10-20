@@ -15,17 +15,17 @@ public:
 
     EditingPresetVisitor(QWidget * parent) : m_parent(parent) {}
 
-    void visit(Preset::GuitarPreset * preset) override
+    void visit(Preset::GuitarPreset& preset) override
     {
-        m_widget = new GuitarPresetEditorWidget(preset, m_parent);
+        m_widget = new GuitarPresetEditorWidget(&preset, m_parent);
     }
 
-    void visit(Preset::ElectricGuitarPreset * preset) override
+    void visit(Preset::ElectricGuitarPreset& preset) override
     {
-        m_widget = new ElectricGuitarPresetEditorWidget(preset, m_parent);
+        m_widget = new ElectricGuitarPresetEditorWidget(&preset, m_parent);
     }
 
-    void visit(Preset::PianoPreset *) override
+    void visit(Preset::PianoPreset& ) override
     {
         // TODO Error!
         assert(!"not supported");
@@ -61,11 +61,10 @@ void PresetEditingWidget::setPreset(const QString &name, Preset::AbstractPreset 
 {
     assert(preset);
 
-    m_ui->nameLabel->setText(name);
-    m_ui->instrumentLabel->setText(instrumentName(preset));
+    m_ui->titleLabel->setText(QString("%1 (%2)").arg(name, instrumentName(preset)));
 
     EditingPresetVisitor editVisitor(this);
-    preset->acceptVisitor(&editVisitor);
+    preset->acceptVisitor(editVisitor);
 
     setEditorWidget(editVisitor.editor());
 }
@@ -82,6 +81,10 @@ void PresetEditingWidget::setEditorWidget(BasePresetEditorWidget * editor)
         layout = new QHBoxLayout(frame);
 
     layout->addWidget(editor);
+
+    // Always start with edge of first button
+    editor->setActiveCubeEdge(selectors()[m_ui->clockYellowButton]);
+
     m_editor = editor;
 }
 

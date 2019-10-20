@@ -63,8 +63,6 @@ PresetSelectionWidget::PresetSelectionWidget(QWidget *parent) :
         m_ui->renameButton->setEnabled(isValid);
         m_ui->nameLineEdit->setStyleSheet(isValid ? "" : "border: 2px solid red");
     });
-
-
 }
 
 QString PresetSelectionWidget::currentPreset() const
@@ -78,6 +76,8 @@ bool PresetSelectionWidget::remove(const QString& name)
         return false;
 
     m_presets.removeFirst();
+    checkForEmpty();
+
     changeIndex(m_index);
     return true;
 }
@@ -88,10 +88,17 @@ bool PresetSelectionWidget::add(const QString& name, const QString& instrument)
         return false;
 
     m_presets.append(name);
+    checkForEmpty();
+
     m_presets2instruments.insert(name, instrument);
 
     changeIndex(m_presets.size() - 1);
     return true;
+}
+
+bool PresetSelectionWidget::isEmpty() const
+{
+    return m_presets.isEmpty();
 }
 
 void PresetSelectionWidget::changeIndex(int newIdx)
@@ -108,6 +115,11 @@ void PresetSelectionWidget::changeIndex(int newIdx)
 
     if(changed)
         emit presetSelected(m_presets[m_index]);
+}
+
+void PresetSelectionWidget::checkForEmpty()
+{
+    emit emptyStateChanged(isEmpty());
 }
 
 void PresetSelectionWidget::updateDirectionButtonsState()

@@ -23,13 +23,18 @@ public:
     bool remove(const QString&);
     bool add(const QString& presetName, const QString& instrumentName);
 
+    bool isEmpty() const;
+
 signals:
+    void emptyStateChanged(bool isEmpty);
+
     void presetSelected(const QString&);
     void presetEditRequested(const QString&);
     void presetRenamed(const QString& oldName, const QString& newName);
 
 private:
     void changeIndex(int newIdx);
+    void checkForEmpty();
     void updateDirectionButtonsState();
     void updateState();
 

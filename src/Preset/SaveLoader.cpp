@@ -1,7 +1,8 @@
 #include "SaveLoader.h"
 
+#include <QFile>
+
 #include "Serializer.h"
-#include "Storage.h"
 #include "Model.h"
 
 namespace Preset {
@@ -14,21 +15,21 @@ using SGuitar = Serializer<GuitarTag>;
 using SElectricGuitar = Serializer<ElectricGuitarTag>;
 using SPiano = Serializer<PianoTag>;
 
-class SerializeVisitor: public Visitor
+class SerializeVisitor: public ConstVisitor
 {
 public:
 
-    void visit(GuitarPreset * preset) override
+    void visit(const GuitarPreset& preset) override
     {
         serialize(preset, SGuitar());
     }
 
-    void visit(ElectricGuitarPreset * preset) override
+    void visit(const ElectricGuitarPreset& preset) override
     {
         serialize(preset, SElectricGuitar());
     }
 
-    void visit(PianoPreset * preset) override
+    void visit(const PianoPreset& preset) override
     {
         serialize(preset, SPiano());
     }
@@ -37,9 +38,9 @@ public:
 
 private:
 
-    void serialize(auto * preset, const auto& serializer)
+    void serialize(const auto& preset, const auto& serializer)
     {
-        m_data = serializer.serialize(preset->data());
+        m_data = serializer.serialize(preset.data());
     }
 
     QByteArray m_data;
@@ -49,69 +50,86 @@ class DeserializeVisitor: public Visitor
 {
 public:
 
-    void visit(GuitarPreset * preset) override
+    void visit(GuitarPreset& preset) override
     {
         deserialize(preset, SGuitar());
     }
 
-    void visit(ElectricGuitarPreset * preset) override
+    void visit(ElectricGuitarPreset& preset) override
     {
         deserialize(preset, SElectricGuitar());
     }
 
-    void visit(PianoPreset * preset) override
+    void visit(PianoPreset& preset) override
     {
         deserialize(preset, SPiano());
     }
 
     void setData(const QByteArray& data) { m_data = data; }
+    bool result() const { return m_result; }
 
 private:
 
-    void deserialize(auto * preset, const auto& deserializer)
+    void deserialize(auto & preset, const auto& deserializer)
     {
-        preset->setData(deserializer.deserialize(m_data));
+        auto data = deserializer.deserialize(m_data, m_result);
+
+        if(m_result)
+            preset.setData(data);
     }
 
+    bool m_result = false;
     QByteArray m_data;
 };
 
 }
 
-SaveLoader::SaveLoader(Storage * storage) : m_storage(storage)
-{}
-
+SaveLoader::SaveLoader() = default;
 SaveLoader::~SaveLoader() = default;
 
-bool SaveLoader::load(const QString& dir, const QString& name)
+AbstractPreset * SaveLoader::load(const QString &filePath)
 {
-    // TODO: open file
-    QByteArray data;
+    QFile loadFile(filePath);
+    if(!loadFile.open(QFile::ReadOnly))
+        return nullptr;
 
-    auto type = readSerializationMeta(data).type;
+    QByteArray data = loadFile.readAll();
+
+    bool ok = false;
+    auto type = readSerializationMeta(data, ok).type;
+
+    if(!ok)
+        return nullptr;
+
+    auto preset = createPreset(type);
 
     auto visitor = DeserializeVisitor();
     visitor.setData(data);
+    preset->acceptVisitor(visitor);
 
-    auto preset = createPreset(type);
-    preset->acceptVisitor(&visitor);
+    if(!visitor.result())
+    {
+        delete preset;
+        return nullptr;
+    }
 
-//    m_storage->addPreset(name, preset);
-
-    return true;
+    return preset;
 }
 
-bool SaveLoader::save(const QString& dir, const QString& name)
+bool SaveLoader::save(const QString &filePath, const AbstractPreset * preset)
 {
+    if(!preset)
+        return false;
+
+    QFile saveFile(filePath);
+
+    if(!saveFile.open(QFile::WriteOnly))
+        return false;
+
     auto visitor = SerializeVisitor();
-    auto preset = m_storage->findPreset(name);
+    preset->acceptVisitor(visitor);
 
-    preset->acceptVisitor(&visitor);
-
-    QByteArray data;
-    data = visitor.data();
-
-    // TODO: data to file
+    saveFile.write(visitor.data());
 
     return true;
 }

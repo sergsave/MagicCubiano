@@ -23,13 +23,22 @@ static QString typeKey()
 
 }
 
-static SerializationMeta readSerializationMeta(const QByteArray& arr)
+static SerializationMeta readSerializationMeta(const QByteArray& arr, bool& ok)
 {
+    ok = false;
+
     QJsonDocument doc = QJsonDocument::fromJson(arr);
     if(doc.isNull())
         return {};
 
-    auto val = doc.object()[Details::typeKey()].toInt();
+    auto obj = doc.object();
+    auto key = Details::typeKey();
+
+    if(!obj.contains(key))
+        return {};
+
+    ok = true;
+    auto val = obj[key].toInt();
     return { static_cast<Instruments::Type>(val) };
 }
 
@@ -37,8 +46,6 @@ template <typename InstrumentTag>
 class Serializer
 {
 public:
-
-    // TODO : Result check
     // TODO : Without copy ?
 
     QByteArray serialize(const Data<InstrumentTag>& data) const
@@ -52,45 +59,44 @@ public:
         return doc.toJson(QJsonDocument::Compact);
     }
 
-    Data<InstrumentTag> deserialize(const QByteArray& arr) const
+    Data<InstrumentTag> deserialize(const QByteArray& arr, bool& ok) const
     {
+        ok = false;
         QJsonDocument doc = QJsonDocument::fromJson(arr);
         if(doc.isNull())
             return {};
 
-        return readData(doc.object());
+        ok = true;
+        auto obj = doc.object();
+        auto dataObj = obj[dataKey].toObject();
+
+        return readData(dataObj);
     }
 
 private:
     using TUnit = Unit<InstrumentTag>;
-    using TUnits = Units<InstrumentTag>;
-    using TColors = QMap<CubeEdge::Color, Units<InstrumentTag>>;
+    using TColors = QMap<CubeEdge::Color, Unit<InstrumentTag>>;
     using TData = Data<InstrumentTag>;
 
     const QString durationKey = "duration";
-    const QString notationKey = "notation";
+    const QString notationsKey = "notations";
     const QString dataKey = "data";
 
     QJsonObject writeUnit(const TUnit& unit) const
     {
         QJsonObject obj;
 
-        QJsonObject notObj;
-        serializeNotation(unit.notation, notObj);
+        QJsonArray notationsArr;
+        for(auto n: unit.notations)
+        {
+            QJsonObject obj;
+            serializeNotation(n, obj);
+            notationsArr.append(obj);
+        }
 
-        obj[notationKey] = notObj;
-        obj[durationKey] = unit.duration;
+        obj[notationsKey] = notationsArr;
+        obj[durationKey] = unit.minDurationMSec;
         return obj;
-    }
-
-    QJsonArray writeUnits(const TUnits& units) const
-    {
-        QJsonArray arr;
-
-        for(auto u: units)
-            arr.append(writeUnit(u));
-
-        return arr;
     }
 
     QJsonObject writeColors(const TColors& colors) const
@@ -98,7 +104,7 @@ private:
         QVariantMap vMap;
 
         for (auto key: colors.keys())
-            vMap.insert(QString::number(key), writeUnits(colors.value(key)));
+            vMap.insert(QString::number(key), writeUnit(colors.value(key)));
 
         return QJsonObject::fromVariantMap(vMap);
     }
@@ -117,20 +123,17 @@ private:
     {
         TUnit unit;
 
-        deserializeNotation(unit.notation, obj);
-        unit.duration = obj[durationKey].toInt();
+        unit.minDurationMSec = obj[durationKey].toInt();
+
+        auto notationsJsArray = obj[notationsKey].toArray();
+        for(auto value: notationsJsArray)
+        {
+            typename InstrumentTag::Notation notation;
+            deserializeNotation(notation, value.toObject());
+            unit.notations.append(notation);
+        }
 
         return unit;
-    }
-
-    TUnits readUnits(const QJsonArray& arr) const
-    {
-        TUnits units;
-
-        for(auto js: arr)
-            units.append(readUnit(js.toObject()));
-
-        return units;
     }
 
     TColors readColors(const QJsonObject& obj) const
@@ -140,8 +143,8 @@ private:
 
         for(auto key: vMap.keys())
         {
-            auto value = vMap.value(key).toList();
-            auto units = readUnits(QJsonArray::fromVariantList(value));
+            auto value = vMap.value(key).toMap();
+            auto units = readUnit(QJsonObject::fromVariantMap(value));
             colors[static_cast<CubeEdge::Color>(key.toInt())] = units;
         }
 
