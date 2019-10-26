@@ -5,9 +5,6 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 
-#include "src/Preset/Storage.h"
-#include "src/Preset/SaveLoader.h"
-
 namespace {
 
 QString openFileDialog(const std::function<void(QFileDialog&)>& setup)
@@ -18,7 +15,9 @@ QString openFileDialog(const std::function<void(QFileDialog&)>& setup)
     dialog.setDefaultSuffix(".json");
     dialog.setWindowFlags(Qt::Window);
     setup(dialog);
-    dialog.exec();
+
+    if(dialog.exec() == QDialog::Rejected)
+        return {};
 
     auto selected = dialog.selectedFiles();
 
@@ -30,42 +29,27 @@ QString openFileDialog(const std::function<void(QFileDialog&)>& setup)
 
 }
 
-SaveLoadHelper::SaveLoadHelper(Preset::Storage * storage, QObject *parent)
-    : QObject(parent),
-      m_storage(storage),
-      m_saveLoader(new Preset::SaveLoader)
+SaveLoadHelper::SaveLoadHelper(QObject *parent)
+    : QObject(parent)
 {
 }
 
 SaveLoadHelper::~SaveLoadHelper() = default;
 
-void SaveLoadHelper::load()
+// BUG! Check dialog result
+void SaveLoadHelper::startLoading()
 {
     auto path = openFileDialog([](QFileDialog & dialog) {
         dialog.setAcceptMode(QFileDialog::AcceptOpen);
     });
-
-    auto preset = m_saveLoader->load(path);
-    auto name = QFileInfo(path).baseName();
-
-    if(!preset)
-    {
-        emit presetLoadFailed(name);
-        return;
-    }
-
-    auto vacName = Preset::generateVacantName(*m_storage, name); // TODO: or failed
-    m_storage->addPreset(vacName, preset);
-    emit presetLoaded(vacName);
+    emit loadRequested(path);
 }
 
-void SaveLoadHelper::save(const QString &name) const
+void SaveLoadHelper::startSaving(const QString &name)
 {
     auto path = openFileDialog([name](QFileDialog & dialog) {
         dialog.setAcceptMode(QFileDialog::AcceptSave);
         dialog.selectFile(name + ".json");
     });
-
-    auto preset = m_storage->findPreset(name);
-    m_saveLoader->save(path, preset);
+    emit saveRequested(name, path);
 }

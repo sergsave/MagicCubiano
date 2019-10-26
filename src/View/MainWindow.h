@@ -10,8 +10,7 @@ class MainWindow;
 }
 
 namespace Preset {
-class Storage;
-class AbstractPreset;
+class Model;
 }
 
 class MainWindow : public QMainWindow
@@ -19,22 +18,23 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(Preset::Storage * storage, QWidget *parent = nullptr);
+    explicit MainWindow(Preset::Model * model, QWidget *parent = nullptr);
     ~MainWindow();
 
     void start();
 
     void onEdgeTurned(const CubeEdge& edge);
 
-
 private slots:
     void onCreateNew();
-    void onEditRequested(const QString& name);
+    void onOpenRequested(const QString& name);
+    void showPresetListDialog();
+
     void updatePresetPage();
-    void addToSelectionWidget(const QString& name);
+    void updateActionsState();
 
 private:
     QScopedPointer<Ui::MainWindow> m_ui;
-    Preset::Storage * m_storage = nullptr;
+    Preset::Model * m_model = nullptr;
 };
 

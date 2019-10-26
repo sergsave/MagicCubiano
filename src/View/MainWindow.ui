@@ -18,10 +18,10 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="presetsPage">
-       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
         <item>
          <widget class="QWidget" name="notificationWidget" native="true"/>
         </item>
@@ -98,6 +98,7 @@
     <addaction name="newPresetAction"/>
     <addaction name="loadPresetAction"/>
     <addaction name="savePresetAction"/>
+    <addaction name="presetsListAction"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -114,6 +115,16 @@
   <action name="newPresetAction">
    <property name="text">
     <string>New Preset</string>
+   </property>
+  </action>
+  <action name="clearPresetsAction">
+   <property name="text">
+    <string>Clear Presets</string>
+   </property>
+  </action>
+  <action name="presetsListAction">
+   <property name="text">
+    <string>Presets list</string>
    </property>
   </action>
  </widget>

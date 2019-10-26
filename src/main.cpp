@@ -4,16 +4,16 @@
 #include "Protocol/GiikerProtocol.h"
 #include "View/MainWindow.h"
 #include "SoundHelper.h"
-#include "Preset/Storage.h"
+#include "Preset/Model.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
     // order is important
-    Preset::Storage storage;
+    Preset::Model model;
     QScopedPointer<SoundGenerator> soundGenerator;
-    MainWindow window(&storage);
+    MainWindow window(&model);
     GiikerProtocol protocol;
 /*
     QObject::connect(&window, &MainWindow::connectAnyRequested, &protocol,

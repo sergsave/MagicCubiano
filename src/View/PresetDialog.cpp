@@ -1,7 +1,7 @@
 #include "PresetDialog.h"
 #include "ui_PresetDialog.h"
 
-#include "src/Preset/Model.h"
+#include "src/Preset/Presets.h"
 
 using namespace Preset;
 

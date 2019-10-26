@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BasePresetEditorWidget.h"
-#include "src/Preset/Model.h"
+#include "src/Preset/Presets.h"
 
 class GuitarStringWidget;
 

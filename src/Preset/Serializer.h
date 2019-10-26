@@ -4,7 +4,7 @@
 #include <QJsonArray>
 #include <QVariant>
 
-#include "Model.h"
+#include "Presets.h"
 #include "NotationSerializer.h"
 
 namespace Preset {

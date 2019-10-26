@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Sound/SoundGeneratorFactory.h"
-#include "Preset/Model.h"
+#include "Preset/Presets.h"
 
 static SoundGenerator * soundGeneratorFor(Preset::AbstractPreset * preset)
 {

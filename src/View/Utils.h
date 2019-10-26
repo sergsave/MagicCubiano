@@ -4,7 +4,7 @@
 #include <QString>
 #include <QMap>
 
-#include "src/Preset/Model.h"
+#include "src/Preset/Presets.h"
 
 // TODO: Common utils
 class InstrumentTypeFetchVisitor : public Preset::ConstVisitor

@@ -9,117 +9,73 @@ PresetSelectionWidget::PresetSelectionWidget(QWidget *parent) :
 {
     m_ui->setupUi(this);
 
-    m_ui->nameLineEdit->setReadOnly(true);
-    m_ui->nameLineEdit->setFrame(false);
-
     updateState();
 
     connect(m_ui->prevButton, &QPushButton::clicked, this, [this] {
-        changeIndex(--m_index);
+        changeIndex(m_index - 1);
     });
 
     connect(m_ui->nextButton, &QPushButton::clicked, this, [this] {
-        changeIndex(++m_index);
+        changeIndex(m_index + 1);
     });
 
     connect(m_ui->openButton, &QAbstractButton::clicked, this, [this] {
         if(!m_presets.isEmpty())
-            emit presetEditRequested(currentPreset());
-    });
-
-    connect(m_ui->renameButton, &QAbstractButton::toggled, this, [this] (bool checked) {
-        m_ui->nameLineEdit->setReadOnly(!checked);
-        m_ui->nameLineEdit->setFrame(checked);
-        m_ui->openButton->setEnabled(!checked);
-
-        if(checked)
-        {
-            m_ui->nextButton->setEnabled(false);
-            m_ui->prevButton->setEnabled(false);
-            return;
-        }
-
-        auto oldName = currentPreset();
-        auto newName = m_ui->nameLineEdit->text();
-        if(newName == oldName)
-            return;
-
-        auto inst = m_presets2instruments.value(oldName);
-        m_presets2instruments.remove(oldName);
-        m_presets2instruments[newName] = inst;
-
-        m_presets[m_index] = m_ui->nameLineEdit->text();
-
-        updateState();
-
-        emit presetRenamed(oldName, newName);
-    });
-
-    connect(m_ui->nameLineEdit, &QLineEdit::textChanged, this, [this](const QString& text) {
-        if(m_ui->nameLineEdit->isReadOnly())
-            return;
-
-        bool isValid = !text.isEmpty() && !m_presets.contains(text);
-        m_ui->renameButton->setEnabled(isValid);
-        m_ui->nameLineEdit->setStyleSheet(isValid ? "" : "border: 2px solid red");
+            emit presetOpenRequested(selectedPreset());
     });
 }
 
-QString PresetSelectionWidget::currentPreset() const
+void PresetSelectionWidget::setPresets(const QStringList &presets)
+{
+    m_presets = presets;
+    changeIndex(0, true);
+}
+
+QStringList PresetSelectionWidget::presets() const
+{
+    return m_presets;
+}
+
+void PresetSelectionWidget::setPresetAdditionalInfo(const QString &preset, const QString &info)
+{
+    m_presets2info[preset] = info;
+    updateState();
+}
+
+QString PresetSelectionWidget::presetAdditionalInfo(const QString &preset) const
+{
+    return m_presets2info.value(preset);
+}
+
+QString PresetSelectionWidget::selectedPreset() const
 {
     return m_presets[m_index];
 }
 
-bool PresetSelectionWidget::remove(const QString& name)
+void PresetSelectionWidget::setSelectedPreset(const QString & preset)
 {
-    if(m_presets.indexOf(name) == -1)
-        return false;
-
-    m_presets.removeFirst();
-    checkForEmpty();
-
-    changeIndex(m_index);
-    return true;
-}
-
-bool PresetSelectionWidget::add(const QString& name, const QString& instrument)
-{
-    if(m_presets.indexOf(name) != -1)
-        return false;
-
-    m_presets.append(name);
-    checkForEmpty();
-
-    m_presets2instruments.insert(name, instrument);
-
-    changeIndex(m_presets.size() - 1);
-    return true;
-}
-
-bool PresetSelectionWidget::isEmpty() const
-{
-    return m_presets.isEmpty();
-}
-
-void PresetSelectionWidget::changeIndex(int newIdx)
-{
-    if(m_presets.isEmpty())
+    if(!m_presets.contains(preset))
         return;
 
-    int bounded = qBound(0, newIdx, m_presets.size() - 1);
+    changeIndex(m_presets.indexOf(preset));
+}
+
+void PresetSelectionWidget::changeIndex(int newIdx, bool forceChanged)
+{
+    auto max = m_presets.isEmpty() ? 0 : m_presets.size() - 1;
+
+    int bounded = qBound(0, newIdx, max);
     bool changed = m_index != bounded;
 
     m_index = bounded;
 
     updateState();
 
-    if(changed)
-        emit presetSelected(m_presets[m_index]);
-}
+    if(m_presets.isEmpty())
+        return;
 
-void PresetSelectionWidget::checkForEmpty()
-{
-    emit emptyStateChanged(isEmpty());
+    if(changed || forceChanged)
+        emit presetSelected(m_presets[m_index]);
 }
 
 void PresetSelectionWidget::updateDirectionButtonsState()
@@ -142,16 +98,16 @@ void PresetSelectionWidget::updateState()
     updateDirectionButtonsState();
 
     QString name;
-    QString instName;
+    QString info;
 
     if(!m_presets.isEmpty())
     {
-        name = currentPreset();
-        instName = m_presets2instruments.value(name);
+        name = selectedPreset();
+        info = m_presets2info.value(name);
     }
 
-    m_ui->nameLineEdit->setText(name);
-    m_ui->typeLabel->setText(instName);
+    m_ui->nameLabel->setText(name);
+    m_ui->infoLabel->setText(info);
 }
 
 PresetSelectionWidget::~PresetSelectionWidget() = default;

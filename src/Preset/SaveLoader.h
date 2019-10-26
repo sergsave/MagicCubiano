@@ -1,7 +1,6 @@
 #pragma once
 
-#include <QScopedPointer>
-#include "Model.h"
+#include "Presets.h"
 
 namespace Preset {
 

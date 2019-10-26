@@ -3,27 +3,18 @@
 #include <QObject>
 #include <QScopedPointer>
 
-namespace Preset {
-class Storage;
-class SaveLoader;
-}
-
 class SaveLoadHelper : public QObject
 {
     Q_OBJECT
 public:
-    explicit SaveLoadHelper(Preset::Storage * storage, QObject *parent = nullptr);
+    explicit SaveLoadHelper(QObject *parent = nullptr);
     ~SaveLoadHelper();
 
+    void startSaving(const QString& presetName);
+    void startLoading();
+
 signals:
-    void presetLoaded(const QString& name);
-    void presetLoadFailed(const QString& name);
+    void loadRequested(const QString& filePath);
+    void saveRequested(const QString& presetName, const QString& filePath);
 
-public slots:
-    void load();
-    void save(const QString& name) const;
-
-private:
-    Preset::Storage * m_storage = nullptr;
-    QScopedPointer<Preset::SaveLoader> m_saveLoader;
 };

@@ -14,33 +14,33 @@ class PresetSelectionWidget : public QWidget
     Q_OBJECT
 
 public:
-
     explicit PresetSelectionWidget(QWidget *parent = 0);
     ~PresetSelectionWidget();
 
-    QString currentPreset() const;
+    // Reset selected preset to first
+    void setPresets(const QStringList& presets);
+    QStringList presets() const;
 
-    bool remove(const QString&);
-    bool add(const QString& presetName, const QString& instrumentName);
+    void setPresetAdditionalInfo(const QString& preset, const QString& info);
+    QString presetAdditionalInfo(const QString& preset) const;
 
-    bool isEmpty() const;
+    QString selectedPreset() const;
+
+public slots:
+    void setSelectedPreset(const QString&);
 
 signals:
-    void emptyStateChanged(bool isEmpty);
-
     void presetSelected(const QString&);
-    void presetEditRequested(const QString&);
-    void presetRenamed(const QString& oldName, const QString& newName);
+    void presetOpenRequested(const QString&);
 
 private:
-    void changeIndex(int newIdx);
-    void checkForEmpty();
+    void changeIndex(int newIdx, bool forceChanged = false);
     void updateDirectionButtonsState();
     void updateState();
 
 private:
     QStringList m_presets;
-    QMap<QString, QString> m_presets2instruments;
+    QMap<QString, QString> m_presets2info;
     int m_index = 0;
     QScopedPointer<Ui::PresetSelectionWidget> m_ui;
 };

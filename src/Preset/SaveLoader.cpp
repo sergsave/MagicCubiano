@@ -3,7 +3,7 @@
 #include <QFile>
 
 #include "Serializer.h"
-#include "Model.h"
+#include "Presets.h"
 
 namespace Preset {
 

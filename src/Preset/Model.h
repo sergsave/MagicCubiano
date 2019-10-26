@@ -1,73 +1,49 @@
 #pragma once
 
-#include <QString>
-#include <QMap>
-
-#include "Visitor.h"
-#include "src/CubeEdge.h"
+#include <QObject>
+#include <QScopedPointer>
 
 namespace Preset {
 
-template <class InstrumentTag>
-struct Unit
-{
-    int minDurationMSec = 0;
-    QList<typename InstrumentTag::Notation> notations;
-};
+class Storage;
+class SaveLoader;
+class AbstractPreset;
 
-template <class InstrumentTag>
-using Data = QMap<CubeEdge::Rotation, QMap<CubeEdge::Color, Unit<InstrumentTag>>>;
-
-class AbstractPreset
+// Model provides access to list of presets
+class Model : public QObject
 {
+    Q_OBJECT
+
 public:
-    virtual ~AbstractPreset() {}
-    virtual void acceptVisitor(Visitor& v) = 0;
-    virtual void acceptVisitor(ConstVisitor& v) const = 0;
-    // TODO: Remove toHarmony??
-    virtual Music::Harmony toHarmony(const CubeEdge&) const = 0;
-};
+    Model(QObject * parent = nullptr);
+    ~Model();
 
-template <class Instrument>
-class TPreset : public AbstractPreset
-{
+public slots:
+    bool setActivePreset(const QString& name);
+
+    // This methods may change active preset
+    bool addPreset(const QString& name, AbstractPreset * preset);
+    bool removePreset(const QString& name);
+    bool renamePreset(const QString& oldName, const QString& newName);
+
+signals:
+    void changed();
+
 public:
-    void acceptVisitor(Visitor& v) override { v.visit(*this); }
-    void acceptVisitor(ConstVisitor& cv) const override { cv.visit(*this); }
+    AbstractPreset * findPreset(const QString& name) const;
+    QStringList allPresets() const;
+    QString activePreset() const;
+    QString findVacantName(const QString &sourceName) const;
 
-    Music::Harmony toHarmony(const CubeEdge& ce) const override
-    {
-        Music::Harmony ret;
-        auto unit = m_data[ce.rotation][ce.color];
-
-        ret.minToneDurationMSec = unit.minDurationMSec;
-        for(auto notation: unit.notations)
-            ret.tones.append(Desc::toneFor(notation));
-        return ret;
-    }
-
-    Data<Instrument> data() const { return m_data; }
-    void setData(const Data<Instrument>& data) { m_data = data; }
+    // loading also add preset
+    bool load(const QString& filePath);
+    bool save(const QString& name, const QString& filePath);
 
 private:
-    using Desc = Instruments::Description<Instrument>;
-    Data<Instrument> m_data;
+    QScopedPointer<Storage> m_storage;
+    QScopedPointer<SaveLoader> m_saveLoader;
+    QString m_activePreset;
 };
 
-static AbstractPreset * createPreset(Instruments::Type type)
-{
-    using T = Instruments::Type;
-    switch (type)
-    {
-    case T::GUITAR:
-        return new GuitarPreset();
-    case T::ELECTRIC_GUITAR:
-        return new ElectricGuitarPreset();
-    case T::PIANO:
-        return new PianoPreset();
-    default:
-        return nullptr;
-    }
 }
 
-}

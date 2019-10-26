@@ -2,13 +2,13 @@
 
 #include <map>
 #include <memory>
-#include <QString>
+#include <QStringList>
 
 namespace Preset {
 
 class AbstractPreset;
 
-// Contains presets with unique names
+// Contains list of presets with unique names
 class Storage
 {
 public:
@@ -20,16 +20,15 @@ public:
     bool renamePreset(const QString& oldName, const QString& newName);
 
     AbstractPreset * findPreset(const QString& name) const;
-    QStringList allPresets() const;
+    QStringList allPresetNames() const;
 
 private:
     bool contains(const QString& name) const;
 
 private:
-    std::map<QString, std::unique_ptr<AbstractPreset>> m_presets;
+    QStringList m_names;
+    std::map<QString, std::unique_ptr<AbstractPreset>> m_name2preset;
 };
-
-QString generateVacantName(const Storage& storage, const QString &sourceName);
 
 }
 
