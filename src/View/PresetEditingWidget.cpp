@@ -3,11 +3,17 @@
 
 #include <cassert>
 
+#include <QMenu>
+
 #include "GuitarPresetEditorWidgets.h"
 #include "src/Preset/Visitor.h"
 #include "Utils.h"
 
 namespace {
+
+const QString g_resetAction = "Reset";
+const QString g_clockwizeSyncAction = "Sync by clockwize";
+const QString g_anticlockwizeSyncAction = "Sync by anticlockwize";
 
 class EditingPresetVisitor : public Preset::Visitor
 {
@@ -55,6 +61,16 @@ PresetEditingWidget::PresetEditingWidget(QWidget * parent):
     });
 
     connect(m_ui->applyButton, &QAbstractButton::clicked, this, &PresetEditingWidget::finished);
+
+    auto menu = createMenu();
+    connect(m_ui->menuButton, &QAbstractButton::clicked, menu, [menu, this] {
+        const auto buttonSize = m_ui->menuButton->size();
+        const auto origin = m_ui->menuButton->mapToGlobal({ buttonSize.width(), buttonSize.height()});
+        const auto menuWidth = menu->sizeHint().width();
+        const auto pos = origin - QPoint(menuWidth, 0);
+
+        menu->popup(pos);
+    });
 }
 
 void PresetEditingWidget::setPreset(const QString &name, Preset::AbstractPreset *preset)
@@ -67,6 +83,11 @@ void PresetEditingWidget::setPreset(const QString &name, Preset::AbstractPreset 
     preset->acceptVisitor(editVisitor);
 
     setEditorWidget(editVisitor.editor());
+}
+
+void PresetEditingWidget::showSettings()
+{
+
 }
 
 void PresetEditingWidget::setEditorWidget(BasePresetEditorWidget * editor)
@@ -86,6 +107,7 @@ void PresetEditingWidget::setEditorWidget(BasePresetEditorWidget * editor)
     editor->setActiveCubeEdge(selectors()[m_ui->clockYellowButton]);
 
     m_editor = editor;
+    bindActions(m_editor);
 }
 
 QMap<QAbstractButton *, CubeEdge> PresetEditingWidget::selectors() const
@@ -107,6 +129,31 @@ QMap<QAbstractButton *, CubeEdge> PresetEditingWidget::selectors() const
     };
 
     return map;
+}
+
+QMenu * PresetEditingWidget::createMenu()
+{
+    auto menu = new QMenu(this);
+
+    auto initAction = [this, menu](const QString& name) {
+        return m_actions[name] = menu->addAction(name);
+    };
+
+    initAction(g_resetAction);
+    initAction(g_clockwizeSyncAction);
+    initAction(g_anticlockwizeSyncAction);
+
+    connect(initAction("Settings"), &QAction::triggered, this, &PresetEditingWidget::showSettings);
+    return menu;
+}
+
+void PresetEditingWidget::bindActions(BasePresetEditorWidget * editor)
+{
+    connect(m_actions[g_resetAction], &QAction::triggered, editor, &BasePresetEditorWidget::resetData);
+    connect(m_actions[g_clockwizeSyncAction], &QAction::triggered, editor,
+            &BasePresetEditorWidget::syncDataByClockwize);
+    connect(m_actions[g_anticlockwizeSyncAction], &QAction::triggered, editor,
+            &BasePresetEditorWidget::syncDataByAnticlockwize);
 }
 
 PresetEditingWidget::~PresetEditingWidget() = default;

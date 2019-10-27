@@ -10,15 +10,22 @@ public:
     using QWidget::QWidget;
     virtual ~BasePresetEditorWidget() {}
 
+public slots:
+    virtual void resetData() = 0;
+    virtual void syncDataByClockwize() = 0;
+    virtual void syncDataByAnticlockwize() = 0;
+
     void setActiveCubeEdge(const CubeEdge& edge)
     {
         m_edge = edge;
-        cubeEdgeChanged(edge);
+        onCubeEdgeChanged(edge);
     }
+
+public:
     CubeEdge activeCubeEdge() const { return m_edge; }
 
 protected:
-    virtual void cubeEdgeChanged(const CubeEdge&) {}
+    virtual void onCubeEdgeChanged(const CubeEdge&) = 0;
 
 private:
     CubeEdge m_edge;

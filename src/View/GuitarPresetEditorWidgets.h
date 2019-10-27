@@ -17,8 +17,8 @@ protected:
     using String2Fret = QMap<int, int>;
     void setState(const String2Fret&);
 
-    virtual void fretChanged(int string, int fret) {}
-    virtual void muteChanged(int string, bool mute) {}
+    virtual void fretChanged(int string, int fret) = 0;
+    virtual void muteChanged(int string, bool mute) = 0;
 
 private:
     QList<GuitarStringWidget*> m_widgets;
@@ -30,10 +30,14 @@ class GuitarPresetEditorWidget : public BaseGuitarPresetEditorWidget
 public:
     explicit GuitarPresetEditorWidget(Preset::GuitarPreset * preset, QWidget * parent = nullptr);
 
+    void resetData() override;
+    void syncDataByClockwize() override;
+    void syncDataByAnticlockwize() override;
+
 protected:
     void fretChanged(int string, int fret) override;
     void muteChanged(int string, bool mute) override;
-    void cubeEdgeChanged(const CubeEdge&) override;
+    void onCubeEdgeChanged(const CubeEdge&) override;
 
 private:
     Preset::GuitarPreset * m_preset = nullptr;
@@ -45,10 +49,14 @@ class ElectricGuitarPresetEditorWidget : public BaseGuitarPresetEditorWidget
 public:
     explicit ElectricGuitarPresetEditorWidget(Preset::ElectricGuitarPreset * preset, QWidget * parent = nullptr);
 
+    void resetData() override;
+    void syncDataByClockwize() override;
+    void syncDataByAnticlockwize() override;
+
 protected:
     void fretChanged(int string, int fret) override;
     void muteChanged(int string, bool mute) override;
-    void cubeEdgeChanged(const CubeEdge&) override;
+    void onCubeEdgeChanged(const CubeEdge&) override;
 
 private:
     Preset::ElectricGuitarPreset * m_preset = nullptr;

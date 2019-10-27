@@ -45,11 +45,22 @@ void BaseGuitarPresetEditorWidget::setState(const BaseGuitarPresetEditorWidget::
 
 using Notations = QList<Instruments::GuitarNotation>;
 
+Notations notationsFrom(const auto& presetData, const CubeEdge& ce)
+{
+    auto copy = presetData;
+    return refNotationsFrom(copy, ce);
+}
+
+Notations& refNotationsFrom(auto& presetData, const CubeEdge& ce)
+{
+    return presetData[ce.rotation][ce.color].notations;
+}
+
 QMap<int,int> extractString2Fret(auto * preset, const CubeEdge& ce)
 {
     QMap<int, int> ret;
 
-    const auto notations = preset->data()[ce.rotation][ce.color].notations;
+    const auto notations = notationsFrom(preset->data(), ce);
 
     for(auto n: notations)
         ret.insert(n.string, n.fret);
@@ -61,7 +72,7 @@ void changePreset(auto * preset, const CubeEdge& ce,
                   const std::function<void(Notations&)>& changeFunc)
 {
     auto data = preset->data();
-    auto &notations = data[ce.rotation][ce.color].notations;
+    auto &notations = refNotationsFrom(data, ce);
     changeFunc(notations);
     preset->setData(data);
 }
@@ -118,6 +129,46 @@ GuitarPresetEditorWidget::GuitarPresetEditorWidget(Preset::GuitarPreset * preset
     setState(extractString2Fret(preset, activeCubeEdge()));
 }
 
+void GuitarPresetEditorWidget::resetData()
+{
+    for(auto rot: CubeEdge::allRotations())
+    {
+        for(auto col: CubeEdge::allColors())
+            changePreset(m_preset, {col, rot}, [](Notations& notations){ notations.clear(); });
+    }
+    setState({});
+}
+
+void GuitarPresetEditorWidget::syncDataByClockwize()
+{
+    for(auto col: CubeEdge::allColors())
+    {
+        const auto anticlockwizeCe = CubeEdge(col, CubeEdge::ANTICLOCKWIZE);
+        const auto clockWizeCe = CubeEdge(col, CubeEdge::CLOCKWIZE);
+
+        changePreset(m_preset, anticlockwizeCe, [this, anticlockwizeCe, clockWizeCe] (Notations& notations) {
+            notations = notationsFrom(m_preset->data(), clockWizeCe);
+        });
+    }
+
+    setState(extractString2Fret(m_preset, activeCubeEdge()));
+}
+
+void GuitarPresetEditorWidget::syncDataByAnticlockwize()
+{
+    for(auto col: CubeEdge::allColors())
+    {
+        const auto anticlockwizeCe = CubeEdge(col, CubeEdge::ANTICLOCKWIZE);
+        const auto clockWizeCe = CubeEdge(col, CubeEdge::CLOCKWIZE);
+
+        changePreset(m_preset, anticlockwizeCe, [this, anticlockwizeCe, clockWizeCe] (Notations& notations) {
+            notations = notationsFrom(m_preset->data(), clockWizeCe);
+        });
+    }
+
+    setState(extractString2Fret(m_preset, activeCubeEdge()));
+}
+
 void GuitarPresetEditorWidget::fretChanged(int string, int fret)
 {
     onFretChanged(m_preset, activeCubeEdge(), string, fret);
@@ -128,7 +179,7 @@ void GuitarPresetEditorWidget::muteChanged(int string, bool mute)
     onMuteChanged(m_preset, activeCubeEdge(), string, mute);
 }
 
-void GuitarPresetEditorWidget::cubeEdgeChanged(const CubeEdge& edge)
+void GuitarPresetEditorWidget::onCubeEdgeChanged(const CubeEdge& edge)
 {
     setState(extractString2Fret(m_preset, edge));
 }
@@ -143,6 +194,46 @@ ElectricGuitarPresetEditorWidget::ElectricGuitarPresetEditorWidget(Preset::Elect
     setState(extractString2Fret(preset, activeCubeEdge()));
 }
 
+void ElectricGuitarPresetEditorWidget::resetData()
+{
+    for(auto rot: CubeEdge::allRotations())
+    {
+        for(auto col: CubeEdge::allColors())
+            changePreset(m_preset, {col, rot}, [](Notations& notations){ notations.clear(); });
+    }
+    setState({});
+}
+
+void ElectricGuitarPresetEditorWidget::syncDataByClockwize()
+{
+    for(auto col: CubeEdge::allColors())
+    {
+        const auto anticlockwizeCe = CubeEdge(col, CubeEdge::ANTICLOCKWIZE);
+        const auto clockWizeCe = CubeEdge(col, CubeEdge::CLOCKWIZE);
+
+        changePreset(m_preset, anticlockwizeCe, [this, anticlockwizeCe, clockWizeCe] (Notations& notations) {
+            notations = notationsFrom(m_preset->data(), clockWizeCe);
+        });
+    }
+
+    setState(extractString2Fret(m_preset, activeCubeEdge()));
+}
+
+void ElectricGuitarPresetEditorWidget::syncDataByAnticlockwize()
+{
+    for(auto col: CubeEdge::allColors())
+    {
+        const auto anticlockwizeCe = CubeEdge(col, CubeEdge::ANTICLOCKWIZE);
+        const auto clockWizeCe = CubeEdge(col, CubeEdge::CLOCKWIZE);
+
+        changePreset(m_preset, anticlockwizeCe, [this, anticlockwizeCe, clockWizeCe] (Notations& notations) {
+            notations = notationsFrom(m_preset->data(), clockWizeCe);
+        });
+    }
+
+    setState(extractString2Fret(m_preset, activeCubeEdge()));
+}
+
 void ElectricGuitarPresetEditorWidget::fretChanged(int string, int fret)
 {
     onFretChanged(m_preset, activeCubeEdge(), string, fret);
@@ -153,7 +244,8 @@ void ElectricGuitarPresetEditorWidget::muteChanged(int string, bool mute)
     onMuteChanged(m_preset, activeCubeEdge(), string, mute);
 }
 
-void ElectricGuitarPresetEditorWidget::cubeEdgeChanged(const CubeEdge& edge)
+void ElectricGuitarPresetEditorWidget::onCubeEdgeChanged(const CubeEdge& edge)
 {
     setState(extractString2Fret(m_preset, edge));
 }
+
