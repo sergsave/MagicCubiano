@@ -110,10 +110,15 @@ void MainWindow::onCreateNew()
 
 void MainWindow::onOpenRequested(const QString &name)
 {
+    auto preset =  m_presetModel->findPreset(name);
     PresetDialog dialog;
-    dialog.openEditPresetPage(name, m_presetModel->findPreset(name));
+    dialog.openEditPresetPage(name, preset);
 
-    dialog.exec();
+    QScopedPointer<Preset::AbstractPreset::Backup> backup(preset->createBackup());
+
+    if(dialog.exec() == QDialog::Rejected)
+        backup->restore();
+
     updatePresetPage();
 }
 

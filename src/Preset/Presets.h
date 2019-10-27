@@ -24,8 +24,16 @@ public:
     virtual ~AbstractPreset() {}
     virtual void acceptVisitor(Visitor& v) = 0;
     virtual void acceptVisitor(ConstVisitor& v) const = 0;
-    // TODO: Remove toHarmony??
     virtual Music::Harmony toHarmony(const CubeEdge&) const = 0;
+
+    class Backup
+    {
+    public:
+        virtual ~Backup() {}
+        virtual void restore() = 0;
+    };
+
+    virtual Backup * createBackup() = 0;
 };
 
 template <class Instrument>
@@ -49,7 +57,30 @@ public:
     Data<Instrument> data() const { return m_data; }
     void setData(const Data<Instrument>& data) { m_data = data; }
 
+    Backup * createBackup() override
+    {
+        return new ConcreteBackup(this);
+    }
+
 private:
+
+    class ConcreteBackup: public Backup
+    {
+    public:
+        ConcreteBackup(TPreset<Instrument> * preset) : m_preset(preset)
+        {
+            m_data = m_preset->data();
+        }
+
+        void restore() override
+        {
+            m_preset->setData(m_data);
+        }
+    private:
+        Data<Instrument> m_data;
+        TPreset<Instrument> * m_preset;
+    };
+
     using Desc = Instruments::Description<Instrument>;
     Data<Instrument> m_data;
 };
