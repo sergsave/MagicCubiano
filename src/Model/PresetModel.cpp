@@ -1,22 +1,23 @@
 #include "Model.h"
 
 #include <QFileInfo>
+#include <QDir>
 
-#include "Storage.h"
-#include "SaveLoader.h"
-#include "Presets.h"
+#include "src/Preset/Storage.h"
+#include "src/Preset/SaveLoader.h"
+#include "src/Preset/Presets.h"
 
-namespace Preset {
+using namespace Preset;
 
-Model::Model(QObject *parent)
+PresetModel::PresetModel(QObject *parent)
     : QObject(parent)
     , m_storage(new Storage())
     , m_saveLoader(new SaveLoader())
 {}
 
-Model::~Model() = default;
+PresetModel::~PresetModel() = default;
 
-bool Model::setActivePreset(const QString &name)
+bool PresetModel::setActivePreset(const QString &name)
 {
     if(!findPreset(name))
         return false;
@@ -29,7 +30,7 @@ bool Model::setActivePreset(const QString &name)
     return true;
 }
 
-bool Model::addPreset(const QString &name, AbstractPreset *preset)
+bool PresetModel::addPreset(const QString &name, AbstractPreset *preset)
 {
     if(!m_storage->addPreset(name, preset))
         return false;
@@ -40,7 +41,7 @@ bool Model::addPreset(const QString &name, AbstractPreset *preset)
     return true;
 }
 
-bool Model::removePreset(const QString &name)
+bool PresetModel::removePreset(const QString &name)
 {
     auto indexOfRemoved = m_storage->allPresetNames().indexOf(name);
     if(!m_storage->removePreset(name))
@@ -55,7 +56,7 @@ bool Model::removePreset(const QString &name)
     return true;
 }
 
-bool Model::renamePreset(const QString &oldName, const QString &newName)
+bool PresetModel::renamePreset(const QString &oldName, const QString &newName)
 {
     if(!m_storage->renamePreset(oldName, newName))
         return false;
@@ -66,22 +67,22 @@ bool Model::renamePreset(const QString &oldName, const QString &newName)
     return true;
 }
 
-AbstractPreset *Model::findPreset(const QString &name) const
+AbstractPreset *PresetModel::findPreset(const QString &name) const
 {
     return m_storage->findPreset(name);
 }
 
-QStringList Model::allPresets() const
+QStringList PresetModel::allPresets() const
 {
     return m_storage->allPresetNames();
 }
 
-QString Model::activePreset() const
+QString PresetModel::activePreset() const
 {
     return m_activePreset;
 }
 
-bool Model::save(const QString &name, const QString &filePath)
+bool PresetModel::savePresets(const QString &name, const QString &filePath)
 {
     auto preset = findPreset(name);
     if(!preset)
@@ -90,7 +91,7 @@ bool Model::save(const QString &name, const QString &filePath)
     return m_saveLoader->save(filePath, preset);
 }
 
-bool Model::load(const QString &filePath)
+bool PresetModel::loadPreset(const QString &filePath)
 {
     auto preset = m_saveLoader->load(filePath);
     if(!preset)
@@ -102,7 +103,22 @@ bool Model::load(const QString &filePath)
     return true;
 }
 
-QString Model::findVacantName(const QString &sourceName) const
+bool PresetModel::loadAllPresets(const QString &folderPath)
+{
+    auto files = QDir(folderPath).entryList(QDir::Files);
+    bool res = true;
+
+    for(auto file: files)
+    {
+        auto fullPath = folderPath + QDir::separator() + file;
+        if(!loadPreset(fullPath))
+            res = false;
+    }
+
+    return res;
+}
+
+QString PresetModel::findVacantName(const QString &sourceName) const
 {
     QString name = sourceName;
     int i = 1;
@@ -113,4 +129,3 @@ QString Model::findVacantName(const QString &sourceName) const
     return name;
 }
 
-}

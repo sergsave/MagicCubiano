@@ -49,9 +49,11 @@ SOURCES += \
     src/View/PresetCreatingWidget.cpp \
     src/Preset/Storage.cpp \
     src/View/SaveLoadHelper.cpp \
-    src/Preset/Model.cpp \
     src/View/PresetListDialog.cpp \
-    src/View/PresetListElementWidget.cpp
+    src/View/PresetListElementWidget.cpp \
+    src/Model/Model.cpp \
+    src/Model/PresetModel.cpp \
+    src/Model/SettingsModel.cpp
 
 HEADERS += \
     src/View/MainWindow.h \
@@ -84,9 +86,11 @@ HEADERS += \
     src/View/PresetCreatingWidget.h \
     src/View/SaveLoadHelper.h \
     src/Preset/Presets.h \
-    src/Preset/Model.h \
     src/View/PresetListDialog.h \
-    src/View/PresetListElementWidget.h
+    src/View/PresetListElementWidget.h \
+    src/Model/Model.h \
+    src/Model/PresetModel.h \
+    src/Model/SettingsModel.h
 
 FORMS += \
     src/View/ConnectionDialog.ui \

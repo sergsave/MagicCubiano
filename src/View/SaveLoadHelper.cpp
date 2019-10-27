@@ -7,12 +7,19 @@
 
 namespace {
 
+const QString g_jsonExt = ".json";
+
+void setJsonFilter(QFileDialog& dialog)
+{
+    dialog.selectNameFilter(QString("Json (*%1)").arg(g_jsonExt));
+    dialog.setDefaultSuffix(g_jsonExt);
+}
+
 QString openFileDialog(const std::function<void(QFileDialog&)>& setup)
 {
     const auto path = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
 
-    QFileDialog dialog(nullptr, "", path, "Json (*.json)");
-    dialog.setDefaultSuffix(".json");
+    QFileDialog dialog(nullptr, "", path);
     dialog.setWindowFlags(Qt::Window);
     setup(dialog);
 
@@ -36,20 +43,31 @@ SaveLoadHelper::SaveLoadHelper(QObject *parent)
 
 SaveLoadHelper::~SaveLoadHelper() = default;
 
-// BUG! Check dialog result
-void SaveLoadHelper::startLoading()
+void SaveLoadHelper::choosePathForLoading()
 {
     auto path = openFileDialog([](QFileDialog & dialog) {
         dialog.setAcceptMode(QFileDialog::AcceptOpen);
+        setJsonFilter(dialog);
     });
     emit loadRequested(path);
 }
 
-void SaveLoadHelper::startSaving(const QString &name)
+void SaveLoadHelper::choosePathForLoadingAll()
+{
+    auto dir = openFileDialog([](QFileDialog & dialog) {
+        dialog.setAcceptMode(QFileDialog::AcceptOpen);
+        dialog.setFileMode(QFileDialog::DirectoryOnly);
+    });
+
+    emit loadAllRequested(dir);
+}
+
+void SaveLoadHelper::choosePathForSaving(const QString &name)
 {
     auto path = openFileDialog([name](QFileDialog & dialog) {
         dialog.setAcceptMode(QFileDialog::AcceptSave);
-        dialog.selectFile(name + ".json");
+        setJsonFilter(dialog);
+        dialog.selectFile(name + g_jsonExt);
     });
     emit saveRequested(name, path);
 }

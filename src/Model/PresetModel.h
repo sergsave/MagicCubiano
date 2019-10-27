@@ -4,46 +4,45 @@
 #include <QScopedPointer>
 
 namespace Preset {
-
 class Storage;
 class SaveLoader;
 class AbstractPreset;
+}
 
 // Model provides access to list of presets
-class Model : public QObject
+class PresetModel : public QObject
 {
     Q_OBJECT
 
 public:
-    Model(QObject * parent = nullptr);
-    ~Model();
+    PresetModel(QObject * parent = nullptr);
+    ~PresetModel();
+
+signals:
+    void changed();
 
 public slots:
     bool setActivePreset(const QString& name);
 
     // This methods may change active preset
-    bool addPreset(const QString& name, AbstractPreset * preset);
+    bool addPreset(const QString& name, Preset::AbstractPreset * preset);
     bool removePreset(const QString& name);
     bool renamePreset(const QString& oldName, const QString& newName);
 
-signals:
-    void changed();
-
 public:
-    AbstractPreset * findPreset(const QString& name) const;
+    Preset::AbstractPreset * findPreset(const QString& name) const;
     QStringList allPresets() const;
     QString activePreset() const;
     QString findVacantName(const QString &sourceName) const;
 
     // loading also add preset
-    bool load(const QString& filePath);
-    bool save(const QString& name, const QString& filePath);
+    bool loadPreset(const QString& filePath);
+    bool loadAllPresets(const QString& folderPath);
+    bool savePresets(const QString& name, const QString& filePath);
 
 private:
-    QScopedPointer<Storage> m_storage;
-    QScopedPointer<SaveLoader> m_saveLoader;
+    QScopedPointer<Preset::Storage> m_storage;
+    QScopedPointer<Preset::SaveLoader> m_saveLoader;
     QString m_activePreset;
 };
-
-}
 

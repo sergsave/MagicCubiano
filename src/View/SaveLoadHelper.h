@@ -10,11 +10,12 @@ public:
     explicit SaveLoadHelper(QObject *parent = nullptr);
     ~SaveLoadHelper();
 
-    void startSaving(const QString& presetName);
-    void startLoading();
+    void choosePathForSaving(const QString& presetName);
+    void choosePathForLoading();
+    void choosePathForLoadingAll();
 
 signals:
     void loadRequested(const QString& filePath);
+    void loadAllRequested(const QString& dir);
     void saveRequested(const QString& presetName, const QString& filePath);
-
 };

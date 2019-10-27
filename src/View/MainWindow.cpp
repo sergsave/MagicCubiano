@@ -3,7 +3,6 @@
 
 #include <QDesktopWidget>
 
-#include "src/Preset/Model.h"
 #include "PresetDialog.h"
 #include "SaveLoadHelper.h"
 #include "PresetListDialog.h"
@@ -11,10 +10,11 @@
 
 #include <QDebug>
 
-MainWindow::MainWindow(Preset::Model * model, QWidget *parent):
-    QMainWindow(parent),
-    m_ui(new Ui::MainWindow),
-    m_model(model)
+MainWindow::MainWindow(Model * model, QWidget *parent)
+    : QMainWindow(parent)
+    , m_ui(new Ui::MainWindow)
+    , m_presetModel(model->presets())
+    , m_settings(model->settings())
 {
     m_ui->setupUi(this);
 
@@ -31,37 +31,51 @@ MainWindow::MainWindow(Preset::Model * model, QWidget *parent):
 
     connect(m_ui->createNewButton, &QAbstractButton::clicked, m_ui->newPresetAction, &QAction::trigger);
     connect(m_ui->loadButton, &QAbstractButton::clicked, m_ui->loadPresetAction, &QAction::trigger);
+    connect(m_ui->loadAllButton, &QAbstractButton::clicked, m_ui->loadAllPresetsAction, &QAction::trigger);
 
     auto saveLoadHelper = new SaveLoadHelper(this);
     connect(m_ui->newPresetAction, &QAction::triggered, this, &MainWindow::onCreateNew);
-    connect(m_ui->loadPresetAction, &QAction::triggered, saveLoadHelper, &SaveLoadHelper::startLoading);
+    connect(m_ui->loadPresetAction, &QAction::triggered, saveLoadHelper, &SaveLoadHelper::choosePathForLoading);
+    connect(m_ui->loadAllPresetsAction, &QAction::triggered, saveLoadHelper,
+        &SaveLoadHelper::choosePathForLoadingAll);
     connect(m_ui->savePresetAction, &QAction::triggered, this, [saveLoadHelper, this] {
-        saveLoadHelper->startSaving(m_model->activePreset());
+        saveLoadHelper->choosePathForSaving(m_presetModel->activePreset());
     });
     connect(m_ui->presetsListAction, &QAction::triggered, this, &MainWindow::showPresetListDialog);
 
     // TODO: Handle save-load errors
-    connect(saveLoadHelper, &SaveLoadHelper::loadRequested, m_model, &Preset::Model::load);
-    connect(saveLoadHelper, &SaveLoadHelper::saveRequested, m_model, &Preset::Model::save);
+    connect(saveLoadHelper, &SaveLoadHelper::loadRequested, m_presetModel, &PresetModel::loadPreset);
+    connect(saveLoadHelper, &SaveLoadHelper::loadAllRequested, m_presetModel, &PresetModel::loadAllPresets);
+    connect(saveLoadHelper, &SaveLoadHelper::saveRequested, m_presetModel, &PresetModel::savePresets);
 
-    connect(m_model, &Preset::Model::changed, this, [this] {
+    connect(m_presetModel, &PresetModel::changed, this, [this] {
         updatePresetPage();
         updateActionsState();
 
         const QSignalBlocker blocker(m_ui->presetSelectionWidget);
         Q_UNUSED(blocker);
-        m_ui->presetSelectionWidget->setPresets(m_model->allPresets());
-        m_ui->presetSelectionWidget->setSelectedPreset(m_model->activePreset());
+        m_ui->presetSelectionWidget->setPresets(m_presetModel->allPresets());
+        m_ui->presetSelectionWidget->setSelectedPreset(m_presetModel->activePreset());
 
-        for(auto preset: m_model->allPresets())
+        for(auto preset: m_presetModel->allPresets())
         {
-            auto instrument = instrumentName(m_model->findPreset(preset));
+            auto instrument = instrumentName(m_presetModel->findPreset(preset));
             m_ui->presetSelectionWidget->setPresetAdditionalInfo(preset, instrument);
         }
     });
 
-    connect(m_ui->presetSelectionWidget, &PresetSelectionWidget::presetSelected, m_model,
-        &Preset::Model::setActivePreset);
+    connect(m_ui->presetSelectionWidget, &PresetSelectionWidget::presetSelected, m_presetModel,
+        &PresetModel::setActivePreset);
+
+    auto syncSettingsUi = [this] {
+        int vol = m_settings->volume();
+        m_ui->volumeSlider->setValue(vol);
+        m_ui->volumeLabel->setText(QString("Vol. \n%1").arg(vol));
+    };
+
+    syncSettingsUi();
+    connect(m_settings, &SettingsModel::changed, this, syncSettingsUi);
+    connect(m_ui->volumeSlider, &QSlider::valueChanged, m_settings, &SettingsModel::setVolume);
 }
 
 MainWindow::~MainWindow() = default;
@@ -79,7 +93,7 @@ void MainWindow::onEdgeTurned(const CubeEdge& edge)
 void MainWindow::onCreateNew()
 {
     PresetDialog dialog;
-    auto sourceName = m_model->findVacantName("New preset");
+    auto sourceName = m_presetModel->findVacantName("New preset");
     dialog.openCreatePresetPage(sourceName);
     dialog.exec();
 
@@ -88,8 +102,8 @@ void MainWindow::onCreateNew()
     if(!preset)
         return;
 
-    auto name = m_model->findVacantName(dialog.currentPresetName());
-    m_model->addPreset(name, preset);
+    auto name = m_presetModel->findVacantName(dialog.currentPresetName());
+    m_presetModel->addPreset(name, preset);
 
     updatePresetPage();
 }
@@ -97,7 +111,7 @@ void MainWindow::onCreateNew()
 void MainWindow::onOpenRequested(const QString &name)
 {
     PresetDialog dialog;
-    dialog.openEditPresetPage(name, m_model->findPreset(name));
+    dialog.openEditPresetPage(name, m_presetModel->findPreset(name));
 
     dialog.exec();
     updatePresetPage();
@@ -106,7 +120,7 @@ void MainWindow::onOpenRequested(const QString &name)
 void MainWindow::showPresetListDialog()
 {
     PresetListDialog dialog;
-    dialog.setPresetList(m_model->allPresets());
+    dialog.setPresetList(m_presetModel->allPresets());
     auto res = dialog.exec();
 
     if(res == QDialog::Rejected)
@@ -116,16 +130,16 @@ void MainWindow::showPresetListDialog()
     for(auto oldName: renamed.keys())
     {
         auto newName = renamed.value(oldName);
-        m_model->renamePreset(oldName, newName);
+        m_presetModel->renamePreset(oldName, newName);
     }
 
     for(auto name: dialog.removedPresets())
-        m_model->removePreset(name);
+        m_presetModel->removePreset(name);
 }
 
 void MainWindow::updatePresetPage()
 {
-    if(!m_model->allPresets().isEmpty())
+    if(!m_presetModel->allPresets().isEmpty())
         m_ui->stackedWidget->setCurrentWidget(m_ui->presetsPage);
     else
         m_ui->stackedWidget->setCurrentWidget(m_ui->noPresetPage);
@@ -133,10 +147,9 @@ void MainWindow::updatePresetPage()
 
 void MainWindow::updateActionsState()
 {
-    auto isEmpty = m_model->allPresets().isEmpty();
+    auto isEmpty = m_presetModel->allPresets().isEmpty();
 
     m_ui->savePresetAction->setDisabled(isEmpty);
     m_ui->presetsListAction->setDisabled(isEmpty);
 }
-
 

@@ -4,13 +4,10 @@
 #include <QScopedPointer>
 
 #include "src/CubeEdge.h"
+#include "src/Model/Model.h"
 
 namespace Ui {
 class MainWindow;
-}
-
-namespace Preset {
-class Model;
 }
 
 class MainWindow : public QMainWindow
@@ -18,7 +15,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(Preset::Model * model, QWidget *parent = nullptr);
+    explicit MainWindow(Model * model, QWidget *parent = nullptr);
     ~MainWindow();
 
     void start();
@@ -35,6 +32,7 @@ private slots:
 
 private:
     QScopedPointer<Ui::MainWindow> m_ui;
-    Preset::Model * m_model = nullptr;
+    PresetModel * m_presetModel = nullptr;
+    SettingsModel * m_settings = nullptr;
 };
 

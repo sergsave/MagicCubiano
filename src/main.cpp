@@ -4,14 +4,14 @@
 #include "Protocol/GiikerProtocol.h"
 #include "View/MainWindow.h"
 #include "SoundHelper.h"
-#include "Preset/Model.h"
+#include "Model/Model.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
     // order is important
-    Preset::Model model;
+    Model model;
     QScopedPointer<SoundGenerator> soundGenerator;
     MainWindow window(&model);
     GiikerProtocol protocol;

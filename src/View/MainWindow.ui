@@ -23,10 +23,65 @@
       <widget class="QWidget" name="presetsPage">
        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
         <item>
-         <widget class="QWidget" name="notificationWidget" native="true"/>
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QWidget" name="notificationWidget" native="true"/>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QLabel" name="volumeLabel">
+              <property name="text">
+               <string>Volume</string>
+              </property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignRight">
+             <widget class="QSlider" name="volumeSlider">
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </item>
         <item>
-         <widget class="PresetSelectionWidget" name="presetSelectionWidget" native="true"/>
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="PresetSelectionWidget" name="presetSelectionWidget" native="true"/>
+           </item>
+          </layout>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -56,6 +111,13 @@
          <widget class="QPushButton" name="loadButton">
           <property name="text">
            <string>Load Preset</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="loadAllButton">
+          <property name="text">
+           <string>Load Presets from folder</string>
           </property>
          </widget>
         </item>
@@ -97,6 +159,7 @@
     <addaction name="separator"/>
     <addaction name="newPresetAction"/>
     <addaction name="loadPresetAction"/>
+    <addaction name="loadAllPresetsAction"/>
     <addaction name="savePresetAction"/>
     <addaction name="presetsListAction"/>
    </widget>
@@ -125,6 +188,11 @@
   <action name="presetsListAction">
    <property name="text">
     <string>Presets list</string>
+   </property>
+  </action>
+  <action name="loadAllPresetsAction">
+   <property name="text">
+    <string>Load Presets</string>
    </property>
   </action>
  </widget>

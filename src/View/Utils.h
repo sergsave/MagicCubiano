@@ -6,7 +6,6 @@
 
 #include "src/Preset/Presets.h"
 
-// TODO: Common utils
 class InstrumentTypeFetchVisitor : public Preset::ConstVisitor
 {
     using T = Instruments::Type;
