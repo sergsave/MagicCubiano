@@ -14,6 +14,7 @@ namespace {
 const QString g_resetAction = "Reset";
 const QString g_clockwizeSyncAction = "Sync by clockwize";
 const QString g_anticlockwizeSyncAction = "Sync by anticlockwize";
+const QString g_additionsAction = "Show additions";
 
 class EditingPresetVisitor : public Preset::Visitor
 {
@@ -51,6 +52,7 @@ PresetEditingWidget::PresetEditingWidget(QWidget * parent):
     m_ui(new Ui::PresetEditingWidget)
 {
     m_ui->setupUi(this);
+    m_ui->additionsFrame->setVisible(false);
 
     auto group = new QButtonGroup(this);
     for (auto b: selectors().keys())
@@ -85,11 +87,6 @@ void PresetEditingWidget::setPreset(const QString &name, Preset::AbstractPreset 
     setEditorWidget(editVisitor.editor());
 }
 
-void PresetEditingWidget::showSettings()
-{
-
-}
-
 void PresetEditingWidget::setEditorWidget(BasePresetEditorWidget * editor)
 {
     if(m_editor)
@@ -101,6 +98,7 @@ void PresetEditingWidget::setEditorWidget(BasePresetEditorWidget * editor)
     if(!layout)
         layout = new QHBoxLayout(frame);
 
+    layout->setContentsMargins({});
     layout->addWidget(editor);
 
     // Always start with edge of first button
@@ -108,6 +106,7 @@ void PresetEditingWidget::setEditorWidget(BasePresetEditorWidget * editor)
 
     m_editor = editor;
     bindActions(m_editor);
+    updateActionsState();
 }
 
 QMap<QAbstractButton *, CubeEdge> PresetEditingWidget::selectors() const
@@ -143,7 +142,9 @@ QMenu * PresetEditingWidget::createMenu()
     initAction(g_clockwizeSyncAction);
     initAction(g_anticlockwizeSyncAction);
 
-    connect(initAction("Settings"), &QAction::triggered, this, &PresetEditingWidget::showSettings);
+    auto action = initAction(g_additionsAction);
+    action->setCheckable(true);
+    connect(action, &QAction::toggled, m_ui->additionsFrame, &QFrame::setVisible);
     return menu;
 }
 
@@ -154,6 +155,12 @@ void PresetEditingWidget::bindActions(BasePresetEditorWidget * editor)
             &BasePresetEditorWidget::syncDataByClockwize);
     connect(m_actions[g_anticlockwizeSyncAction], &QAction::triggered, editor,
             &BasePresetEditorWidget::syncDataByAnticlockwize);
+}
+
+void PresetEditingWidget::updateActionsState()
+{
+    for(auto action: m_actions.values())
+        action->setEnabled(m_editor != nullptr);
 }
 
 PresetEditingWidget::~PresetEditingWidget() = default;

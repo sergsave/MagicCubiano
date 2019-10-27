@@ -30,14 +30,12 @@ signals:
 public slots:
     void setPreset(const QString& name, Preset::AbstractPreset * preset);
 
-private slots:
-    void showSettings();
-
 private:
     void setEditorWidget(BasePresetEditorWidget*);
     QMap<QAbstractButton*, CubeEdge> selectors() const;
     QMenu * createMenu();
     void bindActions(BasePresetEditorWidget*);
+    void updateActionsState();
 
 private:
     QScopedPointer<Ui::PresetEditingWidget> m_ui;

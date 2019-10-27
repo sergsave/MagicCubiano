@@ -26,6 +26,9 @@ public:
     virtual void acceptVisitor(ConstVisitor& v) const = 0;
     virtual Music::Harmony toHarmony(const CubeEdge&) const = 0;
 
+    virtual void setMinDurationMs(const CubeEdge&, int ms) = 0;
+    virtual int minDurationMs(const CubeEdge&) const = 0;
+
     class Backup
     {
     public:
@@ -52,6 +55,16 @@ public:
         for(auto notation: unit.notations)
             ret.tones.append(Desc::toneFor(notation));
         return ret;
+    }
+
+    void setMinDurationMs(const CubeEdge& ce, int ms) override
+    {
+        m_data[ce.rotation][ce.color].minDurationMSec = ms;
+    }
+
+    int minDurationMs(const CubeEdge& ce) const override
+    {
+        return m_data[ce.rotation][ce.color].minDurationMSec;
     }
 
     Data<Instrument> data() const { return m_data; }

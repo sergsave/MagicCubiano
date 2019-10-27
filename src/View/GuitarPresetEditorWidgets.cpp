@@ -2,17 +2,17 @@
 #include "GuitarStringWidget.h"
 
 #include <QHBoxLayout>
-#include <algorithm>
-#include <functional>
 
-using namespace Instruments;
+#include "GuitarPresetEditorImpl.h"
 
-BaseGuitarPresetEditorWidget::BaseGuitarPresetEditorWidget(const GuitarNotation &min,
-                                                           const GuitarNotation &max,
-                                                           QWidget * parent) :
-    BasePresetEditorWidget(parent)
+BaseGuitarPresetEditorWidget::BaseGuitarPresetEditorWidget(IGuitarPresetEditor *impl, QWidget * parent) :
+    BasePresetEditorWidget(parent),
+    m_impl(impl)
 {
     auto layout = new QHBoxLayout(this);
+
+    auto min = m_impl->min();
+    auto max = m_impl->max();
 
     for(int i = min.string; i <= max.string; ++i)
     {
@@ -31,8 +31,12 @@ BaseGuitarPresetEditorWidget::BaseGuitarPresetEditorWidget(const GuitarNotation 
     }
 }
 
-void BaseGuitarPresetEditorWidget::setState(const BaseGuitarPresetEditorWidget::String2Fret & state)
+BaseGuitarPresetEditorWidget::~BaseGuitarPresetEditorWidget() = default;
+
+void BaseGuitarPresetEditorWidget::syncUiWithImpl()
 {
+    auto state = m_impl->stateFor(activeCubeEdge());
+
     for(auto w: m_widgets)
         w->reset();
 
@@ -43,209 +47,52 @@ void BaseGuitarPresetEditorWidget::setState(const BaseGuitarPresetEditorWidget::
     }
 }
 
-using Notations = QList<Instruments::GuitarNotation>;
-
-Notations notationsFrom(const auto& presetData, const CubeEdge& ce)
+void BaseGuitarPresetEditorWidget::resetData()
 {
-    auto copy = presetData;
-    return refNotationsFrom(copy, ce);
+    m_impl->resetData();
+    syncUiWithImpl();
 }
 
-Notations& refNotationsFrom(auto& presetData, const CubeEdge& ce)
+void BaseGuitarPresetEditorWidget::syncDataByClockwize()
 {
-    return presetData[ce.rotation][ce.color].notations;
+    m_impl->syncDataByClockwize();
+    syncUiWithImpl();
 }
 
-QMap<int,int> extractString2Fret(auto * preset, const CubeEdge& ce)
+void BaseGuitarPresetEditorWidget::syncDataByAnticlockwize()
 {
-    QMap<int, int> ret;
-
-    const auto notations = notationsFrom(preset->data(), ce);
-
-    for(auto n: notations)
-        ret.insert(n.string, n.fret);
-
-    return ret;
+    m_impl->syncDataByAnticlockwize();
+    syncUiWithImpl();
 }
 
-void changePreset(auto * preset, const CubeEdge& ce,
-                  const std::function<void(Notations&)>& changeFunc)
+void BaseGuitarPresetEditorWidget::onCubeEdgeChanged(const CubeEdge &)
 {
-    auto data = preset->data();
-    auto &notations = refNotationsFrom(data, ce);
-    changeFunc(notations);
-    preset->setData(data);
+    syncUiWithImpl();
 }
 
-Notations::iterator findNotation(Notations& notations, int string)
+
+void BaseGuitarPresetEditorWidget::fretChanged(int string, int fret)
 {
-    return std::find_if(notations.begin(), notations.end(), [string] (auto& notation) {
-        return notation.string == string;
-    });
+    m_impl->onFretChanged(activeCubeEdge(), string, fret);
 }
 
-void onFretChanged(auto * preset, const CubeEdge& ce, int string, int fret)
+void BaseGuitarPresetEditorWidget::muteChanged(int string, bool mute)
 {
-    changePreset(preset, ce, [string, fret] (Notations& notations){
-
-    auto it = findNotation(notations, string);
-    if(it == notations.end())
-        return;
-
-    it->fret = fret;
-    });
+    m_impl->onMuteChanged(activeCubeEdge(), string, mute);
 }
 
-void onMuteChanged(auto * preset, const CubeEdge& ce, int string, bool mute)
-{
-    changePreset(preset, ce, [string, mute] (Notations& notations){
+using namespace Instruments;
 
-    auto it = findNotation(notations, string);
+GuitarPresetEditorWidget::GuitarPresetEditorWidget(
+    Preset::GuitarPreset *preset,
+    QWidget *parent)
+    : BaseGuitarPresetEditorWidget(new GuitarPresetEditorImpl<GuitarTag>(preset), parent)
+{}
 
-    if(mute)
-    {
-        if(it != notations.end())
-            notations.erase(it);
-        return;
-    }
+ElectricGuitarPresetEditorWidget::ElectricGuitarPresetEditorWidget(
+    Preset::ElectricGuitarPreset *preset,
+    QWidget *parent)
+    : BaseGuitarPresetEditorWidget(new GuitarPresetEditorImpl<ElectricGuitarTag>(preset), parent)
+{}
 
-    if(it != notations.end())
-        return;
-
-    Instruments::GuitarNotation notation;
-    notation.string = string;
-    notations.append(notation);
-
-    });
-}
-
-GuitarPresetEditorWidget::GuitarPresetEditorWidget(Preset::GuitarPreset * preset,
-                                                   QWidget *parent) :
-    BaseGuitarPresetEditorWidget(Description<GuitarTag>::min(),
-                                 Description<GuitarTag>::max(),
-                                 parent),
-    m_preset(preset)
-{
-    setState(extractString2Fret(preset, activeCubeEdge()));
-}
-
-void GuitarPresetEditorWidget::resetData()
-{
-    for(auto rot: CubeEdge::allRotations())
-    {
-        for(auto col: CubeEdge::allColors())
-            changePreset(m_preset, {col, rot}, [](Notations& notations){ notations.clear(); });
-    }
-    setState({});
-}
-
-void GuitarPresetEditorWidget::syncDataByClockwize()
-{
-    for(auto col: CubeEdge::allColors())
-    {
-        const auto anticlockwizeCe = CubeEdge(col, CubeEdge::ANTICLOCKWIZE);
-        const auto clockWizeCe = CubeEdge(col, CubeEdge::CLOCKWIZE);
-
-        changePreset(m_preset, anticlockwizeCe, [this, anticlockwizeCe, clockWizeCe] (Notations& notations) {
-            notations = notationsFrom(m_preset->data(), clockWizeCe);
-        });
-    }
-
-    setState(extractString2Fret(m_preset, activeCubeEdge()));
-}
-
-void GuitarPresetEditorWidget::syncDataByAnticlockwize()
-{
-    for(auto col: CubeEdge::allColors())
-    {
-        const auto anticlockwizeCe = CubeEdge(col, CubeEdge::ANTICLOCKWIZE);
-        const auto clockWizeCe = CubeEdge(col, CubeEdge::CLOCKWIZE);
-
-        changePreset(m_preset, anticlockwizeCe, [this, anticlockwizeCe, clockWizeCe] (Notations& notations) {
-            notations = notationsFrom(m_preset->data(), clockWizeCe);
-        });
-    }
-
-    setState(extractString2Fret(m_preset, activeCubeEdge()));
-}
-
-void GuitarPresetEditorWidget::fretChanged(int string, int fret)
-{
-    onFretChanged(m_preset, activeCubeEdge(), string, fret);
-}
-
-void GuitarPresetEditorWidget::muteChanged(int string, bool mute)
-{
-    onMuteChanged(m_preset, activeCubeEdge(), string, mute);
-}
-
-void GuitarPresetEditorWidget::onCubeEdgeChanged(const CubeEdge& edge)
-{
-    setState(extractString2Fret(m_preset, edge));
-}
-
-ElectricGuitarPresetEditorWidget::ElectricGuitarPresetEditorWidget(Preset::ElectricGuitarPreset *preset,
-                                                                   QWidget *parent) :
-    BaseGuitarPresetEditorWidget(Description<ElectricGuitarTag>::min(),
-                                 Description<ElectricGuitarTag>::max(),
-                                 parent),
-    m_preset(preset)
-{
-    setState(extractString2Fret(preset, activeCubeEdge()));
-}
-
-void ElectricGuitarPresetEditorWidget::resetData()
-{
-    for(auto rot: CubeEdge::allRotations())
-    {
-        for(auto col: CubeEdge::allColors())
-            changePreset(m_preset, {col, rot}, [](Notations& notations){ notations.clear(); });
-    }
-    setState({});
-}
-
-void ElectricGuitarPresetEditorWidget::syncDataByClockwize()
-{
-    for(auto col: CubeEdge::allColors())
-    {
-        const auto anticlockwizeCe = CubeEdge(col, CubeEdge::ANTICLOCKWIZE);
-        const auto clockWizeCe = CubeEdge(col, CubeEdge::CLOCKWIZE);
-
-        changePreset(m_preset, anticlockwizeCe, [this, anticlockwizeCe, clockWizeCe] (Notations& notations) {
-            notations = notationsFrom(m_preset->data(), clockWizeCe);
-        });
-    }
-
-    setState(extractString2Fret(m_preset, activeCubeEdge()));
-}
-
-void ElectricGuitarPresetEditorWidget::syncDataByAnticlockwize()
-{
-    for(auto col: CubeEdge::allColors())
-    {
-        const auto anticlockwizeCe = CubeEdge(col, CubeEdge::ANTICLOCKWIZE);
-        const auto clockWizeCe = CubeEdge(col, CubeEdge::CLOCKWIZE);
-
-        changePreset(m_preset, anticlockwizeCe, [this, anticlockwizeCe, clockWizeCe] (Notations& notations) {
-            notations = notationsFrom(m_preset->data(), clockWizeCe);
-        });
-    }
-
-    setState(extractString2Fret(m_preset, activeCubeEdge()));
-}
-
-void ElectricGuitarPresetEditorWidget::fretChanged(int string, int fret)
-{
-    onFretChanged(m_preset, activeCubeEdge(), string, fret);
-}
-
-void ElectricGuitarPresetEditorWidget::muteChanged(int string, bool mute)
-{
-    onMuteChanged(m_preset, activeCubeEdge(), string, mute);
-}
-
-void ElectricGuitarPresetEditorWidget::onCubeEdgeChanged(const CubeEdge& edge)
-{
-    setState(extractString2Fret(m_preset, edge));
-}
 

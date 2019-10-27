@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include "src/Configuration.h"
 
 class SettingsModel: public QObject
 {
@@ -19,5 +20,5 @@ public:
     int volume() const;
 
 private:
-    int m_volume = 100;
+    int m_volume = Configuration::defaultVolume();
 };
