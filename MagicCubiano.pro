@@ -43,7 +43,6 @@ SOURCES += \
     src/View/GuitarStringWidget.cpp \
     src/Preset/NotationSerializer.cpp \
     src/View/PresetDialog.cpp \
-    src/View/PresetEditingWidget.cpp \
     src/View/PresetCreatingWidget.cpp \
     src/Preset/Storage.cpp \
     src/View/SaveLoadHelper.cpp \
@@ -52,7 +51,9 @@ SOURCES += \
     src/Model/Model.cpp \
     src/Model/PresetModel.cpp \
     src/Model/SettingsModel.cpp \
-    src/View/GuitarPresetEditorWidgets.cpp
+    src/View/MainPresetEditingWidget.cpp \
+    src/View/PresetEditorWidget.cpp \
+    src/View/GuitarNotationsWidget.cpp
 
 HEADERS += \
     src/View/MainWindow.h \
@@ -78,7 +79,6 @@ HEADERS += \
     src/View/GuitarStringWidget.h \
     src/SoundHelper.h \
     src/View/PresetDialog.h \
-    src/View/PresetEditingWidget.h \
     src/View/PresetCreatingWidget.h \
     src/View/SaveLoadHelper.h \
     src/Preset/Presets.h \
@@ -87,19 +87,20 @@ HEADERS += \
     src/Model/Model.h \
     src/Model/PresetModel.h \
     src/Model/SettingsModel.h \
-    src/View/BasePresetEditorWidget.h \
-    src/View/GuitarPresetEditorImpl.h \
-    src/View/GuitarPresetEditorWidgets.h
+    src/View/MainPresetEditingWidget.h \
+    src/View/PresetEditorWidget.h \
+    src/View/GuitarNotationsWidget.h
 
 FORMS += \
     src/View/ConnectionDialog.ui \
     src/View/PresetSelectionWidget.ui \
     src/View/GuitarStringWidget.ui \
     src/View/MainWindow.ui \
-    src/View/PresetEditingWidget.ui \
     src/View/PresetCreatingWidget.ui \
     src/View/PresetDialog.ui \
-    src/View/PresetListDialog.ui
+    src/View/PresetListDialog.ui \
+    src/View/MainPresetEditingWidget.ui \
+    src/View/PresetEditorWidget.ui
 
 RESOURCES += \
     resources/Guitar.qrc \

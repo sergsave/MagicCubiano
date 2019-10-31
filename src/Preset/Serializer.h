@@ -48,7 +48,7 @@ class Serializer
 public:
     // TODO : Without copy ?
 
-    QByteArray serialize(const Data<InstrumentTag>& data) const
+    QByteArray serialize(const typename TPreset<InstrumentTag>::Data& data) const
     {
         QJsonObject obj;
         auto type = Instruments::typeFrom(InstrumentTag());
@@ -59,7 +59,7 @@ public:
         return doc.toJson(QJsonDocument::Compact);
     }
 
-    Data<InstrumentTag> deserialize(const QByteArray& arr, bool& ok) const
+    typename TPreset<InstrumentTag>::Data deserialize(const QByteArray& arr, bool& ok) const
     {
         ok = false;
         QJsonDocument doc = QJsonDocument::fromJson(arr);
@@ -74,9 +74,9 @@ public:
     }
 
 private:
-    using TUnit = Unit<InstrumentTag>;
-    using TColors = QMap<CubeEdge::Color, Unit<InstrumentTag>>;
-    using TData = Data<InstrumentTag>;
+    using TUnit = typename TPreset<InstrumentTag>::Unit;
+    using TColors = QMap<CubeEdge::Color, TUnit>;
+    using TData = typename TPreset<InstrumentTag>::Data;
 
     const QString durationKey = "duration";
     const QString notationsKey = "notations";

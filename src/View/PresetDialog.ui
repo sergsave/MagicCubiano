@@ -20,16 +20,16 @@
       <number>0</number>
      </property>
      <widget class="PresetCreatingWidget" name="creatingPage"/>
-     <widget class="PresetEditingWidget" name="editingPage"/>
+     <widget class="MainPresetEditingWidget" name="editingPage"/>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PresetEditingWidget</class>
+   <class>MainPresetEditingWidget</class>
    <extends>QWidget</extends>
-   <header>src/View/PresetEditingWidget.h</header>
+   <header>src/View/MainPresetEditingWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

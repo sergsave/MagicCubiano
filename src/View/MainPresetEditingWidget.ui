@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PresetEditingWidget</class>
- <widget class="QWidget" name="PresetEditingWidget">
+ <class>MainPresetEditingWidget</class>
+ <widget class="QWidget" name="MainPresetEditingWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -43,59 +43,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QFrame" name="additionsFrame">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>4</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="notesLabel">
-        <property name="text">
-         <string>Notes:</string>
-        </property>
-       </widget>
-      </item>
-      <item alignment="Qt::AlignLeft">
-       <widget class="QLabel" name="notesValueLabel">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item alignment="Qt::AlignRight">
-       <widget class="QLabel" name="delayLabel">
-        <property name="text">
-         <string>Delay, ms:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="delaySpinBox">
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="singleStep">
-         <number>100</number>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QFrame" name="editorFrame"/>
+    <widget class="PresetEditorWidget" name="editorWidget" native="true"/>
    </item>
    <item>
     <widget class="QFrame" name="selectorsFrame">
@@ -240,6 +188,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PresetEditorWidget</class>
+   <extends>QWidget</extends>
+   <header>src/View/PresetEditorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

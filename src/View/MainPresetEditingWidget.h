@@ -4,25 +4,24 @@
 #include "src/CubeEdge.h"
 
 namespace Ui {
-class PresetEditingWidget;
+class MainPresetEditingWidget;
 }
 
 namespace Preset {
 class AbstractPreset;
 }
 
-class BasePresetEditorWidget;
 class QAbstractButton;
 class QAction;
 class QMenu;
 
-class PresetEditingWidget : public QWidget
+class MainPresetEditingWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit PresetEditingWidget(QWidget * parent = nullptr);
-    ~PresetEditingWidget();
+    explicit MainPresetEditingWidget(QWidget * parent = nullptr);
+    ~MainPresetEditingWidget();
 
 signals:
     void finished();
@@ -31,14 +30,10 @@ public slots:
     void setPreset(const QString& name, Preset::AbstractPreset * preset);
 
 private:
-    void setEditorWidget(BasePresetEditorWidget*);
     QMap<QAbstractButton*, CubeEdge> selectors() const;
     QMenu * createMenu();
-    void bindActions(BasePresetEditorWidget*);
-    void updateActionsState();
 
 private:
-    QScopedPointer<Ui::PresetEditingWidget> m_ui;
-    BasePresetEditorWidget * m_editor = nullptr;
+    QScopedPointer<Ui::MainPresetEditingWidget> m_ui;
     QMap<QString, QAction*> m_actions;
 };

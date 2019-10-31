@@ -19,7 +19,7 @@ PresetDialog::PresetDialog(QWidget * parent):
         this->openEditPresetPage(name, preset);
     });
 
-    connect(m_ui->editingPage, &PresetEditingWidget::finished, this, &PresetDialog::accept);
+    connect(m_ui->editingPage, &MainPresetEditingWidget::finished, this, &PresetDialog::accept);
 }
 
 PresetDialog::~PresetDialog() = default;

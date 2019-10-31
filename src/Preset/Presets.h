@@ -8,16 +8,6 @@
 
 namespace Preset {
 
-template <class InstrumentTag>
-struct Unit
-{
-    int minDurationMSec = 0;
-    QList<typename InstrumentTag::Notation> notations;
-};
-
-template <class InstrumentTag>
-using Data = QMap<CubeEdge::Rotation, QMap<CubeEdge::Color, Unit<InstrumentTag>>>;
-
 class AbstractPreset
 {
 public:
@@ -39,10 +29,20 @@ public:
     virtual Backup * createBackup() = 0;
 };
 
-template <class Instrument>
+template <class InstrumentTag>
 class TPreset : public AbstractPreset
 {
 public:
+    using Notations = QList<typename InstrumentTag::Notation>;
+
+    struct Unit
+    {
+        int minDurationMSec = 0;
+        Notations notations;
+    };
+
+    using Data = QMap<CubeEdge::Rotation, QMap<CubeEdge::Color, Unit>>;
+
     void acceptVisitor(Visitor& v) override { v.visit(*this); }
     void acceptVisitor(ConstVisitor& cv) const override { cv.visit(*this); }
 
@@ -67,8 +67,25 @@ public:
         return m_data[ce.rotation][ce.color].minDurationMSec;
     }
 
-    Data<Instrument> data() const { return m_data; }
-    void setData(const Data<Instrument>& data) { m_data = data; }
+    void setNotations(const CubeEdge& ce, const Notations& notations)
+    {
+        m_data[ce.rotation][ce.color].notations = notations;
+    }
+
+    Notations notations(const CubeEdge& ce) const
+    {
+        return m_data[ce.rotation][ce.color].notations;
+    }
+
+    void setData(const Data& data)
+    {
+        m_data = data;
+    }
+
+    Data data() const
+    {
+        return m_data;
+    }
 
     Backup * createBackup() override
     {
@@ -80,7 +97,7 @@ private:
     class ConcreteBackup: public Backup
     {
     public:
-        ConcreteBackup(TPreset<Instrument> * preset) : m_preset(preset)
+        ConcreteBackup(TPreset<InstrumentTag> * preset) : m_preset(preset)
         {
             m_data = m_preset->data();
         }
@@ -90,12 +107,12 @@ private:
             m_preset->setData(m_data);
         }
     private:
-        Data<Instrument> m_data;
-        TPreset<Instrument> * m_preset;
+        typename TPreset<InstrumentTag>::Data m_data;
+        TPreset<InstrumentTag> * m_preset;
     };
 
-    using Desc = Instruments::Description<Instrument>;
-    Data<Instrument> m_data;
+    using Desc = Instruments::Description<InstrumentTag>;
+    Data m_data;
 };
 
 static AbstractPreset * createPreset(Instruments::Type type)
