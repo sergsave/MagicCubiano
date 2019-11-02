@@ -11,8 +11,8 @@ enum class Type
     PIANO
 };
 
-static Type typeFrom(const GuitarTag& )         { return Type::GUITAR; }
-static Type typeFrom(const ElectricGuitarTag& ) { return Type::ELECTRIC_GUITAR; }
-static Type typeFrom(const PianoTag& )          { return Type::PIANO; }
+Type typeFrom(const GuitarTag& );
+Type typeFrom(const ElectricGuitarTag& );
+Type typeFrom(const PianoTag& );
 
 }

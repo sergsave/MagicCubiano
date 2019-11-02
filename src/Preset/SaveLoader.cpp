@@ -4,6 +4,7 @@
 
 #include "Serializer.h"
 #include "Presets.h"
+#include "FactoryMethod.h"
 
 namespace Preset {
 

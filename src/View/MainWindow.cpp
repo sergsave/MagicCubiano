@@ -3,6 +3,7 @@
 
 #include <QDesktopWidget>
 
+#include "src/Preset/Presets.h"
 #include "PresetDialog.h"
 #include "SaveLoadHelper.h"
 #include "PresetListDialog.h"

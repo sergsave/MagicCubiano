@@ -7,7 +7,7 @@
 
 #include "src/Instruments/Common.h"
 #include "src/Configuration.h"
-#include "src/Preset/Storage.h"
+#include "src/Preset/FactoryMethod.h"
 #include "Utils.h"
 
 PresetCreatingWidget::PresetCreatingWidget(QWidget *parent) :

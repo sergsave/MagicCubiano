@@ -53,7 +53,11 @@ SOURCES += \
     src/Model/SettingsModel.cpp \
     src/View/MainPresetEditingWidget.cpp \
     src/View/PresetEditorWidget.cpp \
-    src/View/GuitarNotationsWidget.cpp
+    src/View/GuitarNotationsWidget.cpp \
+    src/Instruments/Common.cpp \
+    src/Instruments/Notations.cpp \
+    src/Preset/FactoryMethod.cpp \
+    src/View/Utils.cpp
 
 HEADERS += \
     src/View/MainWindow.h \
@@ -89,7 +93,8 @@ HEADERS += \
     src/Model/SettingsModel.h \
     src/View/MainPresetEditingWidget.h \
     src/View/PresetEditorWidget.h \
-    src/View/GuitarNotationsWidget.h
+    src/View/GuitarNotationsWidget.h \
+    src/Preset/FactoryMethod.h
 
 FORMS += \
     src/View/ConnectionDialog.ui \

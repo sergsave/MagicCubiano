@@ -37,9 +37,10 @@ struct CubeEdge
     {
         return { CLOCKWIZE, ANTICLOCKWIZE };
     }
+
+    bool operator == (const CubeEdge& ce) const
+    {
+        return this->rotation == ce.rotation && this->color == ce.color;
+    }
 };
 
-static bool operator == (const CubeEdge& lhs, const CubeEdge& rhs)
-{
-    return lhs.rotation == rhs.rotation && lhs.color == rhs.color;
-}
