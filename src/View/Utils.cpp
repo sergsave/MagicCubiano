@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <QMap>
+#include <QPixmap>
 
 QString instrumentName(Instruments::Type type)
 {
@@ -65,4 +66,24 @@ EdgeAppearance appearanceFor(const CubeEdge &edge)
     };
 
     return { colors.value(edge.color, Qt::black), iconPaths.value(edge.rotation) };
+}
+
+QString tonesToString(const Music::Tones& tones)
+{
+    QString text;
+
+    for(auto it = tones.begin(); it != tones.end(); ++it)
+    {
+        if(it != tones.begin())
+            text += " ";
+        text += it->toString();
+    }
+
+    return text;
+}
+
+void setLabelPixmap(QLabel * label, const QString &path)
+{
+    QPixmap pm(path);
+    label->setPixmap(pm.scaled(label->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 }

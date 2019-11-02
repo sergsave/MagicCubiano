@@ -28,7 +28,18 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QWidget" name="notificationWidget" native="true"/>
+           <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,1">
+            <item>
+             <widget class="QLabel" name="cubeStatusLabel">
+              <property name="text">
+               <string>Status</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="NotificationWidget" name="notificationWidget" native="true"/>
+            </item>
+           </layout>
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -201,6 +212,12 @@
    <class>PresetSelectionWidget</class>
    <extends>QWidget</extends>
    <header>src/View/PresetSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>NotificationWidget</class>
+   <extends>QWidget</extends>
+   <header>src/View/NotificationWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

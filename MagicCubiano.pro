@@ -57,7 +57,8 @@ SOURCES += \
     src/Instruments/Common.cpp \
     src/Instruments/Notations.cpp \
     src/Preset/FactoryMethod.cpp \
-    src/View/Utils.cpp
+    src/View/Utils.cpp \
+    src/View/NotificationWidget.cpp
 
 HEADERS += \
     src/View/MainWindow.h \
@@ -94,7 +95,8 @@ HEADERS += \
     src/View/MainPresetEditingWidget.h \
     src/View/PresetEditorWidget.h \
     src/View/GuitarNotationsWidget.h \
-    src/Preset/FactoryMethod.h
+    src/Preset/FactoryMethod.h \
+    src/View/NotificationWidget.h
 
 FORMS += \
     src/View/ConnectionDialog.ui \
@@ -105,7 +107,8 @@ FORMS += \
     src/View/PresetDialog.ui \
     src/View/PresetListDialog.ui \
     src/View/MainPresetEditingWidget.ui \
-    src/View/PresetEditorWidget.ui
+    src/View/PresetEditorWidget.ui \
+    src/View/NotificationWidget.ui
 
 RESOURCES += \
     resources/Guitar.qrc \

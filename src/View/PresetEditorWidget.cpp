@@ -6,6 +6,8 @@
 #include "src/Preset/Visitor.h"
 #include "GuitarNotationsWidget.h"
 
+#include "Utils.h"
+
 namespace {
 
 enum class Action
@@ -158,6 +160,8 @@ PresetEditorWidget::PresetEditorWidget(QWidget * parent) :
 
         m_preset->setMinDurationMs(m_edge, val);
     });
+
+    setLabelPixmap(m_ui->notesLabel, ":/images/musical-note.png");
 }
 
 PresetEditorWidget::~PresetEditorWidget() = default;
@@ -239,12 +243,7 @@ void PresetEditorWidget::updateAdditions()
         return;
 
     m_ui->delaySpinBox->setValue(m_preset->minDurationMs(m_edge));
-
-    QString text;
-    for(auto tone: m_preset->toHarmony(m_edge).tones)
-        text += (" " + tone.toString());
-
-    m_ui->notesValueLabel->setText(text);
+    m_ui->notesValueLabel->setText(tonesToString(m_preset->toHarmony(m_edge).tones));
 }
 
 void PresetEditorWidget::updateAll()

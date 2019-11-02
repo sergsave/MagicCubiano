@@ -9,6 +9,8 @@
 #include "PresetListDialog.h"
 #include "Utils.h"
 
+#include <QTimer>
+
 MainWindow::MainWindow(Model * model, QWidget *parent)
     : QMainWindow(parent)
     , m_ui(new Ui::MainWindow)
@@ -75,6 +77,12 @@ MainWindow::MainWindow(Model * model, QWidget *parent)
     syncSettingsUi();
     connect(m_settings, &SettingsModel::changed, this, syncSettingsUi);
     connect(m_ui->volumeSlider, &QSlider::valueChanged, m_settings, &SettingsModel::setVolume);
+
+    m_ui->notificationWidget->setIdleMessage("Turn the cube and play music!");
+
+    auto timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [this] { onEdgeTurned({});});
+    timer->start(3000);
 }
 
 MainWindow::~MainWindow() = default;
@@ -88,6 +96,13 @@ void MainWindow::onEdgeTurned(const CubeEdge& edge)
 {
     if(m_dialog)
         m_dialog->onEdgeTurned(edge);
+
+    auto activePreset = m_presetModel->findPreset(m_presetModel->activePreset());
+    if(!activePreset)
+        return;
+
+    auto harmony = activePreset->toHarmony(edge);
+    m_ui->notificationWidget->notify(edge, harmony);
 }
 
 void MainWindow::onCreateNew()

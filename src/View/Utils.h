@@ -2,6 +2,7 @@
 
 #include <QString>
 #include <QColor>
+#include <QLabel>
 
 #include "src/Instruments/Common.h"
 #include "src/CubeEdge.h"
@@ -11,8 +12,9 @@ class AbstractPreset;
 }
 
 QString instrumentName(Instruments::Type type);
-
 QString instrumentName(Preset::AbstractPreset * preset);
+
+QString tonesToString(const Music::Tones& tones);
 
 struct EdgeAppearance
 {
@@ -23,3 +25,7 @@ struct EdgeAppearance
 };
 
 EdgeAppearance appearanceFor(const CubeEdge& edge);
+
+void setLabelPixmap(QLabel *, const QString& path);
+
+
