@@ -8,8 +8,6 @@
 #include "PresetListDialog.h"
 #include "Utils.h"
 
-#include <QDebug>
-
 MainWindow::MainWindow(Model * model, QWidget *parent)
     : QMainWindow(parent)
     , m_ui(new Ui::MainWindow)
@@ -87,22 +85,23 @@ void MainWindow::start()
 
 void MainWindow::onEdgeTurned(const CubeEdge& edge)
 {
-
+    if(m_dialog)
+        m_dialog->onEdgeTurned(edge);
 }
 
 void MainWindow::onCreateNew()
 {
-    PresetDialog dialog;
+    createPresetDialog();
     auto sourceName = m_presetModel->findVacantName("New preset");
-    dialog.openCreatePresetPage(sourceName);
-    dialog.exec();
+    m_dialog->openCreatePresetPage(sourceName);
+    m_dialog->exec();
 
-    auto preset = dialog.currentPreset();
+    auto preset = m_dialog->currentPreset();
 
     if(!preset)
         return;
 
-    auto name = m_presetModel->findVacantName(dialog.currentPresetName());
+    auto name = m_presetModel->findVacantName(m_dialog->currentPresetName());
     m_presetModel->addPreset(name, preset);
 
     updatePresetPage();
@@ -111,12 +110,12 @@ void MainWindow::onCreateNew()
 void MainWindow::onOpenRequested(const QString &name)
 {
     auto preset =  m_presetModel->findPreset(name);
-    PresetDialog dialog;
-    dialog.openEditPresetPage(name, preset);
+    createPresetDialog();
+    m_dialog->openEditPresetPage(name, preset);
 
     QScopedPointer<Preset::AbstractPreset::Backup> backup(preset->createBackup());
 
-    if(dialog.exec() == QDialog::Rejected)
+    if(m_dialog->exec() == QDialog::Rejected)
         backup->restore();
 
     updatePresetPage();
@@ -140,6 +139,12 @@ void MainWindow::showPresetListDialog()
 
     for(auto name: dialog.removedPresets())
         m_presetModel->removePreset(name);
+}
+
+void MainWindow::createPresetDialog()
+{
+    if(!m_dialog)
+        m_dialog.reset(new PresetDialog);
 }
 
 void MainWindow::updatePresetPage()

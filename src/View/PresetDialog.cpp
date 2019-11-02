@@ -48,6 +48,11 @@ QString PresetDialog::currentPresetName() const
     return m_name;
 }
 
+void PresetDialog::onEdgeTurned(const CubeEdge& ce)
+{
+    m_ui->editingPage->onEdgeTurned(ce);
+}
+
 void PresetDialog::update(const QString &name, AbstractPreset *preset)
 {
     m_name = name;

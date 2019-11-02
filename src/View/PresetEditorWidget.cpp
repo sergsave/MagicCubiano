@@ -191,7 +191,6 @@ void PresetEditorWidget::setPreset(Preset::AbstractPreset * preset)
         return;
 
     m_preset = preset;
-    updateAdditions();
 
     if(m_editor)
         delete m_editor;
@@ -223,6 +222,8 @@ CubeEdge PresetEditorWidget::activeCubeEdge() const
 
 void PresetEditorWidget::createEditor(Preset::AbstractPreset * preset)
 {
+    updateAdditions();
+
     CreateEditorPresetVisitor visitor(this, [this] {
         updateAdditions();
     });

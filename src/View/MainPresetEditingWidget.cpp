@@ -3,8 +3,18 @@
 
 #include <cassert>
 #include <QMenu>
+#include <QTimer>
 
 #include "Utils.h"
+
+namespace {
+
+QString backgroundColorStyleSheet(const QColor& col)
+{
+    return QString("background-color: %1").arg(col.name());
+}
+
+}
 
 MainPresetEditingWidget::MainPresetEditingWidget(QWidget * parent):
     QWidget(parent),
@@ -14,7 +24,15 @@ MainPresetEditingWidget::MainPresetEditingWidget(QWidget * parent):
 
     auto group = new QButtonGroup(this);
     for (auto b: selectors().keys())
+    {
+        auto edge = selectors().value(b);
+        auto appearance = appearanceFor(edge);
+
+        b->setIcon(QPixmap(appearance.iconPath));
+        b->setStyleSheet(backgroundColorStyleSheet(appearance.color));
+
         group->addButton(b);
+    }
 
     connect(group, QOverload<QAbstractButton*>::of(&QButtonGroup::buttonClicked), this, [this] (auto button) {
         m_ui->editorWidget->setActiveCubeEdge(this->selectors()[button]);
@@ -33,6 +51,20 @@ MainPresetEditingWidget::MainPresetEditingWidget(QWidget * parent):
     });
 
     m_ui->editorWidget->setAdditionsVisible(false);
+}
+
+void MainPresetEditingWidget::onEdgeTurned(const CubeEdge& ce)
+{
+    // Selectors size is fixed
+    auto button = selectors().key(ce);
+    auto prevStylesheet = button->styleSheet();
+
+    button->setStyleSheet({});
+
+    const int blinkTime = 200;
+    QTimer::singleShot(blinkTime, button, [prevStylesheet, button] {
+        button->setStyleSheet(prevStylesheet);
+    });
 }
 
 void MainPresetEditingWidget::setPreset(const QString &name, Preset::AbstractPreset *preset)

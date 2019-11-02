@@ -28,6 +28,7 @@ signals:
 
 public slots:
     void setPreset(const QString& name, Preset::AbstractPreset * preset);
+    void onEdgeTurned(const CubeEdge&);
 
 private:
     QMap<QAbstractButton*, CubeEdge> selectors() const;

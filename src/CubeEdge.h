@@ -39,3 +39,7 @@ struct CubeEdge
     }
 };
 
+static bool operator == (const CubeEdge& lhs, const CubeEdge& rhs)
+{
+    return lhs.rotation == rhs.rotation && lhs.color == rhs.color;
+}

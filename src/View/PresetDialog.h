@@ -3,6 +3,8 @@
 #include <QDialog>
 #include <QScopedPointer>
 
+#include "src/CubeEdge.h"
+
 namespace Ui {
 class PresetDialog;
 }
@@ -25,6 +27,9 @@ public:
     // Preset dialog doesn't take ownership of preset
     Preset::AbstractPreset * currentPreset() const;
     QString currentPresetName() const;
+
+public slots:
+    void onEdgeTurned(const CubeEdge&);
 
 private:
     void update(const QString& name, Preset::AbstractPreset * preset);
