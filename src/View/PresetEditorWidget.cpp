@@ -154,7 +154,7 @@ PresetEditorWidget::PresetEditorWidget(QWidget * parent) :
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->delaySpinBox, qOverload<int>(&QSpinBox::valueChanged), this, [this](int val) {
+    connect(m_ui->delaySpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int val) {
         if(!m_preset)
             return;
 

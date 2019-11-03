@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>MagicCubiano</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -172,7 +172,10 @@
     <addaction name="loadPresetAction"/>
     <addaction name="loadAllPresetsAction"/>
     <addaction name="savePresetAction"/>
+    <addaction name="separator"/>
     <addaction name="presetsListAction"/>
+    <addaction name="separator"/>
+    <addaction name="cubeStatusAction"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -204,6 +207,11 @@
   <action name="loadAllPresetsAction">
    <property name="text">
     <string>Load Presets</string>
+   </property>
+  </action>
+  <action name="cubeStatusAction">
+   <property name="text">
+    <string>Cube Status</string>
    </property>
   </action>
  </widget>

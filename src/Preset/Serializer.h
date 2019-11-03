@@ -11,6 +11,7 @@ namespace Preset {
 
 struct SerializationMeta
 {
+    SerializationMeta(Instruments::Type type = Instruments::Type::GUITAR) : type(type) {}
     Instruments::Type type;
 };
 

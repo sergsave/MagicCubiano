@@ -11,6 +11,7 @@ class MainWindow;
 }
 
 class PresetDialog;
+class CubeStatusDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -31,11 +32,13 @@ private slots:
 
     void updatePresetPage();
     void updateActionsState();
+    void showStatusDialog(bool closeOnConnect = false);
 
 private:
     QScopedPointer<Ui::MainWindow> m_ui;
-    QScopedPointer<PresetDialog> m_dialog;
+    QScopedPointer<PresetDialog> m_presetDialog;
     PresetModel * m_presetModel = nullptr;
     SettingsModel * m_settings = nullptr;
+    GiikerProtocol * m_protocol = nullptr;
 };
 

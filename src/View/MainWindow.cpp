@@ -5,17 +5,17 @@
 
 #include "src/Preset/Presets.h"
 #include "PresetDialog.h"
+#include "CubeStatusDialog.h"
 #include "SaveLoadHelper.h"
 #include "PresetListDialog.h"
 #include "Utils.h"
-
-#include <QTimer>
 
 MainWindow::MainWindow(Model * model, QWidget *parent)
     : QMainWindow(parent)
     , m_ui(new Ui::MainWindow)
     , m_presetModel(model->presets())
     , m_settings(model->settings())
+    , m_protocol(model->remoteProtocol())
 {
     m_ui->setupUi(this);
 
@@ -43,6 +43,7 @@ MainWindow::MainWindow(Model * model, QWidget *parent)
         saveLoadHelper->choosePathForSaving(m_presetModel->activePreset());
     });
     connect(m_ui->presetsListAction, &QAction::triggered, this, &MainWindow::showPresetListDialog);
+    connect(m_ui->cubeStatusAction, &QAction::triggered, this, &MainWindow::showStatusDialog);
 
     // TODO: Handle save-load errors
     connect(saveLoadHelper, &SaveLoadHelper::loadRequested, m_presetModel, &PresetModel::loadPreset);
@@ -80,22 +81,21 @@ MainWindow::MainWindow(Model * model, QWidget *parent)
 
     m_ui->notificationWidget->setIdleMessage("Turn the cube and play music!");
 
-    auto timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, [this] { onEdgeTurned({});});
-    timer->start(3000);
+    connect(m_protocol, &GiikerProtocol::cubeEdgeTurned, this, &MainWindow::onEdgeTurned);
 }
 
 MainWindow::~MainWindow() = default;
 
 void MainWindow::start()
 {
+    showStatusDialog(true);
     show();
 }
 
 void MainWindow::onEdgeTurned(const CubeEdge& edge)
 {
-    if(m_dialog)
-        m_dialog->onEdgeTurned(edge);
+    if(m_presetDialog)
+        m_presetDialog->onEdgeTurned(edge);
 
     auto activePreset = m_presetModel->findPreset(m_presetModel->activePreset());
     if(!activePreset)
@@ -105,19 +105,25 @@ void MainWindow::onEdgeTurned(const CubeEdge& edge)
     m_ui->notificationWidget->notify(edge, harmony);
 }
 
+void MainWindow::createPresetDialog()
+{
+    if(!m_presetDialog)
+        m_presetDialog.reset(new PresetDialog);
+}
+
 void MainWindow::onCreateNew()
 {
     createPresetDialog();
     auto sourceName = m_presetModel->findVacantName("New preset");
-    m_dialog->openCreatePresetPage(sourceName);
-    m_dialog->exec();
+    m_presetDialog->openCreatePresetPage(sourceName);
+    m_presetDialog->exec();
 
-    auto preset = m_dialog->currentPreset();
+    auto preset = m_presetDialog->currentPreset();
 
     if(!preset)
         return;
 
-    auto name = m_presetModel->findVacantName(m_dialog->currentPresetName());
+    auto name = m_presetModel->findVacantName(m_presetDialog->currentPresetName());
     m_presetModel->addPreset(name, preset);
 
     updatePresetPage();
@@ -127,11 +133,11 @@ void MainWindow::onOpenRequested(const QString &name)
 {
     auto preset =  m_presetModel->findPreset(name);
     createPresetDialog();
-    m_dialog->openEditPresetPage(name, preset);
+    m_presetDialog->openEditPresetPage(name, preset);
 
     QScopedPointer<Preset::AbstractPreset::Backup> backup(preset->createBackup());
 
-    if(m_dialog->exec() == QDialog::Rejected)
+    if(m_presetDialog->exec() == QDialog::Rejected)
         backup->restore();
 
     updatePresetPage();
@@ -157,12 +163,6 @@ void MainWindow::showPresetListDialog()
         m_presetModel->removePreset(name);
 }
 
-void MainWindow::createPresetDialog()
-{
-    if(!m_dialog)
-        m_dialog.reset(new PresetDialog);
-}
-
 void MainWindow::updatePresetPage()
 {
     if(!m_presetModel->allPresets().isEmpty())
@@ -177,5 +177,36 @@ void MainWindow::updateActionsState()
 
     m_ui->savePresetAction->setDisabled(isEmpty);
     m_ui->presetsListAction->setDisabled(isEmpty);
+}
+
+void MainWindow::showStatusDialog(bool closeOnConnect)
+{
+    CubeStatusDialog dialog;
+
+    auto updatePage = [&dialog, this] {
+        if(m_protocol && m_protocol->state() == GiikerProtocol::CONNECTED)
+            dialog.goToConnectedPage();
+        else
+            dialog.goToDisconnectedPage();
+    };
+
+    updatePage();
+
+    connect(&dialog, &CubeStatusDialog::connectAnyRequested, m_protocol, &GiikerProtocol::connectToCube);
+    connect(&dialog, &CubeStatusDialog::connectByAddressRequested, m_protocol,
+            &GiikerProtocol::connectToCubeByAddress);
+    connect(&dialog, &CubeStatusDialog::batteryLevelRequested, m_protocol,
+            &GiikerProtocol::requestBatteryLevel);
+    connect(&dialog, &CubeStatusDialog::rejected, m_protocol, &GiikerProtocol::cancelConnection);
+
+    connect(m_protocol, &GiikerProtocol::connected, &dialog, updatePage);
+    connect(m_protocol, &GiikerProtocol::connectionFailed, &dialog, &CubeStatusDialog::onConnectionFailed);
+    connect(m_protocol, &GiikerProtocol::disconnected, &dialog, updatePage);
+    connect(m_protocol, &GiikerProtocol::batteryLevelResponsed, &dialog, &CubeStatusDialog::setBatteryLevel);
+
+    if(closeOnConnect)
+        connect(m_protocol, &GiikerProtocol::connected, &dialog, &CubeStatusDialog::accept);
+
+    dialog.exec();
 }
 

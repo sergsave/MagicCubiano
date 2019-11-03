@@ -33,7 +33,6 @@ SOURCES += \
     src/View/MainWindow.cpp \
     src/Protocol/GiikerProtocol.cpp \
     src/main.cpp \
-    src/View/ConnectionDialog.cpp \
     src/Music.cpp \
     src/Sound/SampleGenerator.cpp \
     src/Sound/GuitarGenerators.cpp \
@@ -58,12 +57,13 @@ SOURCES += \
     src/Instruments/Notations.cpp \
     src/Preset/FactoryMethod.cpp \
     src/View/Utils.cpp \
-    src/View/NotificationWidget.cpp
+    src/View/NotificationWidget.cpp \
+    src/View/CubeStatusDialog.cpp \
+    src/SoundView.cpp
 
 HEADERS += \
     src/View/MainWindow.h \
     src/Protocol/GiikerProtocol.h \
-    src/View/ConnectionDialog.h \
     src/CubeEdge.h \
     src/Music.h \
     src/Sound/SoundGenerator.h \
@@ -82,7 +82,6 @@ HEADERS += \
     src/Preset/Visitor.h \
     src/View/Utils.h \
     src/View/GuitarStringWidget.h \
-    src/SoundHelper.h \
     src/View/PresetDialog.h \
     src/View/PresetCreatingWidget.h \
     src/View/SaveLoadHelper.h \
@@ -96,10 +95,11 @@ HEADERS += \
     src/View/PresetEditorWidget.h \
     src/View/GuitarNotationsWidget.h \
     src/Preset/FactoryMethod.h \
-    src/View/NotificationWidget.h
+    src/View/NotificationWidget.h \
+    src/View/CubeStatusDialog.h \
+    src/SoundView.h
 
 FORMS += \
-    src/View/ConnectionDialog.ui \
     src/View/PresetSelectionWidget.ui \
     src/View/GuitarStringWidget.ui \
     src/View/MainWindow.ui \
@@ -108,7 +108,8 @@ FORMS += \
     src/View/PresetListDialog.ui \
     src/View/MainPresetEditingWidget.ui \
     src/View/PresetEditorWidget.ui \
-    src/View/NotificationWidget.ui
+    src/View/NotificationWidget.ui \
+    src/View/CubeStatusDialog.ui
 
 RESOURCES += \
     resources/Guitar.qrc \
