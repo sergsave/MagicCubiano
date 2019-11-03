@@ -79,9 +79,22 @@ MainWindow::MainWindow(Model * model, QWidget *parent)
     connect(m_settings, &SettingsModel::changed, this, syncSettingsUi);
     connect(m_ui->volumeSlider, &QSlider::valueChanged, m_settings, &SettingsModel::setVolume);
 
-    m_ui->notificationWidget->setIdleMessage("Turn the cube and play music!");
-
     connect(m_protocol, &GiikerProtocol::cubeEdgeTurned, this, &MainWindow::onEdgeTurned);
+    auto updateStatus = [this] {
+        const bool isConnected = m_protocol->state() == GiikerProtocol::CONNECTED;
+
+        QString statusLabelText = "Status: ";
+        statusLabelText += isConnected ? "Connected" : "Disconnected";
+        m_ui->cubeStatusLabel->setText(statusLabelText);
+
+        const QString notificationIdleText = isConnected ?
+                    "Turn the cube and play music!" :
+                    "Connect the cube for playing music!";
+
+        m_ui->notificationWidget->setIdleMessage(notificationIdleText);
+    };
+    connect(m_protocol, &GiikerProtocol::connected, this, updateStatus);
+    connect(m_protocol, &GiikerProtocol::disconnected, this, updateStatus);
 }
 
 MainWindow::~MainWindow() = default;
@@ -197,6 +210,7 @@ void MainWindow::showStatusDialog(bool closeOnConnect)
             &GiikerProtocol::connectToCubeByAddress);
     connect(&dialog, &CubeStatusDialog::batteryLevelRequested, m_protocol,
             &GiikerProtocol::requestBatteryLevel);
+    connect(&dialog, &CubeStatusDialog::disconnectRequested, m_protocol, &GiikerProtocol::disconnectFromCube);
     connect(&dialog, &CubeStatusDialog::rejected, m_protocol, &GiikerProtocol::cancelConnection);
 
     connect(m_protocol, &GiikerProtocol::connected, &dialog, updatePage);

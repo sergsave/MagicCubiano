@@ -7,11 +7,14 @@
 
 NotificationWidget::NotificationWidget(QWidget *parent) :
     QWidget(parent),
-    m_ui(new Ui::NotificationWidget)
+    m_ui(new Ui::NotificationWidget),
+    m_timer(new QTimer(this))
 {
     m_ui->setupUi(this);
     setLabelPixmap(m_ui->noteIconLabel, ":/images/musical-note.png");
     setPage(m_ui->idlePage);
+
+    connect(m_timer, &QTimer::timeout, this, [this] { setPage(m_ui->idlePage); });
 }
 
 NotificationWidget::~NotificationWidget() = default;
@@ -28,7 +31,7 @@ void NotificationWidget::notify(const CubeEdge &ce, const Music::Harmony& harmon
     QString text = tones.isEmpty() ? "No tones" : tonesToString(tones);
     m_ui->notesLabel->setText(text);
 
-    QTimer::singleShot(m_notifyTime, this, [this] { setPage(m_ui->idlePage); });
+    m_timer->start(m_notifyTime);
 }
 
 void NotificationWidget::setIdleMessage(const QString& msg)

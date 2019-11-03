@@ -75,18 +75,27 @@ void GiikerProtocol::stopDiscovery()
 
 GiikerProtocol::State GiikerProtocol::state() const
 {
-    if(m_bleController && m_bleController->state() == QLowEnergyController::ConnectedState)
+    if(m_bleController && m_bleController->state() != QLowEnergyController::UnconnectedState)
         return CONNECTED;
 
     return DISCONNECTED;
+}
+
+void GiikerProtocol::resetBleControl()
+{
+    if(!m_bleController)
+        return;
+
+    delete m_bleController;
+    m_bleController = nullptr;
 }
 
 void GiikerProtocol::cancelConnection()
 {
     stopDiscovery();
 
-    if(m_bleController && m_bleController->state() != QLowEnergyController::ConnectedState)
-        m_bleController->deleteLater();
+    if(m_bleController && m_bleController->state() == QLowEnergyController::UnconnectedState)
+        resetBleControl();
 }
 
 void GiikerProtocol::disconnectFromCube()
@@ -97,8 +106,6 @@ void GiikerProtocol::disconnectFromCube()
         return;
 
     m_bleController->disconnectFromDevice();
-    delete m_bleController;
-    m_bleController = nullptr;
 }
 
 void GiikerProtocol::connectToDevice(const QBluetoothDeviceInfo &device)
@@ -115,6 +122,7 @@ void GiikerProtocol::connectToDevice(const QBluetoothDeviceInfo &device)
 
     connect(m_bleController, &QLowEnergyController::disconnected, this, [this] {
         emit disconnected();
+        resetBleControl();
     });
 
     connect(m_bleController, &QLowEnergyController::discoveryFinished, this,

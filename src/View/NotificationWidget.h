@@ -9,6 +9,8 @@ namespace Ui {
 class NotificationWidget;
 }
 
+class QTimer;
+
 class NotificationWidget : public QWidget
 {
     Q_OBJECT
@@ -26,5 +28,6 @@ private:
 private:
     static const int m_notifyTime = 2000;
 
+    QTimer * m_timer;
     QScopedPointer<Ui::NotificationWidget> m_ui;
 };

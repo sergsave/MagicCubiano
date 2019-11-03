@@ -11,6 +11,8 @@ PresetListDialog::PresetListDialog(QWidget *parent) :
 {
     m_ui->setupUi(this);
 
+    setWindowFlags(Qt::Window);
+
     connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 }

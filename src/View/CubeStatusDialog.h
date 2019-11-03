@@ -18,6 +18,7 @@ public:
 signals:
     void connectAnyRequested();
     void connectByAddressRequested(const QString&);
+    void disconnectRequested();
     void batteryLevelRequested();
 
 public slots:

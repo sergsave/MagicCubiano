@@ -48,6 +48,7 @@ private slots:
     void serviceStateChanged(QLowEnergyService::ServiceState st);
     void onCharacteristicChanged(const QLowEnergyCharacteristic &c, const QByteArray &value);
     void stopDiscovery();
+    void resetBleControl();
 
     QLowEnergyService * createService(const QBluetoothUuid& uuid);
     void deleteAllServices();

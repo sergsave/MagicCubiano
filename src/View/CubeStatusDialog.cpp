@@ -12,6 +12,7 @@ CubeStatusDialog::CubeStatusDialog(QWidget * parent) :
     m_ui(new Ui::CubeStatusDialog)
 {
     m_ui->setupUi(this);
+    setWindowFlags(Qt::Window);
 
     connect(m_ui->connectToAnyButton, &QPushButton::clicked, this, [this] {
         setConnectionStatus(IN_PROGRESS);
@@ -19,12 +20,19 @@ CubeStatusDialog::CubeStatusDialog(QWidget * parent) :
     });
 
     connect(m_ui->connectByAddressButton, &QPushButton::clicked, this, [this] {
-        setConnectionStatus(IN_PROGRESS);
         auto addr = getAddresFromInputDialog();
-        emit connectByAddressRequested(addr);
+        if(!addr.isEmpty())
+        {
+            setConnectionStatus(IN_PROGRESS);
+            emit connectByAddressRequested(addr);
+        }
     });
 
-    // TODO: Cancel connection
+    connect(m_ui->disconnectButton, &QPushButton::clicked, this, [this] {
+        setConnectionStatus(READY);
+        emit disconnectRequested();
+    });
+
     connect(m_ui->cancelButton, &QPushButton::clicked, this, &QDialog::reject);
 
     goToDisconnectedPage();
@@ -101,7 +109,11 @@ QString CubeStatusDialog::getAddresFromInputDialog()
     auto lineEdit = dialog.findChild<QLineEdit*>();
     lineEdit->setInputMask("HH:HH:HH:HH:HH:HH;_");
 
-    dialog.exec();
+    dialog.setStyleSheet("QDialog { border: 2px solid grey }");
+
+    if(dialog.exec() == QDialog::Rejected)
+        return {};
+
     return dialog.textValue();
 }
 
