@@ -33,6 +33,8 @@ PresetCreatingWidget::PresetCreatingWidget(QWidget *parent) :
     for(auto t: Configuration::soonInstruments())
         addButton(t)->setEnabled(false);
 
+    layout->addStretch();
+
     connect(buttonGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), this, [this] (int id) {
         auto name = m_ui->nameLineEdit->text();
         emit presetCreated(name, Preset::createPreset(static_cast<Instruments::Type>(id)));

@@ -59,5 +59,3 @@ void PresetDialog::update(const QString &name, AbstractPreset *preset)
     m_preset = preset;
 }
 
-
-

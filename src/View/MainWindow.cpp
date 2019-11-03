@@ -80,6 +80,7 @@ MainWindow::MainWindow(Model * model, QWidget *parent)
     connect(m_ui->volumeSlider, &QSlider::valueChanged, m_settings, &SettingsModel::setVolume);
 
     connect(m_protocol, &GiikerProtocol::cubeEdgeTurned, this, &MainWindow::onEdgeTurned);
+
     auto updateStatus = [this] {
         const bool isConnected = m_protocol->state() == GiikerProtocol::CONNECTED;
 
@@ -93,6 +94,9 @@ MainWindow::MainWindow(Model * model, QWidget *parent)
 
         m_ui->notificationWidget->setIdleMessage(notificationIdleText);
     };
+
+    updateStatus();
+
     connect(m_protocol, &GiikerProtocol::connected, this, updateStatus);
     connect(m_protocol, &GiikerProtocol::disconnected, this, updateStatus);
 }

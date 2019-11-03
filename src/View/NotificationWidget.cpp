@@ -25,7 +25,7 @@ void NotificationWidget::notify(const CubeEdge &ce, const Music::Harmony& harmon
 
     auto appearance = appearanceFor(ce);
     setLabelPixmap(m_ui->rotationIconLabel, appearance.iconPath);
-    m_ui->notifyPage->setStyleSheet(QString("background-color: %1").arg(appearance.color.name()));
+    m_ui->notifyFrame->setStyleSheet(QString("background-color: %1").arg(appearance.color.name()));
 
     auto tones = harmony.tones;
     QString text = tones.isEmpty() ? "No tones" : tonesToString(tones);

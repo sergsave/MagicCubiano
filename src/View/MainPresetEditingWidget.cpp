@@ -34,6 +34,8 @@ MainPresetEditingWidget::MainPresetEditingWidget(QWidget * parent):
         group->addButton(b);
     }
 
+    m_ui->clockYellowButton->setChecked(true);
+
     connect(group, QOverload<QAbstractButton*>::of(&QButtonGroup::buttonClicked), this, [this] (auto button) {
         m_ui->editorWidget->setActiveCubeEdge(this->selectors()[button]);
     });

@@ -39,6 +39,7 @@ private:
     void updateEditor();
     void updateAdditions();
     void updateAll();
+    bool event(QEvent *event) override;
 
 private:
     QScopedPointer<Ui::PresetEditorWidget> m_ui;

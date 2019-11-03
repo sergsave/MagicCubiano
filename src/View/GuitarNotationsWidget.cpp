@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <QHBoxLayout>
+#include <QLabel>
 
 #include "GuitarStringWidget.h"
 
@@ -10,12 +11,21 @@ GuitarNotationsWidget::GuitarNotationsWidget(const Instruments::GuitarNotation& 
                                              QWidget *parent)
     : QWidget(parent)
 {
-    auto layout = new QHBoxLayout(this);
+    auto title = new QLabel(this);
+    title->setText("Select fret value for each guitar string");
+    auto vLayout = new QVBoxLayout(this);
+    vLayout->addWidget(title);
+
+    auto hLayout = new QHBoxLayout();
+    hLayout->setContentsMargins({});
+    hLayout->setSpacing(0);
+
+    vLayout->addItem(hLayout);
 
     for(int i = min.string; i <= max.string; ++i)
     {
         auto stringW = new GuitarStringWidget(i, min.fret, max.fret, this);
-        layout->addWidget(stringW);
+        hLayout->addWidget(stringW);
 
         connect(stringW, &GuitarStringWidget::fretValueChanged, this, [stringW, this](int val) {
             onFretChanged(stringW->number(), val);

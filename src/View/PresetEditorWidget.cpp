@@ -197,7 +197,10 @@ void PresetEditorWidget::setPreset(Preset::AbstractPreset * preset)
     m_preset = preset;
 
     if(m_editor)
+    {
         delete m_editor;
+        m_editor = nullptr;
+    }
 
     createEditor(preset);
 
@@ -250,6 +253,15 @@ void PresetEditorWidget::updateAll()
 {
     updateEditor();
     updateAdditions();
+}
+
+// XXX Hack for Android, TODO: remove
+bool PresetEditorWidget::event(QEvent *event)
+{
+    if(m_editor)
+        m_editor->setMaximumSize(m_ui->notationsFrame->size());
+
+    return QWidget::event(event);
 }
 
 void PresetEditorWidget::updateEditor()

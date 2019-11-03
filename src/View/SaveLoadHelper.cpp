@@ -11,7 +11,7 @@ const QString g_jsonExt = ".json";
 
 void setJsonFilter(QFileDialog& dialog)
 {
-    dialog.selectNameFilter(QString("Json (*%1)").arg(g_jsonExt));
+    dialog.setNameFilter(QString("Json (*%1)").arg(g_jsonExt));
     dialog.setDefaultSuffix(g_jsonExt);
 }
 
