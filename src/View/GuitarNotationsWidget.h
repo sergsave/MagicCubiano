@@ -24,10 +24,5 @@ signals:
     void notationsChanged(const Notations& notations);
 
 private:
-    void onFretChanged(int string, int fret);
-    void onMuteChanged(int string, bool mute);
-    GuitarStringWidget * stringWidget(int string);
-
-private:
-    QList<GuitarStringWidget*> m_widgets;
+    QMap<int, GuitarStringWidget*> m_strings2widgets;
 };

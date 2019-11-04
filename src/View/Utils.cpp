@@ -74,12 +74,11 @@ QString tonesToString(const Music::Tones& tones)
 {
     QString text;
 
-    for(auto tone: tones)
+    for(auto it = tones.begin(); it != tones.end(); ++it)
     {
-        auto toneStr = tone.toString();
-        auto str = QString(5, ' '); // max toneStr size
-
-        text += str.replace(0, toneStr.count(), toneStr);
+        if(it != tones.begin())
+            text += " ";
+        text += it->toString();
     }
 
     return text;

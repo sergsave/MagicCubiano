@@ -28,6 +28,9 @@ public:
     Preset::AbstractPreset * currentPreset() const;
     QString currentPresetName() const;
 
+signals:
+    void presetCreated(const QString& name, Preset::AbstractPreset * preset);
+
 public slots:
     void onEdgeTurned(const CubeEdge&);
 

@@ -15,6 +15,7 @@ PresetDialog::PresetDialog(QWidget * parent):
     m_ui->stackedWidget->setCurrentWidget(m_ui->creatingPage);
 
     connect(m_ui->creatingPage, &PresetCreatingWidget::presetCreated, this, [this](auto name, auto * preset){
+        emit this->presetCreated(name, preset);
         this->update(name, preset);
         this->openEditPresetPage(name, preset);
     });

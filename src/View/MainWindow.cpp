@@ -153,17 +153,17 @@ void MainWindow::onCreateNew()
     createPresetDialog();
     auto sourceName = m_presetModel->findVacantName("New preset");
     m_presetDialog->openCreatePresetPage(sourceName);
+
+    connect(m_presetDialog.data(), &PresetDialog::presetCreated, this, [this](auto name, auto preset) {
+        if(!preset)
+            return;
+
+        auto vacName = m_presetModel->findVacantName(name);
+        m_presetModel->addPreset(vacName, preset);
+
+        this->updatePresetPage();
+    });
     m_presetDialog->exec();
-
-    auto preset = m_presetDialog->currentPreset();
-
-    if(!preset)
-        return;
-
-    auto name = m_presetModel->findVacantName(m_presetDialog->currentPresetName());
-    m_presetModel->addPreset(name, preset);
-
-    updatePresetPage();
 }
 
 void MainWindow::onOpenRequested(const QString &name)
