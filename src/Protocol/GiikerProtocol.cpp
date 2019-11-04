@@ -7,9 +7,10 @@
 
 namespace {
 
-const QString g_cubeServiceUuid = "{0000aadb-0000-1000-8000-00805f9b34fb}";
-const QString g_cubeServiceCharUuid = "{0000aadc-0000-1000-8000-00805f9b34fb}";
-const QString g_cubeServiceNotifyDescUuid = "{00002902-0000-1000-8000-00805f9b34fb}";
+const QString g_cubeServiceBaseUuid = "0000-1000-8000-00805f9b34fb";
+const QString g_cubeServiceUuid = QString("{0000aadb-%1}").arg(g_cubeServiceBaseUuid);
+const QString g_cubeServiceCharUuid = QString("{0000aadc-%1}").arg(g_cubeServiceBaseUuid);
+const QString g_cubeServiceNotifyDescUuid = QString("{00002902-%1}").arg(g_cubeServiceBaseUuid);
 
 void enableCharNotifications(QLowEnergyService * serv, const QBluetoothUuid &charUuid, const QBluetoothUuid& descUuid)
 {
@@ -142,7 +143,10 @@ QLowEnergyService * GiikerProtocol::createService(const QBluetoothUuid &uuid)
         this, &GiikerProtocol::serviceStateChanged);
 
     connect(service, &QLowEnergyService::characteristicChanged,
-        this, &GiikerProtocol::onCharacteristicChanged);
+        this, &GiikerProtocol::handleCharacteristicData);
+
+    connect(service, &QLowEnergyService::characteristicRead,
+        this, &GiikerProtocol::handleCharacteristicData);
 
     service->discoverDetails();
     return service;
@@ -194,7 +198,7 @@ void GiikerProtocol::serviceStateChanged(QLowEnergyService::ServiceState st)
     }
 }
 
-void GiikerProtocol::onCubeCharChanged(const QByteArray &value)
+void GiikerProtocol::handleCubeCharData(const QByteArray &value)
 {
     const QMap<char, CubeEdge::Color> code2edges
     {
@@ -230,22 +234,27 @@ void GiikerProtocol::onCubeCharChanged(const QByteArray &value)
     emit cubeEdgeTurned(info);
 }
 
-void GiikerProtocol::onBatteryCharChanged(const QByteArray &value)
+void GiikerProtocol::handleBatteryCharData(const QByteArray &value)
 {
-    // TODO:
+    auto level = value.at(0);
+    emit batteryLevelResponsed(level);
 }
 
-void GiikerProtocol::onCharacteristicChanged(const QLowEnergyCharacteristic &c, const QByteArray &value)
+void GiikerProtocol::handleCharacteristicData(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
     if (c.uuid().toString() == g_cubeServiceCharUuid)
-        onCubeCharChanged(value);
+        handleCubeCharData(value);
 
     if(c.uuid() == QBluetoothUuid(QBluetoothUuid::BatteryLevel))
-        onBatteryCharChanged(value);
+        handleBatteryCharData(value);
 }
 
 void GiikerProtocol::requestBatteryLevel()
 {
-    // TODO:
+    if(!m_batteryService)
+        return;
+
+    auto characteristic = m_batteryService->characteristic({QBluetoothUuid::CharacteristicType::BatteryLevel});
+    m_batteryService->readCharacteristic(characteristic);
 }
 

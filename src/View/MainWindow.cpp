@@ -207,8 +207,6 @@ void MainWindow::showStatusDialog(bool closeOnConnect)
             dialog.goToDisconnectedPage();
     };
 
-    updatePage();
-
     connect(&dialog, &CubeStatusDialog::connectAnyRequested, m_protocol, &GiikerProtocol::connectToCube);
     connect(&dialog, &CubeStatusDialog::connectByAddressRequested, m_protocol,
             &GiikerProtocol::connectToCubeByAddress);
@@ -224,6 +222,8 @@ void MainWindow::showStatusDialog(bool closeOnConnect)
 
     if(closeOnConnect)
         connect(m_protocol, &GiikerProtocol::connected, &dialog, &CubeStatusDialog::accept);
+
+    updatePage();
 
     dialog.exec();
 }

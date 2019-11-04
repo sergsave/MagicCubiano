@@ -46,14 +46,14 @@ private slots:
     void connectToDevice(const QBluetoothDeviceInfo& device);
     void serviceScanDone();
     void serviceStateChanged(QLowEnergyService::ServiceState st);
-    void onCharacteristicChanged(const QLowEnergyCharacteristic &c, const QByteArray &value);
+    void handleCharacteristicData(const QLowEnergyCharacteristic &c, const QByteArray &value);
     void stopDiscovery();
     void resetBleControl();
 
     QLowEnergyService * createService(const QBluetoothUuid& uuid);
     void deleteAllServices();
-    void onCubeCharChanged(const QByteArray &value);
-    void onBatteryCharChanged(const QByteArray &value);
+    void handleCubeCharData(const QByteArray &value);
+    void handleBatteryCharData(const QByteArray &value);
 
 private:
     QBluetoothDeviceDiscoveryAgent * m_discoveryDevAgent = nullptr;

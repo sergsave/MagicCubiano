@@ -56,7 +56,7 @@ void CubeStatusDialog::goToDisconnectedPage()
 
 void CubeStatusDialog::setBatteryLevel(int batteryInPerc)
 {
-    m_ui->batteryValueLabel->setText(QString("%1%%").arg(batteryInPerc));
+    m_ui->batteryValueLabel->setText(QString("%1%").arg(batteryInPerc));
 }
 
 void CubeStatusDialog::onConnectionFailed()
