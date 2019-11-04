@@ -22,9 +22,9 @@ GuitarNotationsWidget::GuitarNotationsWidget(const Instruments::GuitarNotation& 
 
     vLayout->addItem(hLayout);
 
-    for(int i = max.string; i >= min.string; --i)
+    for(int i = min.string; i >= max.string; --i)
     {
-        auto stringW = new GuitarStringWidget(i + 1, min.fret, max.fret, this);
+        auto stringW = new GuitarStringWidget(i, min.fret, max.fret, this);
         hLayout->addWidget(stringW);
 
         connect(stringW, &GuitarStringWidget::fretValueChanged, this, [this]{

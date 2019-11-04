@@ -11,7 +11,7 @@ struct TonesTable
 {
     static const QVector<Tones> data;
     static const int stringQuantity = 6;
-    static const int fretQuantity = 21;
+    static const int fretQuantity = 20;
 
     TonesTable()
     {
@@ -24,12 +24,12 @@ struct TonesTable
 
 using T = Tone;
 const QVector<Tones> TonesTable::data{
-    allTonesFor( {Tone(T::E, 4), Tone(T::C,       6) }),
-    allTonesFor( {Tone(T::B, 3), Tone(T::G,       5) }),
-    allTonesFor( {Tone(T::G, 3), Tone(T::D_SHARP, 5) }),
-    allTonesFor( {Tone(T::D, 3), Tone(T::A_SHARP, 4) }),
-    allTonesFor( {Tone(T::A, 2), Tone(T::F,       4) }),
-    allTonesFor( {Tone(T::E, 2), Tone(T::C,       4) })
+    allTonesFor( {Tone(T::E, 4), Tone(T::B,       5) }),
+    allTonesFor( {Tone(T::B, 3), Tone(T::F_SHARP, 5) }),
+    allTonesFor( {Tone(T::G, 3), Tone(T::D,       5) }),
+    allTonesFor( {Tone(T::D, 3), Tone(T::A      , 4) }),
+    allTonesFor( {Tone(T::A, 2), Tone(T::E,       4) }),
+    allTonesFor( {Tone(T::E, 2), Tone(T::B,       3) })
 };
 
 TonesTable g_tonesTable;
@@ -40,17 +40,17 @@ namespace Instruments {
 
 GuitarNotation Details::min(const GuitarTag &)
 {
-    return { 0, 0 };
+    return { g_tonesTable.stringQuantity, 0 };
 }
 
 GuitarNotation Details::max(const GuitarTag &)
 {
-    return { g_tonesTable.stringQuantity - 1, g_tonesTable.fretQuantity - 1 };
+    return { 1, g_tonesTable.fretQuantity - 1 };
 }
 
 Tone Details::toneFor(const GuitarNotation & notation)
 {
-    int string = notation.string;
+    int string = notation.string - 1;
     int fret = notation.fret;
 
     if(string < 0 || string >= g_tonesTable.data.size())

@@ -56,6 +56,9 @@ Tones allTonesFor(const Interval &interval)
     const auto min = interval.min;
     const auto max = interval.max;
 
+    if(min > max)
+        return {};
+
     const auto fullOctave = Music::allTonesFor(0);
 
     const auto minIdx = fullOctave.indexOf(min.note);
