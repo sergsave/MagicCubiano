@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include <QScopedPointer>
+#include <QSet>
 
 #include "src/CubeEdge.h"
 #include "src/Model/Model.h"
@@ -12,6 +13,7 @@ class MainWindow;
 
 class PresetDialog;
 class CubeStatusDialog;
+class QAction;
 
 class MainWindow : public QMainWindow
 {
@@ -22,6 +24,9 @@ public:
     ~MainWindow();
 
     void start();
+
+private:
+    void createMenu();
 
 private slots:
     void onCreateNew();
@@ -40,5 +45,6 @@ private:
     PresetModel * m_presetModel = nullptr;
     SettingsModel * m_settings = nullptr;
     GiikerProtocol * m_protocol = nullptr;
+    QSet<QAction*> m_nonEmptyPresetsActions;
 };
 

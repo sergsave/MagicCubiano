@@ -5,6 +5,8 @@
 #include <cassert>
 #include <QMap>
 #include <QPixmap>
+#include <QMenu>
+#include <QAbstractButton>
 
 QString instrumentName(Instruments::Type type)
 {
@@ -72,11 +74,12 @@ QString tonesToString(const Music::Tones& tones)
 {
     QString text;
 
-    for(auto it = tones.begin(); it != tones.end(); ++it)
+    for(auto tone: tones)
     {
-        if(it != tones.begin())
-            text += " ";
-        text += it->toString();
+        auto toneStr = tone.toString();
+        auto str = QString(5, ' '); // max toneStr size
+
+        text += str.replace(0, toneStr.count(), toneStr);
     }
 
     return text;
@@ -85,5 +88,17 @@ QString tonesToString(const Music::Tones& tones)
 void setLabelPixmap(QLabel * label, const QString &path)
 {
     QPixmap pm(path);
-    label->setPixmap(pm.scaled(label->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+    label->setPixmap(pm.scaled(label->size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
+}
+
+void bindMenu(QMenu *menu, QAbstractButton * button)
+{
+    QObject::connect(button, &QAbstractButton::clicked, menu, [button, menu] {
+        const auto buttonSize = button->size();
+        const auto origin = button->mapToGlobal({ buttonSize.width(), buttonSize.height()});
+        const auto menuWidth = menu->sizeHint().width();
+        const auto pos = origin - QPoint(menuWidth, 0);
+
+        menu->popup(pos);
+    });
 }

@@ -25,12 +25,7 @@ MainPresetEditingWidget::MainPresetEditingWidget(QWidget * parent):
     auto group = new QButtonGroup(this);
     for (auto b: selectors().keys())
     {
-        auto edge = selectors().value(b);
-        auto appearance = appearanceFor(edge);
-
-        b->setIcon(QPixmap(appearance.iconPath));
-        b->setStyleSheet(backgroundColorStyleSheet(appearance.color));
-
+        b->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         group->addButton(b);
     }
 
@@ -43,14 +38,7 @@ MainPresetEditingWidget::MainPresetEditingWidget(QWidget * parent):
     connect(m_ui->applyButton, &QAbstractButton::clicked, this, &MainPresetEditingWidget::finished);
 
     auto menu = createMenu();
-    connect(m_ui->menuButton, &QAbstractButton::clicked, menu, [menu, this] {
-        const auto buttonSize = m_ui->menuButton->size();
-        const auto origin = m_ui->menuButton->mapToGlobal({ buttonSize.width(), buttonSize.height()});
-        const auto menuWidth = menu->sizeHint().width();
-        const auto pos = origin - QPoint(menuWidth, 0);
-
-        menu->popup(pos);
-    });
+    bindMenu(menu, m_ui->menuButton);
 
     m_ui->editorWidget->setAdditionsVisible(false);
 }
@@ -106,21 +94,16 @@ QMap<QAbstractButton *, CubeEdge> MainPresetEditingWidget::selectors() const
 
 QMenu * MainPresetEditingWidget::createMenu()
 {
-    const QString g_resetAction = "Reset";
-    const QString g_clockwizeSyncAction = "Sync by clockwize";
-    const QString g_anticlockwizeSyncAction = "Sync by anticlockwize";
-    const QString g_additionsAction = "Show additions";
-
     auto menu = new QMenu(this);
 
     auto initAction = [this, menu](const QString& name) {
         return m_actions[name] = menu->addAction(name);
     };
 
-    auto resetAction = initAction(g_resetAction);
-    auto clockwizeAction = initAction(g_clockwizeSyncAction);
-    auto anticlockwizeAction = initAction(g_anticlockwizeSyncAction);
-    auto additionsAction = initAction(g_additionsAction);
+    auto resetAction = initAction("Reset");
+    auto clockwizeAction = initAction("Sync by clockwize");
+    auto anticlockwizeAction = initAction("Sync by anticlockwize");
+    auto additionsAction = initAction("Show additions");
 
     additionsAction->setCheckable(true);
 
@@ -134,6 +117,22 @@ QMenu * MainPresetEditingWidget::createMenu()
             &PresetEditorWidget::setAdditionsVisible);
 
     return menu;
+}
+
+// For correct icons size
+void MainPresetEditingWidget::showEvent(QShowEvent * ev)
+{
+    for(auto b: selectors().keys())
+    {
+        auto edge = selectors().value(b);
+        auto appearance = appearanceFor(edge);
+
+        auto pm = QPixmap(appearance.iconPath);
+        b->setIconSize(b->size() * 3 / 4);
+        b->setIcon(pm);
+        b->setStyleSheet(backgroundColorStyleSheet(appearance.color));
+    }
+    QWidget::showEvent(ev);
 }
 
 MainPresetEditingWidget::~MainPresetEditingWidget() = default;

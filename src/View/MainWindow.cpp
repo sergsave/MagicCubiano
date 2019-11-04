@@ -2,6 +2,7 @@
 #include "ui_MainWindow.h"
 
 #include <QDesktopWidget>
+#include <QMenu>
 
 #include "src/Preset/Presets.h"
 #include "PresetDialog.h"
@@ -22,33 +23,12 @@ MainWindow::MainWindow(Model * model, QWidget *parent)
     QRect scr = QApplication::desktop()->screenGeometry();
     move( scr.center() - rect().center() );
 
-    m_ui->menubar->setNativeMenuBar(false); //fix for menubar notshowing in ubuntu
-
+    createMenu();
     updatePresetPage();
     updateActionsState();
 
     connect(m_ui->presetSelectionWidget, &PresetSelectionWidget::presetOpenRequested, this,
         &MainWindow::onOpenRequested);
-
-    connect(m_ui->createNewButton, &QAbstractButton::clicked, m_ui->newPresetAction, &QAction::trigger);
-    connect(m_ui->loadButton, &QAbstractButton::clicked, m_ui->loadPresetAction, &QAction::trigger);
-    connect(m_ui->loadAllButton, &QAbstractButton::clicked, m_ui->loadAllPresetsAction, &QAction::trigger);
-
-    auto saveLoadHelper = new SaveLoadHelper(this);
-    connect(m_ui->newPresetAction, &QAction::triggered, this, &MainWindow::onCreateNew);
-    connect(m_ui->loadPresetAction, &QAction::triggered, saveLoadHelper, &SaveLoadHelper::choosePathForLoading);
-    connect(m_ui->loadAllPresetsAction, &QAction::triggered, saveLoadHelper,
-        &SaveLoadHelper::choosePathForLoadingAll);
-    connect(m_ui->savePresetAction, &QAction::triggered, this, [saveLoadHelper, this] {
-        saveLoadHelper->choosePathForSaving(m_presetModel->activePreset());
-    });
-    connect(m_ui->presetsListAction, &QAction::triggered, this, &MainWindow::showPresetListDialog);
-    connect(m_ui->cubeStatusAction, &QAction::triggered, this, &MainWindow::showStatusDialog);
-
-    // TODO: Handle save-load errors
-    connect(saveLoadHelper, &SaveLoadHelper::loadRequested, m_presetModel, &PresetModel::loadPreset);
-    connect(saveLoadHelper, &SaveLoadHelper::loadAllRequested, m_presetModel, &PresetModel::loadAllPresets);
-    connect(saveLoadHelper, &SaveLoadHelper::saveRequested, m_presetModel, &PresetModel::savePresets);
 
     connect(m_presetModel, &PresetModel::changed, this, [this] {
         updatePresetPage();
@@ -107,6 +87,46 @@ void MainWindow::start()
 {
     showStatusDialog(true);
     show();
+}
+
+void MainWindow::createMenu()
+{
+    auto menu = new QMenu(this);
+
+    menu->addSeparator();
+    auto newPresetAction = menu->addAction("New Preset");
+    auto loadPresetAction = menu->addAction("Load Preset");
+    auto loadAllPresetsAction = menu->addAction("Load Presets");
+    auto savePresetAction = menu->addAction("Save Preset");
+    menu->addSeparator();
+    auto presetsListAction = menu->addAction("Presets list");
+    menu->addSeparator();
+    auto cubeStatusAction = menu->addAction("Cube Status");
+
+    // Use custom instead QMenuBar. QMenuBar is looking terrible on Android
+    connect(m_ui->createNewButton, &QAbstractButton::clicked, newPresetAction, &QAction::trigger);
+    connect(m_ui->loadButton, &QAbstractButton::clicked, loadPresetAction, &QAction::trigger);
+    connect(m_ui->loadAllButton, &QAbstractButton::clicked, loadAllPresetsAction, &QAction::trigger);
+
+    auto saveLoadHelper = new SaveLoadHelper(this);
+    connect(newPresetAction, &QAction::triggered, this, &MainWindow::onCreateNew);
+    connect(loadPresetAction, &QAction::triggered, saveLoadHelper, &SaveLoadHelper::choosePathForLoading);
+    connect(loadAllPresetsAction, &QAction::triggered, saveLoadHelper,
+        &SaveLoadHelper::choosePathForLoadingAll);
+    connect(savePresetAction, &QAction::triggered, this, [saveLoadHelper, this] {
+        saveLoadHelper->choosePathForSaving(m_presetModel->activePreset());
+    });
+    connect(presetsListAction, &QAction::triggered, this, &MainWindow::showPresetListDialog);
+    connect(cubeStatusAction, &QAction::triggered, this, &MainWindow::showStatusDialog);
+
+    // TODO: Handle save-load errors
+    connect(saveLoadHelper, &SaveLoadHelper::loadRequested, m_presetModel, &PresetModel::loadPreset);
+    connect(saveLoadHelper, &SaveLoadHelper::loadAllRequested, m_presetModel, &PresetModel::loadAllPresets);
+    connect(saveLoadHelper, &SaveLoadHelper::saveRequested, m_presetModel, &PresetModel::savePresets);
+
+    m_nonEmptyPresetsActions << savePresetAction << presetsListAction;
+
+    bindMenu(menu, m_ui->menuButton);
 }
 
 void MainWindow::onEdgeTurned(const CubeEdge& edge)
@@ -190,10 +210,8 @@ void MainWindow::updatePresetPage()
 
 void MainWindow::updateActionsState()
 {
-    auto isEmpty = m_presetModel->allPresets().isEmpty();
-
-    m_ui->savePresetAction->setDisabled(isEmpty);
-    m_ui->presetsListAction->setDisabled(isEmpty);
+    for(auto a : m_nonEmptyPresetsActions)
+        a->setDisabled(m_presetModel->allPresets().isEmpty());
 }
 
 void MainWindow::showStatusDialog(bool closeOnConnect)

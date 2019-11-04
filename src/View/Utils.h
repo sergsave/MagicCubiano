@@ -28,4 +28,9 @@ EdgeAppearance appearanceFor(const CubeEdge& edge);
 
 void setLabelPixmap(QLabel *, const QString& path);
 
+class QMenu;
+class QAbstractButton;
+
+void bindMenu(QMenu * menu, QAbstractButton*);
+
 
