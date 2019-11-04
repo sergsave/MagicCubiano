@@ -27,6 +27,16 @@ MainPresetEditingWidget::MainPresetEditingWidget(QWidget * parent):
     {
         b->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         group->addButton(b);
+
+        auto edge = selectors().value(b);
+        auto appearance = appearanceFor(edge);
+
+        auto pm = QPixmap(appearance.iconPath);
+        //TODO: remove hardcode
+        b->setIconSize({80, 80});
+
+        b->setIcon(pm);
+        b->setStyleSheet(backgroundColorStyleSheet(appearance.color));
     }
 
     m_ui->clockYellowButton->setChecked(true);
@@ -117,22 +127,6 @@ QMenu * MainPresetEditingWidget::createMenu()
             &PresetEditorWidget::setAdditionsVisible);
 
     return menu;
-}
-
-// For correct icons size
-void MainPresetEditingWidget::showEvent(QShowEvent * ev)
-{
-    for(auto b: selectors().keys())
-    {
-        auto edge = selectors().value(b);
-        auto appearance = appearanceFor(edge);
-
-        auto pm = QPixmap(appearance.iconPath);
-        b->setIconSize(b->size() * 3 / 4);
-        b->setIcon(pm);
-        b->setStyleSheet(backgroundColorStyleSheet(appearance.color));
-    }
-    QWidget::showEvent(ev);
 }
 
 MainPresetEditingWidget::~MainPresetEditingWidget() = default;

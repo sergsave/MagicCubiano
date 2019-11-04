@@ -33,7 +33,6 @@ public slots:
 private:
     QMap<QAbstractButton*, CubeEdge> selectors() const;
     QMenu * createMenu();
-    void showEvent(QShowEvent*) override;
 
 private:
     QScopedPointer<Ui::MainPresetEditingWidget> m_ui;

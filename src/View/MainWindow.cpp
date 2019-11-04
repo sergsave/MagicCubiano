@@ -144,8 +144,7 @@ void MainWindow::onEdgeTurned(const CubeEdge& edge)
 
 void MainWindow::createPresetDialog()
 {
-    if(!m_presetDialog)
-        m_presetDialog.reset(new PresetDialog);
+    m_presetDialog.reset(new PresetDialog);
 }
 
 void MainWindow::onCreateNew()
