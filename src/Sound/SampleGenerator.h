@@ -9,10 +9,14 @@ class SampleGenerator : public SoundGenerator
 {
     Q_OBJECT
 public:
-    explicit SampleGenerator(const Music::Interval&, QObject* parent = nullptr);
+    using SoundGenerator::SoundGenerator;
+
+    Music::Interval interval() const;
 
 protected:
-    void setResourcePathFunc(const std::function<QString(const Music::Tone&)>& func);
+    using PathFunc = std::function<QString(const Music::Tone&)>;
+
+    SampleGenerator(const PathFunc&, const Music::Interval&, QObject * parent);
 
 private:
     void doPlay(const Music::Harmony& harm, int vol) override;
@@ -20,7 +24,7 @@ private:
 
 private:
     Music::Interval m_interval;
-    std::function<QString(const Music::Tone&)> m_pathFunc;
+    PathFunc m_pathFunc;
 
     QList<QSoundEffect*> m_players;
 };

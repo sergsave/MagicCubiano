@@ -3,20 +3,33 @@
 #include <QBluetoothLocalDevice>
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QLowEnergyController>
+#include <QTimer>
 
-const QString GiikerProtocol::serviceUuid =
-        QString("{0000aadb-0000-1000-8000-00805f9b34fb}");
-const QString GiikerProtocol::serviceCharUuid =
-        QString("{0000aadc-0000-1000-8000-00805f9b34fb}");
-const QString GiikerProtocol::serviceNotifyDescUuid =
-        QString("{00002902-0000-1000-8000-00805f9b34fb}");
+namespace {
+
+const QString g_cubeServiceBaseUuid = "0000-1000-8000-00805f9b34fb";
+const QString g_cubeServiceUuid = QString("{0000aadb-%1}").arg(g_cubeServiceBaseUuid);
+const QString g_cubeServiceCharUuid = QString("{0000aadc-%1}").arg(g_cubeServiceBaseUuid);
+const QString g_cubeServiceNotifyDescUuid = QString("{00002902-%1}").arg(g_cubeServiceBaseUuid);
+
+void enableCharNotifications(QLowEnergyService * serv, const QBluetoothUuid &charUuid, const QBluetoothUuid& descUuid)
+{
+    if(!serv)
+        return;
+
+    auto characteristic = serv->characteristic(charUuid);
+    auto notificationDesc = characteristic.descriptor(descUuid);
+
+    if (notificationDesc.isValid())
+        serv->writeDescriptor(notificationDesc, QByteArray::fromHex("0100"));
+}
+
+}
 
 GiikerProtocol::GiikerProtocol(QObject * parent):
     QObject(parent)
 {
     m_discoveryDevAgent = new QBluetoothDeviceDiscoveryAgent(this);
-
-    // TODO: device selection dialog
     m_discoveryDevAgent->setLowEnergyDiscoveryTimeout(0);
 
     auto deviceDiscovered = [this] (const QBluetoothDeviceInfo & device){
@@ -28,7 +41,7 @@ GiikerProtocol::GiikerProtocol(QObject * parent):
 
     auto errorOccured = [this](Error err) {
             Q_UNUSED(err);
-            emit cubeConnectionFailed();
+            emit connectionFailed();
     };
 
     connect(m_discoveryDevAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,
@@ -43,11 +56,11 @@ void GiikerProtocol::connectToCube()
     m_discoveryDevAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
 }
 
-void GiikerProtocol::connectToCube(const QString &macAddres)
+void GiikerProtocol::connectToCubeByAddress(const QString &macAddres)
 {
     if(QBluetoothLocalDevice().hostMode() == QBluetoothLocalDevice::HostPoweredOff)
     {
-        emit cubeConnectionFailed();
+        QTimer::singleShot(0, this, &GiikerProtocol::connectionFailed);
         return;
     }
 
@@ -55,43 +68,115 @@ void GiikerProtocol::connectToCube(const QString &macAddres)
     connectToDevice(info);
 }
 
-void GiikerProtocol::connectToDevice(const QBluetoothDeviceInfo &device)
+void GiikerProtocol::stopDiscovery()
 {
     if(m_discoveryDevAgent && m_discoveryDevAgent->isActive())
         m_discoveryDevAgent->stop();
+}
+
+GiikerProtocol::State GiikerProtocol::state() const
+{
+    if(m_bleController && m_bleController->state() != QLowEnergyController::UnconnectedState)
+        return CONNECTED;
+
+    return DISCONNECTED;
+}
+
+void GiikerProtocol::resetBleControl()
+{
+    if(!m_bleController)
+        return;
+
+    delete m_bleController;
+    m_bleController = nullptr;
+}
+
+void GiikerProtocol::cancelConnection()
+{
+    stopDiscovery();
+
+    if(m_bleController && m_bleController->state() == QLowEnergyController::UnconnectedState)
+        resetBleControl();
+}
+
+void GiikerProtocol::disconnectFromCube()
+{
+    // TODO: reset service descriptors
+
+    if(!m_bleController)
+        return;
+
+    m_bleController->disconnectFromDevice();
+}
+
+void GiikerProtocol::connectToDevice(const QBluetoothDeviceInfo &device)
+{
+    stopDiscovery();
+    disconnectFromCube();
 
     m_bleController = new QLowEnergyController(device.address(), this);
     m_bleController->setRemoteAddressType(QLowEnergyController::PublicAddress);
 
-    connect(m_bleController, &QLowEnergyController::connected, this, [this]() {
+    connect(m_bleController, &QLowEnergyController::connected, this, [this] {
         m_bleController->discoverServices();
+    });
+
+    connect(m_bleController, &QLowEnergyController::disconnected, this, [this] {
+        emit disconnected();
+        resetBleControl();
     });
 
     connect(m_bleController, &QLowEnergyController::discoveryFinished, this,
         &GiikerProtocol::serviceScanDone);
 
-    // TODO: Quit the app after disconnect.
-    // TODO: Auto connect.
-
     m_bleController->connectToDevice();
+}
+
+QLowEnergyService * GiikerProtocol::createService(const QBluetoothUuid &uuid)
+{
+    auto service = m_bleController->createServiceObject(uuid, this);
+
+    if(!service)
+        return nullptr;
+
+    connect(service, &QLowEnergyService::stateChanged,
+        this, &GiikerProtocol::serviceStateChanged);
+
+    connect(service, &QLowEnergyService::characteristicChanged,
+        this, &GiikerProtocol::handleCharacteristicData);
+
+    connect(service, &QLowEnergyService::characteristicRead,
+        this, &GiikerProtocol::handleCharacteristicData);
+
+    service->discoverDetails();
+    return service;
+}
+
+void GiikerProtocol::deleteAllServices()
+{
+    auto reset = [] (QLowEnergyService*& service) {
+        if(service)
+        {
+            delete service;
+            service = nullptr;
+        }
+    };
+    reset(m_cubeService);
+    reset(m_batteryService);
 }
 
 void GiikerProtocol::serviceScanDone()
 {
-    m_bleService = m_bleController->createServiceObject(QBluetoothUuid(serviceUuid), this);
+    deleteAllServices();
 
-    if(!m_bleService)
-        return;
+    m_cubeService = createService(QBluetoothUuid(g_cubeServiceUuid));
+    m_batteryService = createService(QBluetoothUuid(QBluetoothUuid::BatteryService));
 
-    emit cubeConnected();
+    if(m_cubeService && m_batteryService)
+        emit connected();
+    else
+        emit connectionFailed();
 
-    connect(m_bleService, &QLowEnergyService::stateChanged,
-        this, &GiikerProtocol::serviceStateChanged);
-
-    connect(m_bleService, &QLowEnergyService::characteristicChanged,
-        this, &GiikerProtocol::onCharacteristicChanged);
-
-    m_bleService->discoverDetails();
 }
 
 void GiikerProtocol::serviceStateChanged(QLowEnergyService::ServiceState st)
@@ -100,11 +185,12 @@ void GiikerProtocol::serviceStateChanged(QLowEnergyService::ServiceState st)
     {
     case QLowEnergyService::ServiceDiscovered:
     {
-        auto characteristic = m_bleService->characteristic(QBluetoothUuid(serviceCharUuid));
-        auto notificationDesc = characteristic.descriptor(QBluetoothUuid(serviceNotifyDescUuid));
-
-        if (notificationDesc.isValid())
-            m_bleService->writeDescriptor(notificationDesc, QByteArray::fromHex("0100"));
+        enableCharNotifications(m_cubeService,
+            QBluetoothUuid(g_cubeServiceCharUuid),
+            QBluetoothUuid(g_cubeServiceNotifyDescUuid));
+        enableCharNotifications(m_batteryService,
+            { QBluetoothUuid::CharacteristicType::BatteryLevel },
+            { QBluetoothUuid::ClientCharacteristicConfiguration });
     }
         break;
     default:
@@ -112,11 +198,8 @@ void GiikerProtocol::serviceStateChanged(QLowEnergyService::ServiceState st)
     }
 }
 
-void GiikerProtocol::onCharacteristicChanged(const QLowEnergyCharacteristic &c, const QByteArray &value)
+void GiikerProtocol::handleCubeCharData(const QByteArray &value)
 {
-    if (c.uuid().toString() != serviceCharUuid)
-        return;
-
     const QMap<char, CubeEdge::Color> code2edges
     {
         {1, CubeEdge::BLUE},
@@ -150,3 +233,28 @@ void GiikerProtocol::onCharacteristicChanged(const QLowEnergyCharacteristic &c, 
 
     emit cubeEdgeTurned(info);
 }
+
+void GiikerProtocol::handleBatteryCharData(const QByteArray &value)
+{
+    auto level = value.at(0);
+    emit batteryLevelResponsed(level);
+}
+
+void GiikerProtocol::handleCharacteristicData(const QLowEnergyCharacteristic &c, const QByteArray &value)
+{
+    if (c.uuid().toString() == g_cubeServiceCharUuid)
+        handleCubeCharData(value);
+
+    if(c.uuid() == QBluetoothUuid(QBluetoothUuid::BatteryLevel))
+        handleBatteryCharData(value);
+}
+
+void GiikerProtocol::requestBatteryLevel()
+{
+    if(!m_batteryService)
+        return;
+
+    auto characteristic = m_batteryService->characteristic({QBluetoothUuid::CharacteristicType::BatteryLevel});
+    m_batteryService->readCharacteristic(characteristic);
+}
+

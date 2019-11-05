@@ -5,11 +5,11 @@
 class GuitarGenerator : public SampleGenerator
 {
 public:
-    GuitarGenerator(const Music::Interval&, QObject * parent = nullptr);
+    GuitarGenerator(QObject * parent = nullptr);
 };
 
-class DistortionGuitarGenerator : public SampleGenerator
+class ElectricGuitarGenerator : public SampleGenerator
 {
 public:
-    DistortionGuitarGenerator(const Music::Interval&, QObject * parent = nullptr);
+    ElectricGuitarGenerator(QObject * parent = nullptr);
 };

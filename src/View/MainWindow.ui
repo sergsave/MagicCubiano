@@ -1,120 +1,217 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
- <widget class="QWidget" name="MainWindow">
+ <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>600</height>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Magic Cubiano</string>
+   <string>MagicCubiano</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QToolButton {background-color: &quot;#dcdcdc&quot;}</string>
-  </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,3,1">
-   <property name="spacing">
-    <number>3</number>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="menuButton">
+        <property name="text">
+         <string>   ...   </string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QStackedWidget" name="stackedWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="presetsPage">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,1">
+            <item>
+             <widget class="QLabel" name="cubeStatusLabel">
+              <property name="text">
+               <string>Status</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="NotificationWidget" name="notificationWidget" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QLabel" name="volumeLabel">
+              <property name="text">
+               <string>Volume</string>
+              </property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignRight">
+             <widget class="QSlider" name="volumeSlider">
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="PresetSelectionWidget" name="presetSelectionWidget" native="true"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="noPresetPage">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="createNewButton">
+          <property name="text">
+           <string>Create new Preset</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="loadButton">
+          <property name="text">
+           <string>Load Preset</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="loadAllButton">
+          <property name="text">
+           <string>Load Presets from folder</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <action name="savePresetAction">
+   <property name="text">
+    <string>Save Preset</string>
    </property>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,3,1">
-     <item>
-      <widget class="PresetExchangeWidget" name="presetExchangeWidget" native="true"/>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QToolButton" name="settingsButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QFrame" name="edgesFrame">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
-     <property name="spacing">
-      <number>12</number>
-     </property>
-     <item row="1" column="0">
-      <widget class="QToolButton" name="resetButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Reset</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QToolButton" name="syncButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Sync</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="InstrumentSelectionWidget" name="instrumentsWidget" native="true"/>
-     </item>
-     <item row="1" column="1">
-      <widget class="PresetSelectionWidget" name="presetSelectionWidget" native="true"/>
-     </item>
-    </layout>
-   </item>
-  </layout>
+  </action>
+  <action name="loadPresetAction">
+   <property name="text">
+    <string>Load Preset</string>
+   </property>
+  </action>
+  <action name="newPresetAction">
+   <property name="text">
+    <string>New Preset</string>
+   </property>
+  </action>
+  <action name="clearPresetsAction">
+   <property name="text">
+    <string>Clear Presets</string>
+   </property>
+  </action>
+  <action name="presetsListAction">
+   <property name="text">
+    <string>Presets list</string>
+   </property>
+  </action>
+  <action name="loadAllPresetsAction">
+   <property name="text">
+    <string>Load Presets</string>
+   </property>
+  </action>
+  <action name="cubeStatusAction">
+   <property name="text">
+    <string>Cube Status</string>
+   </property>
+  </action>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>InstrumentSelectionWidget</class>
-   <extends>QWidget</extends>
-   <header>src/View/InstrumentSelectionWidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>PresetSelectionWidget</class>
    <extends>QWidget</extends>
@@ -122,9 +219,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>PresetExchangeWidget</class>
+   <class>NotificationWidget</class>
    <extends>QWidget</extends>
-   <header>src/View/PresetExchangeWidget.h</header>
+   <header>src/View/NotificationWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

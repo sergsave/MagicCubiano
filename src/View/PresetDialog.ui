@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PresetDialog</class>
+ <widget class="QDialog" name="PresetDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="PresetCreatingWidget" name="creatingPage"/>
+     <widget class="MainPresetEditingWidget" name="editingPage"/>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MainPresetEditingWidget</class>
+   <extends>QWidget</extends>
+   <header>src/View/MainPresetEditingWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PresetCreatingWidget</class>
+   <extends>QWidget</extends>
+   <header>src/View/PresetCreatingWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

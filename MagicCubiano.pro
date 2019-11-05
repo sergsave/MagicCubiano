@@ -8,10 +8,6 @@ CONFIG += c++14
 
 QT       += core gui bluetooth multimedia
 
-android{
-    QT       += androidextras
-}
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = MagicCubiano
@@ -33,53 +29,96 @@ SOURCES += \
     src/View/MainWindow.cpp \
     src/Protocol/GiikerProtocol.cpp \
     src/main.cpp \
-    src/View/ConnectionDialog.cpp \
-    src/View/EdgeWidget.cpp \
-    src/View/GuitarEdgeSettingsDialog.cpp \
     src/Music.cpp \
-    src/Sound/ToneGenerator.cpp \
     src/Sound/SampleGenerator.cpp \
     src/Sound/GuitarGenerators.cpp \
-    src/View/InstrumentSelectionWidget.cpp \
-    src/View/EdgeSettingsFactory.cpp \
-    src/View/SettingsDialog.cpp \
-    src/View/SelectionWidget.cpp \
+    src/Preset/SaveLoader.cpp \
+    src/Instruments/Descriptions.cpp \
     src/View/PresetSelectionWidget.cpp \
-    src/Preset.cpp \
-    src/View/PresetExchangeWidget.cpp
+    src/View/GuitarStringWidget.cpp \
+    src/Preset/NotationSerializer.cpp \
+    src/View/PresetDialog.cpp \
+    src/View/PresetCreatingWidget.cpp \
+    src/Preset/Storage.cpp \
+    src/View/SaveLoadHelper.cpp \
+    src/View/PresetListDialog.cpp \
+    src/View/PresetListElementWidget.cpp \
+    src/Model/Model.cpp \
+    src/Model/PresetModel.cpp \
+    src/Model/SettingsModel.cpp \
+    src/View/MainPresetEditingWidget.cpp \
+    src/View/PresetEditorWidget.cpp \
+    src/View/GuitarNotationsWidget.cpp \
+    src/Instruments/Common.cpp \
+    src/Instruments/Notations.cpp \
+    src/Preset/FactoryMethod.cpp \
+    src/View/Utils.cpp \
+    src/View/NotificationWidget.cpp \
+    src/View/CubeStatusDialog.cpp \
+    src/SoundView.cpp
 
 HEADERS += \
     src/View/MainWindow.h \
     src/Protocol/GiikerProtocol.h \
-    src/View/ConnectionDialog.h \
     src/CubeEdge.h \
-    src/View/EdgeWidget.h \
-    src/View/EdgeSettingsFactory.h \
-    src/View/GuitarEdgeSettingsDialog.h \
-    src/View/EdgeSettingsDialog.h \
     src/Music.h \
-    src/Sound/ToneGenerator.h \
     src/Sound/SoundGenerator.h \
     src/Sound/SoundGeneratorFactory.h \
     src/Sound/SampleGenerator.h \
     src/Configuration.h \
     src/Sound/GuitarGenerators.h \
-    src/View/InstrumentSelectionWidget.h \
-    src/View/SettingsDialog.h \
-    src/View/SelectionWidget.h \
+    src/Instruments/Notations.h \
+    src/Instruments/Descriptions.h \
+    src/Instruments/Common.h \
+    src/Preset/Storage.h \
+    src/Preset/SaveLoader.h \
+    src/Preset/NotationSerializer.h \
+    src/Preset/Serializer.h \
     src/View/PresetSelectionWidget.h \
-    src/Preset.h \
-    src/View/PresetExchangeWidget.h
+    src/Preset/Visitor.h \
+    src/View/Utils.h \
+    src/View/GuitarStringWidget.h \
+    src/View/PresetDialog.h \
+    src/View/PresetCreatingWidget.h \
+    src/View/SaveLoadHelper.h \
+    src/Preset/Presets.h \
+    src/View/PresetListDialog.h \
+    src/View/PresetListElementWidget.h \
+    src/Model/Model.h \
+    src/Model/PresetModel.h \
+    src/Model/SettingsModel.h \
+    src/View/MainPresetEditingWidget.h \
+    src/View/PresetEditorWidget.h \
+    src/View/GuitarNotationsWidget.h \
+    src/Preset/FactoryMethod.h \
+    src/View/NotificationWidget.h \
+    src/View/CubeStatusDialog.h \
+    src/SoundView.h
 
 FORMS += \
+    src/View/PresetSelectionWidget.ui \
+    src/View/GuitarStringWidget.ui \
     src/View/MainWindow.ui \
-    src/View/ConnectionDialog.ui \
-    src/View/EdgeWidget.ui \
-    src/View/GuitarEdgeSettingsDialog.ui \
-    src/View/SettingsDialog.ui \
-    src/View/SelectionWidget.ui
+    src/View/PresetCreatingWidget.ui \
+    src/View/PresetDialog.ui \
+    src/View/PresetListDialog.ui \
+    src/View/MainPresetEditingWidget.ui \
+    src/View/PresetEditorWidget.ui \
+    src/View/NotificationWidget.ui \
+    src/View/CubeStatusDialog.ui
 
 RESOURCES += \
     resources/Guitar.qrc \
     resources/DistortionGuitar.qrc \
     resources/Other.qrc
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+
+DISTFILES += \
+    android/AndroidManifest.xml \
+    android/gradle/wrapper/gradle-wrapper.jar \
+    android/gradlew \
+    android/res/values/libs.xml \
+    android/build.gradle \
+    android/gradle/wrapper/gradle-wrapper.properties \
+    android/gradlew.bat

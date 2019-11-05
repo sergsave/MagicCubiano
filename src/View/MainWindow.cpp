@@ -1,230 +1,247 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
-#include "ConnectionDialog.h"
-
-#include <QScopedPointer>
 #include <QDesktopWidget>
+#include <QMenu>
 
-#include <cassert>
+#include "src/Preset/Presets.h"
+#include "PresetDialog.h"
+#include "CubeStatusDialog.h"
+#include "SaveLoadHelper.h"
+#include "PresetListDialog.h"
+#include "Utils.h"
 
-MainWindow::MainWindow(QWidget *parent):
-    QWidget(parent),
-    m_ui(new Ui::MainWindow)
+MainWindow::MainWindow(Model * model, QWidget *parent)
+    : QMainWindow(parent)
+    , m_ui(new Ui::MainWindow)
+    , m_presetModel(model->presets())
+    , m_settings(model->settings())
+    , m_protocol(model->remoteProtocol())
 {
     m_ui->setupUi(this);
-
-    createSettingsFactory();
-    createEdgeWidgets();
 
     QRect scr = QApplication::desktop()->screenGeometry();
     move( scr.center() - rect().center() );
 
-    connect(m_ui->syncButton, &QAbstractButton::clicked, this, &MainWindow::synchronizeEdgesRotation);
-    connect(m_ui->resetButton, &QAbstractButton::clicked, this, &MainWindow::setDefaultHarmonies);
-    connect(m_ui->settingsButton, &QAbstractButton::clicked, this, &MainWindow::enterGlobalSettings);
-    connect(m_ui->instrumentsWidget, &InstrumentSelectionWidget::instrumentTypeChanged,
-            this, &MainWindow::onInstrumentTypeChanged);
+    createMenu();
+    updatePresetPage();
+    updateActionsState();
 
-    initPresets();
+    connect(m_ui->presetSelectionWidget, &PresetSelectionWidget::presetOpenRequested, this,
+        &MainWindow::onOpenRequested);
+
+    connect(m_presetModel, &PresetModel::changed, this, [this] {
+        updatePresetPage();
+        updateActionsState();
+
+        const QSignalBlocker blocker(m_ui->presetSelectionWidget);
+        Q_UNUSED(blocker);
+        m_ui->presetSelectionWidget->setPresets(m_presetModel->allPresets());
+        m_ui->presetSelectionWidget->setSelectedPreset(m_presetModel->activePreset());
+
+        for(auto preset: m_presetModel->allPresets())
+        {
+            auto instrument = instrumentName(m_presetModel->findPreset(preset));
+            m_ui->presetSelectionWidget->setPresetAdditionalInfo(preset, instrument);
+        }
+    });
+
+    connect(m_ui->presetSelectionWidget, &PresetSelectionWidget::presetSelected, m_presetModel,
+        &PresetModel::setActivePreset);
+
+    auto syncSettingsUi = [this] {
+        int vol = m_settings->volume();
+        m_ui->volumeSlider->setValue(vol);
+        m_ui->volumeLabel->setText(QString("Vol. \n%1").arg(vol));
+    };
+
+    syncSettingsUi();
+    connect(m_settings, &SettingsModel::changed, this, syncSettingsUi);
+    connect(m_ui->volumeSlider, &QSlider::valueChanged, m_settings, &SettingsModel::setVolume);
+
+    connect(m_protocol, &GiikerProtocol::cubeEdgeTurned, this, &MainWindow::onEdgeTurned);
+
+    auto updateStatus = [this] {
+        const bool isConnected = m_protocol->state() == GiikerProtocol::CONNECTED;
+
+        QString statusLabelText = "Status: ";
+        statusLabelText += isConnected ? "Connected" : "Disconnected";
+        m_ui->cubeStatusLabel->setText(statusLabelText);
+
+        const QString notificationIdleText = isConnected ?
+                    "Turn the cube and play music!" :
+                    "Connect the cube for playing music!";
+
+        m_ui->notificationWidget->setIdleMessage(notificationIdleText);
+    };
+
+    updateStatus();
+
+    connect(m_protocol, &GiikerProtocol::connected, this, updateStatus);
+    connect(m_protocol, &GiikerProtocol::disconnected, this, updateStatus);
 }
 
-MainWindow::~MainWindow()
-{
-    for(auto w: edgeWidgets()) w->setSettingsFactory(nullptr);
-}
+MainWindow::~MainWindow() = default;
 
 void MainWindow::start()
 {
-    m_dialog = new ConnectionDialog(this);
-
-    connect(m_dialog, &ConnectionDialog::connectAnyRequested, this, &MainWindow::connectAnyRequested);
-    connect(m_dialog, &ConnectionDialog::connectByAddressRequested, this, &MainWindow::connectByAddressRequested);
-    m_dialog->exec();
-
+    showStatusDialog(true);
     show();
 }
 
-Music::Harmony MainWindow::harmonyFor(const CubeEdge & edge) const
+void MainWindow::createMenu()
 {
-    auto edgeWidget = m_color2edges.value(edge.color, nullptr);
+    auto menu = new QMenu(this);
 
-    if(!edgeWidget)
-        return {};
+    menu->addSeparator();
+    auto newPresetAction = menu->addAction("New Preset");
+    auto loadPresetAction = menu->addAction("Load Preset");
+    auto loadAllPresetsAction = menu->addAction("Load Presets");
+    auto savePresetAction = menu->addAction("Save Preset");
+    menu->addSeparator();
+    auto presetsListAction = menu->addAction("Presets list");
+    menu->addSeparator();
+    auto cubeStatusAction = menu->addAction("Cube Status");
 
-    auto harmony = edgeWidget->harmony(edge.rotation);
-    harmony.delayMSec = harmonyDelayMsec();
+    // Use custom instead QMenuBar. QMenuBar is looking terrible on Android
+    connect(m_ui->createNewButton, &QAbstractButton::clicked, newPresetAction, &QAction::trigger);
+    connect(m_ui->loadButton, &QAbstractButton::clicked, loadPresetAction, &QAction::trigger);
+    connect(m_ui->loadAllButton, &QAbstractButton::clicked, loadAllPresetsAction, &QAction::trigger);
 
-    return harmony;
+    auto saveLoadHelper = new SaveLoadHelper(this);
+    connect(newPresetAction, &QAction::triggered, this, &MainWindow::onCreateNew);
+    connect(loadPresetAction, &QAction::triggered, saveLoadHelper, &SaveLoadHelper::choosePathForLoading);
+    connect(loadAllPresetsAction, &QAction::triggered, saveLoadHelper,
+        &SaveLoadHelper::choosePathForLoadingAll);
+    connect(savePresetAction, &QAction::triggered, this, [saveLoadHelper, this] {
+        saveLoadHelper->choosePathForSaving(m_presetModel->activePreset());
+    });
+    connect(presetsListAction, &QAction::triggered, this, &MainWindow::showPresetListDialog);
+    connect(cubeStatusAction, &QAction::triggered, this, &MainWindow::showStatusDialog);
+
+    // TODO: Handle save-load errors
+    connect(saveLoadHelper, &SaveLoadHelper::loadRequested, m_presetModel, &PresetModel::loadPreset);
+    connect(saveLoadHelper, &SaveLoadHelper::loadAllRequested, m_presetModel, &PresetModel::loadAllPresets);
+    connect(saveLoadHelper, &SaveLoadHelper::saveRequested, m_presetModel, &PresetModel::savePresets);
+
+    m_nonEmptyPresetsActions << savePresetAction << presetsListAction;
+
+    bindMenu(menu, m_ui->menuButton);
 }
 
-void MainWindow::highlightEdge(CubeEdge::Color color)
+void MainWindow::onEdgeTurned(const CubeEdge& edge)
 {
-    if(auto edge = m_color2edges.value(color, nullptr))
-        edge->indicate();
+    if(m_presetDialog)
+        m_presetDialog->onEdgeTurned(edge);
+
+    auto activePreset = m_presetModel->findPreset(m_presetModel->activePreset());
+    if(!activePreset)
+        return;
+
+    auto harmony = activePreset->toHarmony(edge);
+    m_ui->notificationWidget->notify(edge, harmony);
 }
 
-Music::Instrument MainWindow::instrumentType() const
+void MainWindow::createPresetDialog()
 {
-    return m_ui->instrumentsWidget->instrumentType();
+    m_presetDialog.reset(new PresetDialog);
 }
 
-int MainWindow::volume() const
+void MainWindow::onCreateNew()
 {
-    return m_globalSettings.volume;
+    createPresetDialog();
+    auto sourceName = m_presetModel->findVacantName("New preset");
+    m_presetDialog->openCreatePresetPage(sourceName);
+
+    connect(m_presetDialog.data(), &PresetDialog::presetCreated, this, [this](auto name, auto preset) {
+        if(!preset)
+            return;
+
+        auto vacName = m_presetModel->findVacantName(name);
+        m_presetModel->addPreset(vacName, preset);
+
+        this->updatePresetPage();
+    });
+    m_presetDialog->exec();
 }
 
-void MainWindow::connected()
+void MainWindow::onOpenRequested(const QString &name)
 {
-    if(m_dialog) m_dialog->connected();
+    auto preset =  m_presetModel->findPreset(name);
+    createPresetDialog();
+    m_presetDialog->openEditPresetPage(name, preset);
+
+    QScopedPointer<Preset::AbstractPreset::Backup> backup(preset->createBackup());
+
+    if(m_presetDialog->exec() == QDialog::Rejected)
+        backup->restore();
+
+    updatePresetPage();
 }
 
-void MainWindow::connectionFailed()
+void MainWindow::showPresetListDialog()
 {
-    if(m_dialog) m_dialog->connectionFailed();
+    PresetListDialog dialog;
+    dialog.setPresetList(m_presetModel->allPresets());
+    auto res = dialog.exec();
+
+    if(res == QDialog::Rejected)
+        return;
+
+    auto renamed = dialog.renamedPresets();
+    for(auto oldName: renamed.keys())
+    {
+        auto newName = renamed.value(oldName);
+        m_presetModel->renamePreset(oldName, newName);
+    }
+
+    for(auto name: dialog.removedPresets())
+        m_presetModel->removePreset(name);
 }
 
-void MainWindow::createEdgeWidgets()
+void MainWindow::updatePresetPage()
 {
-    using Col = CubeEdge::Color;
+    if(!m_presetModel->allPresets().isEmpty())
+        m_ui->stackedWidget->setCurrentWidget(m_ui->presetsPage);
+    else
+        m_ui->stackedWidget->setCurrentWidget(m_ui->noPresetPage);
+}
 
-    assert(m_color2edges.empty());
+void MainWindow::updateActionsState()
+{
+    for(auto a : m_nonEmptyPresetsActions)
+        a->setDisabled(m_presetModel->allPresets().isEmpty());
+}
 
-    auto layout = m_ui->edgesFrame->layout();
-    if(!layout)
-        layout = new QVBoxLayout(m_ui->edgesFrame);
+void MainWindow::showStatusDialog(bool closeOnConnect)
+{
+    CubeStatusDialog dialog;
 
-    auto addWidget = [layout, this] (CubeEdge::Color col) {
-        auto w = new EdgeWidget(col, m_settingsFactory.data(), this);
-        layout->addWidget(w);
-
-        m_color2edges[col] = w;
+    auto updatePage = [&dialog, this] {
+        if(m_protocol && m_protocol->state() == GiikerProtocol::CONNECTED)
+            dialog.goToConnectedPage();
+        else
+            dialog.goToDisconnectedPage();
     };
 
-    addWidget(Col::YELLOW);
-    addWidget(Col::ORANGE);
-    addWidget(Col::RED);
-    addWidget(Col::GREEN);
-    addWidget(Col::WHITE);
-    addWidget(Col::BLUE);
+    connect(&dialog, &CubeStatusDialog::connectAnyRequested, m_protocol, &GiikerProtocol::connectToCube);
+    connect(&dialog, &CubeStatusDialog::connectByAddressRequested, m_protocol,
+            &GiikerProtocol::connectToCubeByAddress);
+    connect(&dialog, &CubeStatusDialog::batteryLevelRequested, m_protocol,
+            &GiikerProtocol::requestBatteryLevel);
+    connect(&dialog, &CubeStatusDialog::disconnectRequested, m_protocol, &GiikerProtocol::disconnectFromCube);
+    connect(&dialog, &CubeStatusDialog::rejected, m_protocol, &GiikerProtocol::cancelConnection);
 
-    setDefaultHarmonies();
+    connect(m_protocol, &GiikerProtocol::connected, &dialog, updatePage);
+    connect(m_protocol, &GiikerProtocol::connectionFailed, &dialog, &CubeStatusDialog::onConnectionFailed);
+    connect(m_protocol, &GiikerProtocol::disconnected, &dialog, updatePage);
+    connect(m_protocol, &GiikerProtocol::batteryLevelResponsed, &dialog, &CubeStatusDialog::setBatteryLevel);
+
+    if(closeOnConnect)
+        connect(m_protocol, &GiikerProtocol::connected, &dialog, &CubeStatusDialog::accept);
+
+    updatePage();
+
+    dialog.exec();
 }
 
-void MainWindow::onInstrumentTypeChanged(Music::Instrument ins)
-{
-    updateSettingsFactory();
-    emit instrumentTypeChanged(ins);
-}
-
-void MainWindow::onPresetChanged(const PresetSelectionWidget::NamedPreset& preset)
-{
-    auto setupEdgeWidgets = [this, &preset](CubeEdge::Rotation rot){
-        auto ews = edgeWidgets();
-        auto colors = preset.second[rot];
-
-        for(auto key: colors.keys())
-            ews[key]->setHarmony(colors.value(key), rot);
-    };
-
-    setupEdgeWidgets(CubeEdge::CLOCKWIZE);
-    setupEdgeWidgets(CubeEdge::ANTICLOCKWIZE);
-}
-
-void MainWindow::createSettingsFactory()
-{
-    auto type = m_ui->instrumentsWidget->instrumentType();
-    m_settingsFactory.reset(EdgeSettingsFactory::createInstance(type));
-}
-
-void MainWindow::updateSettingsFactory()
-{
-    createSettingsFactory();
-
-    for(auto ew: edgeWidgets())
-        ew->setSettingsFactory(m_settingsFactory.data());
-}
-
-QList<EdgeWidget *> MainWindow::edgeWidgets()
-{
-    assert(!m_color2edges.empty());
-    return m_color2edges.values();
-}
-
-void MainWindow::setAllDirectionHarmony(EdgeWidget *ew, const Music::Harmony& harm)
-{
-    ew->setHarmony(harm, CubeEdge::Rotation::ANTICLOCKWIZE);
-    ew->setHarmony(harm, CubeEdge::Rotation::CLOCKWIZE);
-}
-
-void MainWindow::synchronizeEdgesRotation()
-{
-    for(auto ew: edgeWidgets())
-    {
-        if(!ew) continue;
-        ew->indicate();
-
-        auto currHarmony = ew->harmony(ew->rotateDirection());
-        setAllDirectionHarmony(ew, currHarmony);
-    }
-}
-
-void MainWindow::setDefaultHarmonies()
-{
-    for(auto ew: edgeWidgets())
-    {
-        if(!ew) continue;
-        ew->indicate();
-
-        using namespace Music;
-
-        auto tone = Tone(Tone::E, 2);
-        auto delay = harmonyDelayMsec();
-        auto harmony = Harmony({tone}, delay);
-
-        setAllDirectionHarmony(ew, harmony);
-    }
-}
-
-int MainWindow::harmonyDelayMsec() const
-{
-    return m_globalSettings.delayMSec;
-}
-
-void MainWindow::enterGlobalSettings()
-{
-    auto oldSettings = m_globalSettings;
-
-    SettingsDialog dialog(oldSettings);
-    if(dialog.exec() == QDialog::Accepted)
-       m_globalSettings = dialog.settings();
-
-    auto vol = m_globalSettings.volume;
-    if(vol != oldSettings.volume)
-        emit volumeChanged(vol);
-}
-
-void MainWindow::initPresets()
-{
-    auto exchangeW = m_ui->presetExchangeWidget;
-    auto selectionW = m_ui->presetSelectionWidget;
-
-    exchangeW->setPresetCompositor([this]{
-        Preset preset;
-
-        for(auto w: edgeWidgets())
-        {
-            auto color = w->edgeColor();
-            preset[CubeEdge::CLOCKWIZE][color] = w->harmony(CubeEdge::CLOCKWIZE);
-            preset[CubeEdge::ANTICLOCKWIZE][color] = w->harmony(CubeEdge::ANTICLOCKWIZE);
-        }
-
-        return preset;
-    });
-
-    connect(exchangeW, &PresetExchangeWidget::presetImported, selectionW, [selectionW] (auto name, auto preset) {
-        selectionW->addPreset({name, preset});
-    });
-
-    connect(selectionW, &PresetSelectionWidget::presetChanged, this, &MainWindow::onPresetChanged);
-}

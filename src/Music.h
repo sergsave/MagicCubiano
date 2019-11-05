@@ -5,15 +5,7 @@
 
 namespace Music {
 
-enum class Instrument
-{
-    GUITAR,
-    DISTORTION_GUITAR,
-    PIANO,
-    BEEPER
-};
-
-// Attention! enum Note is used for preset serialization
+// Attention! enum Note is used for serialization
 struct Tone
 {
     // Order in frequency increasement
@@ -40,13 +32,14 @@ using Tones = QVector<Tone>;
 Tones allTonesFor(int octave);
 Tones allTonesFor(const Interval& interval);
 
+// TODO: Duration for each tone!
 struct Harmony
 {
     Harmony() {}
-    Harmony(const Tones&, int delayMSec);
+    Harmony(const Tones&, int minToneDurationMSec);
 
     Tones tones;
-    int delayMSec = 0;
+    int minToneDurationMSec = 0;
 };
 
 bool operator == (const Tone& lhs, const Tone& rhs);

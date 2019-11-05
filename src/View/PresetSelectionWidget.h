@@ -1,26 +1,46 @@
 #pragma once
 
+#include <QWidget>
 #include <QList>
-#include "SelectionWidget.h"
+#include <QMap>
+#include <QScopedPointer>
 
-#include "src/Preset.h"
+namespace Ui {
+class PresetSelectionWidget;
+}
 
-class PresetSelectionWidget: public SelectionWidget
+class PresetSelectionWidget : public QWidget
 {
     Q_OBJECT
+
 public:
-    using NamedPreset = QPair<QString, Preset>;
+    explicit PresetSelectionWidget(QWidget *parent = 0);
+    ~PresetSelectionWidget();
 
-    PresetSelectionWidget(QWidget * parent = nullptr);
+    // Reset selected preset to first
+    void setPresets(const QStringList& presets);
+    QStringList presets() const;
 
-    void addPreset(const NamedPreset&);
+    void setPresetAdditionalInfo(const QString& preset, const QString& info);
+    QString presetAdditionalInfo(const QString& preset) const;
 
-    NamedPreset preset() const;
-    QList<NamedPreset> presets() const;
+    QString selectedPreset() const;
+
+public slots:
+    void setSelectedPreset(const QString&);
 
 signals:
-    void presetChanged(const NamedPreset& preset);
+    void presetSelected(const QString&);
+    void presetOpenRequested(const QString&);
 
 private:
-    QList<NamedPreset> m_presets;
+    void changeIndex(int newIdx, bool forceChanged = false);
+    void updateDirectionButtonsState();
+    void updateState();
+
+private:
+    QStringList m_presets;
+    QMap<QString, QString> m_presets2info;
+    int m_index = 0;
+    QScopedPointer<Ui::PresetSelectionWidget> m_ui;
 };

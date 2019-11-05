@@ -2,23 +2,17 @@
 
 #include <cassert>
 
-#include "ToneGenerator.h"
 #include "GuitarGenerators.h"
+#include "src/Instruments/Common.h"
 
-#include "src/Configuration.h"
-
-SoundGenerator * createSoundGenerator(Music::Instrument type, QObject * parent = nullptr)
+SoundGenerator * createSoundGenerator(Instruments::Type type, QObject * parent = nullptr)
 {    
-    auto interval = Configuration::intervalFor(type);
-
     switch (type)
     {
-    case Music::Instrument::BEEPER:
-        return new ToneGenerator(interval, parent);
-    case Music::Instrument::GUITAR:
-        return new GuitarGenerator(interval, parent);
-    case Music::Instrument::DISTORTION_GUITAR:
-        return new DistortionGuitarGenerator(interval, parent);
+    case Instruments::Type::GUITAR:
+        return new GuitarGenerator(parent);
+    case Instruments::Type::ELECTRIC_GUITAR:
+        return new ElectricGuitarGenerator(parent);
     default:
         assert(!"unsupported");
         return nullptr;

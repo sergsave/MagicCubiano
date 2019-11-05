@@ -39,8 +39,8 @@ QString Tone::toString(Format f) const
     return {};
 }
 
-Harmony::Harmony(const Tones & tones, int delayMSec):
-    tones(tones), delayMSec(delayMSec)
+Harmony::Harmony(const Tones & tones, int dur):
+    tones(tones), minToneDurationMSec(dur)
 {}
 
 Tones allTonesFor(int o)
@@ -55,6 +55,9 @@ Tones allTonesFor(const Interval &interval)
 {
     const auto min = interval.min;
     const auto max = interval.max;
+
+    if(min > max)
+        return {};
 
     const auto fullOctave = Music::allTonesFor(0);
 
@@ -72,9 +75,7 @@ Tones allTonesFor(const Interval &interval)
             pos = minIdx;
 
         if(o == max.octave)
-            len = maxIdx - pos;
-
-        if(len > 0) ++len;
+            len = 1 + maxIdx - pos;
 
         allTones << Music::allTonesFor(o).mid(pos, len);
     }
