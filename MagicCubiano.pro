@@ -8,10 +8,6 @@ CONFIG += c++14
 
 QT       += core gui bluetooth multimedia
 
-android{
-    QT       += androidextras
-}
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = MagicCubiano
@@ -115,3 +111,14 @@ RESOURCES += \
     resources/Guitar.qrc \
     resources/DistortionGuitar.qrc \
     resources/Other.qrc
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+
+DISTFILES += \
+    android/AndroidManifest.xml \
+    android/gradle/wrapper/gradle-wrapper.jar \
+    android/gradlew \
+    android/res/values/libs.xml \
+    android/build.gradle \
+    android/gradle/wrapper/gradle-wrapper.properties \
+    android/gradlew.bat
