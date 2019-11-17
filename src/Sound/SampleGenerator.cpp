@@ -33,7 +33,13 @@ Music::Interval SampleGenerator::interval() const
 
 void SampleGenerator::doPlay(const Music::Harmony & harm, int volume)
 {
-    qDeleteAll(m_players);
+    for(auto p: m_players)
+    {
+        p->setMuted(true);
+
+        const int antiClickDelay = 10;
+        QTimer::singleShot(antiClickDelay, p, &QObject::deleteLater);
+    }
     m_players.clear();
 
     for(int i = 0; i != harm.tones.size(); ++i)
