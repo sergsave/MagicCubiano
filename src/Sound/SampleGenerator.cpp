@@ -37,7 +37,7 @@ void SampleGenerator::doPlay(const Music::Harmony & harm, int volume)
     {
         p->setMuted(true);
 
-        const int antiClickDelay = 10;
+        const int antiClickDelay = 20;
         QTimer::singleShot(antiClickDelay, p, &QObject::deleteLater);
     }
     m_players.clear();
