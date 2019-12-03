@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include <QSoundEffect>
+#include <QEventLoop>
 #include <QAudio>
 #include <QTimer>
 #include <QFileInfo>
@@ -34,12 +35,14 @@ Music::Interval SampleGenerator::interval() const
 void SampleGenerator::doPlay(const Music::Harmony & harm, int volume)
 {
     for(auto p: m_players)
-    {
         p->setMuted(true);
 
-        const int antiClickDelay = 20;
-        QTimer::singleShot(antiClickDelay, p, &QObject::deleteLater);
-    }
+    const int antiClickDelay = 10;
+    QEventLoop loop;
+    QTimer::singleShot(antiClickDelay, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    qDeleteAll(m_players);
     m_players.clear();
 
     for(int i = 0; i != harm.tones.size(); ++i)
